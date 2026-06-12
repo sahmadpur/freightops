@@ -29,6 +29,8 @@ export function ContactsEditor({
 
   return (
     <div className="space-y-3">
+      {/* Index keys are fine here: rows are only user-edited, inputs are controlled,
+          and state lives in the parent form. Not suitable for sorted/filtered lists. */}
       {contacts.map((c, i) => (
         <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
           <div className="mb-2 flex items-center justify-between">
