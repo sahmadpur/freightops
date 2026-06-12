@@ -8,6 +8,6 @@ export default defineConfig({
     passWithNoTests: true,
   },
   resolve: {
-    alias: { "@": path.resolve(path.dirname(import.meta.url.slice(7)), "./src") },
+    alias: { "@": path.resolve(import.meta.dirname, "./src") },
   },
 });
