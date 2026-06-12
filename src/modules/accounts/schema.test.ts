@@ -45,4 +45,26 @@ describe("accountInputSchema", () => {
     const many = Array.from({ length: 21 }, (_, i) => ({ name: `C${i}`, phones: [], emails: [] }));
     expect(accountInputSchema.safeParse({ ...valid, contacts: many }).success).toBe(false);
   });
+
+  it("rejects whitespace-only contact name", () => {
+    const r = accountInputSchema.safeParse({
+      ...valid,
+      contacts: [{ name: "   ", phones: [], emails: [] }],
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("rejects too-short phone numbers", () => {
+    const r = accountInputSchema.safeParse({
+      ...valid,
+      contacts: [{ name: "X", phones: ["1"], emails: [] }],
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("treats whitespace-only optional fields as empty", () => {
+    const r = accountInputSchema.safeParse({ ...valid, taxId: "   " });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.taxId || null).toBeNull();
+  });
 });

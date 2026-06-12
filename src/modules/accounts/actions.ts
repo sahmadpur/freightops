@@ -57,10 +57,16 @@ export async function updateAccount(id: string, input: unknown): Promise<ActionR
   if (!parsed.success) return { ok: false, fieldErrors: parsed.error.flatten().fieldErrors };
   const data = parsed.data;
 
-  const before = await db.query.accounts.findFirst({ where: eq(accounts.id, id) });
-  if (!before) return { ok: false, error: "not_found" };
+  const result = await db.transaction(async (tx) => {
+    const before = await tx.query.accounts.findFirst({ where: eq(accounts.id, id) });
+    if (!before) return "not_found" as const;
 
-  await db.transaction(async (tx) => {
+    const beforeContacts = await tx
+      .select({ name: contacts.name })
+      .from(contacts)
+      .where(and(eq(contacts.parentType, "account"), eq(contacts.parentId, id)))
+      .orderBy(contacts.createdAt);
+
     const after = {
       title: data.title,
       taxId: data.taxId || null,
@@ -69,7 +75,9 @@ export async function updateAccount(id: string, input: unknown): Promise<ActionR
     };
     await tx.update(accounts).set(after).where(eq(accounts.id, id));
 
-    // Contacts: replace-all strategy (simple and audit-friendly for v1)
+    // Contacts: replace-all strategy (simple and audit-friendly for v1).
+    // Contact ids regenerate on every update — fine while nothing references them
+    // (Phase 4 notifications re-read contact emails at send time).
     await tx.delete(contacts).where(and(eq(contacts.parentType, "account"), eq(contacts.parentId, id)));
     if (data.contacts.length > 0) {
       await tx.insert(contacts).values(
@@ -84,19 +92,23 @@ export async function updateAccount(id: string, input: unknown): Promise<ActionR
     }
 
     const changes = auditDiff(before, after, AUDITED_FIELDS);
-    changes.push({
-      field: "contacts",
-      oldValue: null,
-      newValue: data.contacts.map((c) => c.name).join(", ") || null,
-    });
-    await recordAudit(tx, {
-      userId: session.user.id,
-      entityType: "account",
-      entityId: id,
-      action: "updated",
-      changes,
-    });
+    const oldNames = beforeContacts.map((c) => c.name).join(", ") || null;
+    const newNames = data.contacts.map((c) => c.name).join(", ") || null;
+    if (oldNames !== newNames) {
+      changes.push({ field: "contacts", oldValue: oldNames, newValue: newNames });
+    }
+    if (changes.length > 0) {
+      await recordAudit(tx, {
+        userId: session.user.id,
+        entityType: "account",
+        entityId: id,
+        action: "updated",
+        changes,
+      });
+    }
+    return "ok" as const;
   });
 
+  if (result === "not_found") return { ok: false, error: "not_found" };
   return { ok: true, id };
 }
