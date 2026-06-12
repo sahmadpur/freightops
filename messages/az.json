@@ -30,5 +30,47 @@
     "arrived": "Çatıb",
     "delivered": "Təhvil verilib",
     "closed": "Bağlanıb"
+  },
+  "actions": {
+    "new": "Yarat",
+    "edit": "Redaktə et",
+    "view": "Bax",
+    "save": "Yadda saxla",
+    "cancel": "Ləğv et",
+    "back": "Geri",
+    "saving": "Yadda saxlanılır..."
+  },
+  "fields": {
+    "companyTitle": "Şirkətin adı",
+    "taxId": "VÖEN",
+    "address": "Şirkətin ünvanı",
+    "notes": "Şərhlər / qeydlər",
+    "contacts": "Əlaqələr",
+    "contactName": "Ad, soyad",
+    "phones": "Telefonlar",
+    "emails": "E-poçt",
+    "addContact": "Əlaqə əlavə et",
+    "addPhone": "Telefon əlavə et",
+    "addEmail": "E-poçt əlavə et",
+    "remove": "Sil",
+    "createdAt": "Yaradılıb",
+    "orders": "Sifarişlər",
+    "orderHistory": "Sifariş tarixçəsi",
+    "noOrdersYet": "Hələ sifariş yoxdur",
+    "actionsCol": "Əməliyyatlar"
+  },
+  "accounts": {
+    "newAccount": "Yeni müştəri",
+    "editAccount": "Müştərini redaktə et",
+    "notFound": "Müştəri tapılmadı",
+    "searchPlaceholder": "Müştəri axtar...",
+    "empty": "Hələ müştəri yoxdur — birincisini yaradın."
+  },
+  "carriers": {
+    "newCarrier": "Yeni daşıyıcı",
+    "editCarrier": "Daşıyıcını redaktə et",
+    "notFound": "Daşıyıcı tapılmadı",
+    "searchPlaceholder": "Daşıyıcı axtar...",
+    "empty": "Hələ daşıyıcı yoxdur — birincisini yaradın."
   }
 }

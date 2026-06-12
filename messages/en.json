@@ -30,5 +30,47 @@
     "arrived": "Arrived",
     "delivered": "Delivered",
     "closed": "Closed"
+  },
+  "actions": {
+    "new": "New",
+    "edit": "Edit",
+    "view": "View",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "saving": "Saving..."
+  },
+  "fields": {
+    "companyTitle": "Company title",
+    "taxId": "Tax ID",
+    "address": "Company address",
+    "notes": "Comments / notes",
+    "contacts": "Contacts",
+    "contactName": "Name, surname",
+    "phones": "Phones",
+    "emails": "Emails",
+    "addContact": "Add contact",
+    "addPhone": "Add phone",
+    "addEmail": "Add email",
+    "remove": "Remove",
+    "createdAt": "Created",
+    "orders": "Orders",
+    "orderHistory": "Order history",
+    "noOrdersYet": "No orders yet",
+    "actionsCol": "Actions"
+  },
+  "accounts": {
+    "newAccount": "New account",
+    "editAccount": "Edit account",
+    "notFound": "Account not found",
+    "searchPlaceholder": "Search accounts...",
+    "empty": "No accounts yet — create the first one."
+  },
+  "carriers": {
+    "newCarrier": "New carrier",
+    "editCarrier": "Edit carrier",
+    "notFound": "Carrier not found",
+    "searchPlaceholder": "Search carriers...",
+    "empty": "No carriers yet — create the first one."
   }
 }
