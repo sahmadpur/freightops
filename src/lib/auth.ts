@@ -3,6 +3,9 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 
+const secret = process.env.BETTER_AUTH_SECRET;
+if (!secret) throw new Error("BETTER_AUTH_SECRET env var is required");
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -15,6 +18,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    disableSignUp: true,
   },
   user: {
     additionalFields: {
@@ -24,7 +28,7 @@ export const auth = betterAuth({
       active: { type: "boolean", defaultValue: true, input: false },
     },
   },
-  secret: process.env.BETTER_AUTH_SECRET,
+  secret,
   baseURL: process.env.BETTER_AUTH_URL,
 });
 
