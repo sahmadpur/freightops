@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import { LOCALES, type Locale } from "@/i18n/locale";
 import { setLocale } from "./language-switcher.actions";
 
+const LOCALE_NAMES: Record<Locale, string> = {
+  en: "English",
+  ru: "Russian",
+  az: "Azerbaijani",
+};
+
 export function LanguageSwitcher() {
   const current = useLocale();
   const router = useRouter();
@@ -20,6 +26,8 @@ export function LanguageSwitcher() {
         <button
           key={l}
           onClick={() => choose(l)}
+          aria-pressed={l === current}
+          aria-label={`Switch to ${LOCALE_NAMES[l]}`}
           className={`px-2.5 py-1 rounded-full text-xs border ${
             l === current
               ? "bg-[#1a3a5c] text-white border-[#1a3a5c]"
