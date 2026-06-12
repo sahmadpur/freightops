@@ -1,0 +1,34 @@
+"use client";
+
+import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
+import { LOCALES, type Locale } from "@/i18n/locale";
+import { setLocale } from "./language-switcher.actions";
+
+export function LanguageSwitcher() {
+  const current = useLocale();
+  const router = useRouter();
+
+  async function choose(locale: Locale) {
+    await setLocale(locale);
+    router.refresh();
+  }
+
+  return (
+    <div className="flex gap-1">
+      {LOCALES.map((l) => (
+        <button
+          key={l}
+          onClick={() => choose(l)}
+          className={`px-2.5 py-1 rounded-full text-xs border ${
+            l === current
+              ? "bg-[#1a3a5c] text-white border-[#1a3a5c]"
+              : "text-slate-500 border-slate-300"
+          }`}
+        >
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}

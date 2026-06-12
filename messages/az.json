@@ -1,0 +1,34 @@
+{
+  "common": {
+    "appName": "FreightOps",
+    "signIn": "Daxil ol",
+    "signOut": "Çıxış",
+    "save": "Yadda saxla",
+    "cancel": "Ləğv et",
+    "search": "Axtarış"
+  },
+  "nav": {
+    "orders": "Sifarişlər",
+    "dashboard": "İdarə paneli",
+    "accounts": "Müştərilər",
+    "carriers": "Daşıyıcılar",
+    "transportation": "Nəqliyyat",
+    "finance": "Maliyyə",
+    "documents": "Sənədlər",
+    "users": "İstifadəçilər və rollar",
+    "audit": "Audit jurnalı",
+    "myOrders": "Sifarişlərim"
+  },
+  "status": {
+    "created": "Yaradılıb",
+    "received": "Qəbul edilib",
+    "internal_transit": "Daxili tranzit",
+    "loaded": "Yüklənib",
+    "transit": "Yoldadır",
+    "at_border": "Sərhəddə",
+    "at_customs": "Gömrükdə",
+    "arrived": "Çatıb",
+    "delivered": "Təhvil verilib",
+    "closed": "Bağlanıb"
+  }
+}

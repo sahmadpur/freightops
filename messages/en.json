@@ -1,0 +1,34 @@
+{
+  "common": {
+    "appName": "FreightOps",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search"
+  },
+  "nav": {
+    "orders": "Orders",
+    "dashboard": "Dashboard",
+    "accounts": "Accounts",
+    "carriers": "Carriers",
+    "transportation": "Transportation",
+    "finance": "Finance",
+    "documents": "Documents",
+    "users": "Users & Roles",
+    "audit": "Audit Log",
+    "myOrders": "My orders"
+  },
+  "status": {
+    "created": "Created",
+    "received": "Received",
+    "internal_transit": "Internal transit",
+    "loaded": "Loaded",
+    "transit": "Transit",
+    "at_border": "At the border",
+    "at_customs": "At customs",
+    "arrived": "Arrived",
+    "delivered": "Delivered",
+    "closed": "Closed"
+  }
+}

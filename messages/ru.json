@@ -1,0 +1,34 @@
+{
+  "common": {
+    "appName": "FreightOps",
+    "signIn": "Войти",
+    "signOut": "Выйти",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "search": "Поиск"
+  },
+  "nav": {
+    "orders": "Заказы",
+    "dashboard": "Дашборд",
+    "accounts": "Клиенты",
+    "carriers": "Перевозчики",
+    "transportation": "Транспорт",
+    "finance": "Финансы",
+    "documents": "Документы",
+    "users": "Пользователи и роли",
+    "audit": "Журнал аудита",
+    "myOrders": "Мои заказы"
+  },
+  "status": {
+    "created": "Создан",
+    "received": "Получен",
+    "internal_transit": "Внутренний транзит",
+    "loaded": "Погружен",
+    "transit": "В пути",
+    "at_border": "На границе",
+    "at_customs": "На таможне",
+    "arrived": "Прибыл",
+    "delivered": "Доставлен",
+    "closed": "Закрыт"
+  }
+}
