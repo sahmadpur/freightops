@@ -1,0 +1,43 @@
+FROM node:24-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+
+FROM node:24-alpine AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+# Dummy values at build time: auth.ts throws if BETTER_AUTH_SECRET is absent
+# and db/index.ts opens a postgres connection on module load.
+# These are replaced by real env vars at runtime.
+ARG DATABASE_URL=postgres://dummy:dummy@localhost:5432/dummy
+ARG BETTER_AUTH_SECRET=build-time-dummy-secret-32chars!!
+ENV DATABASE_URL=$DATABASE_URL
+ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
+RUN npm run build
+
+# Separate stage: install drizzle-kit and its runtime deps for the target platform.
+# drizzle-kit needs esbuild (platform-specific binary), drizzle-orm, and the postgres
+# driver. We install the full project deps then drizzle-kit on top to get matching versions.
+FROM node:24-alpine AS migrate-deps
+WORKDIR /migrate
+COPY package.json package-lock.json ./
+RUN npm ci
+
+FROM node:24-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /app/.next/standalone ./
+COPY --from=build /app/.next/static ./.next/static
+COPY --from=build /app/public ./public
+COPY --from=build /app/drizzle ./drizzle
+COPY --from=build /app/drizzle.config.ts ./
+# Copy drizzle-kit + its deps (esbuild with linux binaries, drizzle-orm, postgres driver)
+COPY --from=migrate-deps /migrate/node_modules/drizzle-kit ./node_modules/drizzle-kit
+COPY --from=migrate-deps /migrate/node_modules/drizzle-orm ./node_modules/drizzle-orm
+COPY --from=migrate-deps /migrate/node_modules/esbuild ./node_modules/esbuild
+COPY --from=migrate-deps /migrate/node_modules/@esbuild ./node_modules/@esbuild
+COPY --from=migrate-deps /migrate/node_modules/postgres ./node_modules/postgres
+EXPOSE 3000
+# Use node directly on bin.cjs to avoid npx attempting a network download
+CMD ["sh", "-c", "node node_modules/drizzle-kit/bin.cjs migrate && node server.js"]
