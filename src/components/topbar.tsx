@@ -16,7 +16,11 @@ export function Topbar({ userName }: { userName: string }) {
       <span className="text-sm text-slate-600">{userName}</span>
       <button
         onClick={async () => {
-          await signOut();
+          try {
+            await signOut();
+          } catch (err) {
+            console.error("Sign-out failed:", err);
+          }
           router.push("/sign-in");
         }}
         className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"

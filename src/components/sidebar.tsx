@@ -28,7 +28,7 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
       key={href}
       href={href}
       className={`block rounded-lg px-3 py-2 text-sm ${
-        pathname.startsWith(href)
+        pathname === href || pathname.startsWith(href + "/")
           ? "bg-[#1a3a5c] text-white"
           : "text-slate-600 hover:bg-slate-100"
       }`}
