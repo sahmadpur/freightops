@@ -6,6 +6,7 @@ export type DbExecutor = Pick<typeof db, "insert">;
 
 export type AuditChange = { field: string; oldValue: string | null; newValue: string | null };
 
+// Assumes scalar inputs (string/number/boolean/null); objects stringify as "[object Object]".
 function normalize(v: unknown): string | null {
   if (v === null || v === undefined || v === "") return null;
   return String(v);
