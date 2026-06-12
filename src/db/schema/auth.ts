@@ -1,8 +1,11 @@
-import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { userRoleEnum, languageEnum } from "./enums";
+import { accounts } from "./domain";
 
-export const userRoleEnum = pgEnum("user_role", ["admin", "operator", "client"]);
-export const languageEnum = pgEnum("language", ["en", "ru", "az"]);
+// Re-export so consumers can still import from "./auth" as before.
+export { userRoleEnum, languageEnum } from "./enums";
 
 export const user = pgTable("user", {
   // Better Auth supplies its own IDs on insert; the DB default is a safety net for seed scripts.
@@ -12,8 +15,8 @@ export const user = pgTable("user", {
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
   role: userRoleEnum("role").notNull().default("operator"),
-  // FK references domain accounts.id (customer company, not the auth "account" table); FK added in Task 5 migration
-  accountId: text("account_id"),
+  // FK references domain accounts.id (customer company, not the auth "account" table); lazy thunk breaks the auth↔domain cycle
+  accountId: text("account_id").references((): AnyPgColumn => accounts.id, { onDelete: "set null" }),
   language: languageEnum("language").notNull().default("en"),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

@@ -1,5 +1,5 @@
 {
-  "id": "02d7b162-0072-4b66-9d2c-967f10fc9f58",
+  "id": "8267cd87-99ce-46e7-9b19-a6cf7611223e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -277,7 +277,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_account_id_accounts_id_fk": {
+          "name": "user_account_id_accounts_id_fk",
+          "tableFrom": "user",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "user_email_unique": {
@@ -482,7 +496,29 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "audit_log_entity_idx": {
+          "name": "audit_log_entity_idx",
+          "columns": [
+            {
+              "expression": "entity_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entity_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "audit_log_user_id_user_id_fk": {
           "name": "audit_log_user_id_user_id_fk",
@@ -613,7 +649,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "comments_order_id_idx": {
+          "name": "comments_order_id_idx",
+          "columns": [
+            {
+              "expression": "order_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "comments_order_id_orders_id_fk": {
           "name": "comments_order_id_orders_id_fk",
@@ -827,7 +879,8 @@
         },
         "role": {
           "name": "role",
-          "type": "text",
+          "type": "user_role",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -1086,7 +1139,38 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "orders_account_id_idx": {
+          "name": "orders_account_id_idx",
+          "columns": [
+            {
+              "expression": "account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "orders_status_idx": {
+          "name": "orders_status_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "orders_account_id_accounts_id_fk": {
           "name": "orders_account_id_accounts_id_fk",
@@ -1212,7 +1296,23 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "payments_order_id_idx": {
+          "name": "payments_order_id_idx",
+          "columns": [
+            {
+              "expression": "order_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "payments_order_id_orders_id_fk": {
           "name": "payments_order_id_orders_id_fk",
