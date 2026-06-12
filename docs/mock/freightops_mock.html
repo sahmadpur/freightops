@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreightOps — Platform Mock</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --sidebar-w: 210px;
+    --header-h: 52px;
+    --navy: #1a3a5c;
+    --navy-hover: #22507e;
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface2: #f8f9fa;
+    --border: rgba(0,0,0,0.10);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1a1a;
+    --text2: #5a6272;
+    --text3: #9ba3b0;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; color: var(--text); background: var(--bg); height: 100vh; overflow: hidden; }
+
+  /* SHELL */
+  .shell { display: flex; height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  .logo { padding: 14px 16px; border-bottom: 0.5px solid var(--border); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 9px; color: var(--text); }
+  .logo-icon { width: 30px; height: 30px; background: var(--navy); border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0; }
+  .nav { padding: 12px 8px; flex: 1; overflow-y: auto; }
+  .nav-section { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); padding: 10px 10px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--radius); cursor: pointer; color: var(--text2); font-size: 13px; transition: background 0.12s, color 0.12s; user-select: none; }
+  .nav-item:hover { background: var(--bg); color: var(--text); }
+  .nav-item.active { background: var(--navy); color: #fff; }
+  .nav-item i { font-size: 17px; flex-shrink: 0; }
+  .user-bar { padding: 12px 14px; border-top: 0.5px solid var(--border); display: flex; align-items: center; gap: 9px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; background: #ddeaf9; color: #1a3a5c; }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+  .topbar { height: var(--header-h); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; padding: 0 20px; gap: 12px; background: var(--surface); flex-shrink: 0; }
+  .topbar-title { font-size: 15px; font-weight: 600; flex: 1; color: var(--text); }
+  .search-wrap { position: relative; }
+  .search-wrap i { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 15px; pointer-events: none; }
+  .search-wrap input { border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 7px 10px 7px 32px; font-size: 13px; background: var(--surface2); width: 230px; color: var(--text); outline: none; transition: border 0.15s; }
+  .search-wrap input:focus { border-color: var(--navy); }
+  .lang-tabs { display: flex; gap: 3px; }
+  .lang-tab { padding: 4px 10px; border-radius: 20px; font-size: 11px; border: 0.5px solid var(--border2); cursor: pointer; color: var(--text2); transition: all 0.12s; user-select: none; }
+  .lang-tab.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .bell-wrap { position: relative; }
+  .notif-dot { width: 7px; height: 7px; background: #e24b4a; border-radius: 50%; position: absolute; top: 5px; right: 5px; border: 1.5px solid var(--surface); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--surface); color: var(--text); font-size: 13px; cursor: pointer; white-space: nowrap; transition: background 0.12s; font-family: inherit; }
+  .btn:hover { background: var(--surface2); }
+  .btn-primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .btn-primary:hover { background: var(--navy-hover); border-color: var(--navy-hover); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .icon-btn { width: 30px; height: 30px; border: 0.5px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); background: var(--surface); transition: background 0.12s; flex-shrink: 0; }
+  .icon-btn:hover { background: var(--surface2); color: var(--text); }
+  .icon-btn.active-page { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  /* CONTENT */
+  .content { flex: 1; overflow-y: auto; }
+  .page { display: none; padding: 20px; }
+  .page.active { display: block; }
+
+  /* BADGES — full 10-status set */
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; white-space: nowrap; }
+  .b-created  { background: #ddeaf9; color: #0c447c; }
+  .b-received { background: #e3e0f7; color: #3b2f7e; }
+  .b-internal { background: #d8eef7; color: #0b4a63; }
+  .b-loaded   { background: #d4f2e7; color: #085041; }
+  .b-transit  { background: #fdefd1; color: #633806; }
+  .b-border   { background: #fde8df; color: #712b13; }
+  .b-customs  { background: #fae0ea; color: #72243e; }
+  .b-arrived  { background: #e0f0d0; color: #27500a; }
+  .b-delivered { background: #c8e8d8; color: #085041; }
+  .b-closed   { background: #e8e8e8; color: #444; }
+  .b-role-admin { background: #1a3a5c; color: #fff; }
+  .b-role-op   { background: #ddeaf9; color: #0c447c; }
+  .b-role-client { background: #e8e8e8; color: #444; }
+
+  /* TABLE */
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; }
+  .card-header { padding: 12px 16px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-body { padding: 16px; }
+  .tbl-scroll { overflow-x: auto; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .tbl th { text-align: left; padding: 9px 14px; font-weight: 600; color: var(--text2); border-bottom: 0.5px solid var(--border); font-size: 11.5px; white-space: nowrap; background: var(--surface2); }
+  .tbl td { padding: 10px 14px; border-bottom: 0.5px solid var(--border); vertical-align: middle; color: var(--text); }
+  .tbl tbody tr:last-child td { border-bottom: none; }
+  .tbl tbody tr:hover td { background: var(--surface2); }
+  .act-btns { display: flex; gap: 4px; }
+  .muted { color: var(--text3); font-size: 11.5px; white-space: nowrap; }
+
+  /* STATUS FILTER */
+  .status-sel { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .status-pill { padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 0.5px solid var(--border2); cursor: pointer; color: var(--text2); transition: all 0.12s; user-select: none; }
+  .status-pill.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  /* METRICS */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .metric { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .metric-label { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+  .metric-val { font-size: 24px; font-weight: 600; color: var(--text); }
+  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+  /* GRIDS */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+  /* FINANCE ROWS */
+  .fin-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .fin-row:last-child { border-bottom: none; }
+  .amount { font-weight: 600; }
+  .pos { color: #3b6d11; }
+  .neg { color: #a32d2d; }
+
+  /* FIELD */
+  .field-row { margin-bottom: 14px; }
+  .field-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+  .field-val { font-size: 13px; color: var(--text); font-weight: 500; }
+  .field-input { width: 100%; border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 8px 10px; font-size: 13px; background: var(--surface); color: var(--text); outline: none; font-family: inherit; transition: border 0.15s; }
+  .field-input:focus { border-color: var(--navy); }
+  select.field-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ba3b0' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+
+  /* MODAL */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.38); display: none; align-items: center; justify-content: center; z-index: 200; }
+  .modal-bg.open { display: flex; }
+  .modal-box { background: var(--surface); border-radius: var(--radius-lg); width: 620px; max-height: 88vh; overflow-y: auto; border: 0.5px solid var(--border2); box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+  .modal-box.wide { width: 760px; }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 0.5px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 1; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .modal-title { font-size: 15px; font-weight: 600; }
+  .modal-body { padding: 20px; }
+
+  /* TABS */
+  .tab-bar { display: flex; gap: 2px; border-bottom: 0.5px solid var(--border); padding: 0 20px; background: var(--surface2); }
+  .tab { padding: 10px 14px; font-size: 13px; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -0.5px; transition: color 0.12s; user-select: none; }
+  .tab.on { color: var(--navy); border-bottom-color: var(--navy); font-weight: 600; }
+
+  /* TIMELINE */
+  .timeline { display: flex; flex-direction: column; }
+  .tl-item { display: flex; gap: 12px; }
+  .tl-line { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--navy); flex-shrink: 0; margin-top: 3px; }
+  .tl-dot.empty { background: var(--surface); border: 2px solid var(--border2); }
+  .tl-connector { width: 1.5px; flex: 1; background: var(--border2); min-height: 22px; }
+  .tl-text { padding-bottom: 16px; }
+  .tl-status { font-size: 13px; font-weight: 500; }
+  .tl-date { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  /* DOCUMENTS */
+  .doc-list { display: flex; flex-direction: column; gap: 6px; }
+  .doc-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0.5px solid var(--border); border-radius: var(--radius); background: var(--surface2); }
+  .doc-item i { color: var(--text2); font-size: 18px; }
+  .doc-name { flex: 1; font-size: 13px; }
+  .doc-date { font-size: 11px; color: var(--text3); white-space: nowrap; }
+  .doc-vis { font-size: 10.5px; padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+  .doc-vis.yes { background: #d4f2e7; color: #085041; }
+  .doc-vis.no { background: #e8e8e8; color: #666; }
+
+  /* CHAT */
+  .chat-thread { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; max-height: 320px; overflow-y: auto; }
+  .chat-msg { max-width: 82%; padding: 9px 12px; border-radius: 10px; font-size: 13px; }
+  .chat-msg.staff { background: var(--surface2); border: 0.5px solid var(--border); align-self: flex-start; }
+  .chat-msg.client { background: #ddeaf9; align-self: flex-end; }
+  .chat-meta { font-size: 10.5px; color: var(--text3); margin-bottom: 3px; }
+  .chat-input-row { display: flex; gap: 8px; }
+
+  /* VEHICLE CARD */
+  .vehicle-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; }
+  .vh-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .vh-icon { width: 40px; height: 40px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .vh-id { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .vh-route { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .vh-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .vh-stat { background: var(--surface2); border-radius: 6px; padding: 9px 12px; }
+  .vh-stat-label { font-size: 10.5px; color: var(--text3); margin-bottom: 3px; }
+  .vh-stat-val { font-size: 13px; font-weight: 600; }
+
+  /* BAR */
+  .mini-bar { display: flex; border-radius: 4px; overflow: hidden; height: 9px; margin-top: 8px; }
+  .bar-seg { height: 100%; }
+
+  /* PAGINATION */
+  .pagination { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text2); padding: 4px 2px; }
+
+  /* SECTION HEADING */
+  .sec-head { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 10px; }
+
+  /* METRIC SMALL */
+  .metric-sm { background: var(--surface2); border-radius: var(--radius); padding: 12px 14px; }
+
+  /* MONTH TABS */
+  .month-bar { display: flex; gap: 3px; margin-bottom: 18px; }
+  .month-tab { padding: 5px 12px; border-radius: 20px; font-size: 12px; border: 0.5px solid var(--border2); cursor: pointer; color: var(--text2); transition: all 0.12s; }
+  .month-tab.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+  /* PORTAL PREVIEW */
+  .portal-banner { background: #fdefd1; border: 0.5px solid #e8c98a; border-radius: var(--radius); padding: 10px 14px; font-size: 12.5px; color: #633806; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon"><i class="ti ti-ship"></i></div>
+      FreightOps
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" onclick="showPage('orders',this)"><i class="ti ti-list-details"></i> Orders</div>
+      <div class="nav-item" onclick="showPage('dashboard',this)"><i class="ti ti-chart-bar"></i> Dashboard</div>
+      <div class="nav-item" onclick="showPage('accounts',this)"><i class="ti ti-building"></i> Accounts</div>
+      <div class="nav-item" onclick="showPage('carriers',this)"><i class="ti ti-steering-wheel"></i> Carriers</div>
+      <div class="nav-item" onclick="showPage('transport',this)"><i class="ti ti-truck"></i> Transportation</div>
+      <div class="nav-section">Finance</div>
+      <div class="nav-item" onclick="showPage('finance',this)"><i class="ti ti-receipt"></i> Finance</div>
+      <div class="nav-item" onclick="showPage('documents',this)"><i class="ti ti-files"></i> Documents</div>
+      <div class="nav-section">System</div>
+      <div class="nav-item" onclick="showPage('users',this)"><i class="ti ti-users"></i> Users &amp; Roles</div>
+      <div class="nav-item" onclick="showPage('audit',this)"><i class="ti ti-history"></i> Audit Log</div>
+      <div class="nav-item"><i class="ti ti-settings"></i> Settings</div>
+      <div class="nav-section">Preview</div>
+      <div class="nav-item" onclick="showPage('portal',this)"><i class="ti ti-user-circle"></i> Client portal</div>
+    </nav>
+    <div class="user-bar">
+      <div class="avatar">AH</div>
+      <div>
+        <div style="font-size:12.5px; font-weight:600;">Anar Hasanov</div>
+        <div style="font-size:11px; color:var(--text3);">Admin</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="page-title">Orders</span>
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" placeholder="Search orders, clients, transport, &quot;not paid&quot;...">
+      </div>
+      <div class="lang-tabs">
+        <div class="lang-tab on">EN</div>
+        <div class="lang-tab">RU</div>
+        <div class="lang-tab">AZ</div>
+      </div>
+      <div class="bell-wrap">
+        <div class="icon-btn"><i class="ti ti-bell"></i></div>
+        <div class="notif-dot"></div>
+      </div>
+      <button class="btn btn-primary" id="top-action" onclick="openNewOrder()"><i class="ti ti-plus"></i> New Order</button>
+    </div>
+
+    <div class="content">
+
+      <!-- ===================== ORDERS PAGE ===================== -->
+      <div class="page active" id="page-orders">
+        <div class="status-sel">
+          <div class="status-pill on" onclick="filterStatus(this,'all')">All orders</div>
+          <div class="status-pill" onclick="filterStatus(this,'created')">Created</div>
+          <div class="status-pill" onclick="filterStatus(this,'received')">Received</div>
+          <div class="status-pill" onclick="filterStatus(this,'internal')">Internal transit</div>
+          <div class="status-pill" onclick="filterStatus(this,'loaded')">Loaded</div>
+          <div class="status-pill" onclick="filterStatus(this,'transit')">Transit</div>
+          <div class="status-pill" onclick="filterStatus(this,'border')">At the border</div>
+          <div class="status-pill" onclick="filterStatus(this,'customs')">At customs</div>
+          <div class="status-pill" onclick="filterStatus(this,'arrived')">Arrived</div>
+          <div class="status-pill" onclick="filterStatus(this,'delivered')">Delivered</div>
+          <div class="status-pill" onclick="filterStatus(this,'closed')">Closed</div>
+        </div>
+        <div class="card">
+          <div class="tbl-scroll">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Created</th>
+                <th>Order ID</th>
+                <th>Account</th>
+                <th>Order title</th>
+                <th>Route</th>
+                <th>Transport</th>
+                <th>Client charge</th>
+                <th>Status</th>
+                <th>Last modified</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-body">
+              <tr data-status="created">
+                <td class="muted">Jun 10, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-043</strong></td>
+                <td>AzTech Import</td>
+                <td>Machine parts — urgent</td>
+                <td>Dubai → Baku</td>
+                <td class="muted">—</td>
+                <td>$3,700</td>
+                <td><span class="badge b-created">Created</span></td>
+                <td class="muted">Jun 10, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-043','AzTech Import','created')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+              <tr data-status="received">
+                <td class="muted">Jun 8, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-042</strong></td>
+                <td>Caspian Foods</td>
+                <td>Packaging materials</td>
+                <td>Kyiv → Baku</td>
+                <td class="muted">—</td>
+                <td>$1,900</td>
+                <td><span class="badge b-received">Received</span></td>
+                <td class="muted">Jun 9, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-042','Caspian Foods','received')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+              <tr data-status="transit">
+                <td class="muted">Jun 1, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-041</strong></td>
+                <td>Baku Steel LLC</td>
+                <td>Steel pipes — Q2 restock</td>
+                <td>Istanbul → Baku</td>
+                <td>TRK-0188</td>
+                <td>$4,200</td>
+                <td><span class="badge b-transit">Transit</span></td>
+                <td class="muted">Jun 4, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-041','Baku Steel LLC','transit')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+              <tr data-status="customs">
+                <td class="muted">May 29, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-040</strong></td>
+                <td>Caspian Foods</td>
+                <td>Food products — summer line</td>
+                <td>Riga → Baku</td>
+                <td>TRK-0185</td>
+                <td>$3,100</td>
+                <td><span class="badge b-customs">At customs</span></td>
+                <td class="muted">Jun 9, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-040','Caspian Foods','customs')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+              <tr data-status="arrived">
+                <td class="muted">May 28, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-039</strong></td>
+                <td>AzTech Import</td>
+                <td>Server hardware batch 3</td>
+                <td>Frankfurt → Baku</td>
+                <td>AIR-044</td>
+                <td>$8,800</td>
+                <td><span class="badge b-arrived">Arrived</span></td>
+                <td class="muted">Jun 7, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-039','AzTech Import','arrived')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+              <tr data-status="border">
+                <td class="muted">May 27, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-038</strong></td>
+                <td>Silk Road Textiles</td>
+                <td>Fabrics — autumn collection</td>
+                <td>Milan → Baku</td>
+                <td>TRK-0183</td>
+                <td>$2,400</td>
+                <td><span class="badge b-border">At the border</span></td>
+                <td class="muted">Jun 8, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-038','Silk Road Textiles','border')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+              <tr data-status="delivered">
+                <td class="muted">May 22, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-037</strong></td>
+                <td>Global Pharma AZ</td>
+                <td>Pharmaceuticals — cold chain</td>
+                <td>Warsaw → Baku</td>
+                <td>TRK-0180</td>
+                <td>$5,600</td>
+                <td><span class="badge b-delivered">Delivered</span></td>
+                <td class="muted">Jun 6, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-037','Global Pharma AZ','delivered')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+              <tr data-status="loaded">
+                <td class="muted">May 20, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-036</strong></td>
+                <td>Baku Steel LLC</td>
+                <td>Industrial equipment</td>
+                <td>Beijing → Baku</td>
+                <td>SEA-012</td>
+                <td>$11,500</td>
+                <td><span class="badge b-loaded">Loaded</span></td>
+                <td class="muted">Jun 5, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-036','Baku Steel LLC','loaded')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+              <tr data-status="closed">
+                <td class="muted">Apr 14, 2026</td>
+                <td><strong style="color:var(--navy);">ORD-2026-029</strong></td>
+                <td>Silk Road Textiles</td>
+                <td>Fabrics — spring collection</td>
+                <td>Milan → Baku</td>
+                <td>TRK-0171</td>
+                <td>$2,200</td>
+                <td><span class="badge b-closed">Closed</span></td>
+                <td class="muted">May 18, 2026</td>
+                <td><div class="act-btns">
+                  <div class="icon-btn" onclick="openDetail('ORD-2026-029','Silk Road Textiles','closed')" title="View details"><i class="ti ti-eye"></i></div>
+                  <div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div>
+                  <div class="icon-btn" title="Documents"><i class="ti ti-files"></i></div>
+                </div></td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+        <div class="pagination">
+          <span>Showing 9 of 43 orders</span>
+          <div style="display:flex; gap:4px;">
+            <div class="icon-btn"><i class="ti ti-chevron-left"></i></div>
+            <div class="icon-btn active-page">1</div>
+            <div class="icon-btn">2</div>
+            <div class="icon-btn">3</div>
+            <div class="icon-btn"><i class="ti ti-chevron-right"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== DASHBOARD PAGE ===================== -->
+      <div class="page" id="page-dashboard">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+          <div style="font-size:13px; color:var(--text2); font-weight:500;">Select period:</div>
+          <div class="month-bar">
+            <div class="month-tab">Jan</div><div class="month-tab">Feb</div><div class="month-tab">Mar</div>
+            <div class="month-tab">Apr</div><div class="month-tab">May</div><div class="month-tab on">Jun</div>
+          </div>
+        </div>
+
+        <div class="sec-head">Operational overview</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">Active shipments</div><div class="metric-val">24</div><div class="metric-sub">↑ 3 vs last month</div></div>
+          <div class="metric"><div class="metric-label">Cargo in transit</div><div class="metric-val">11</div><div class="metric-sub">Across 6 countries</div></div>
+          <div class="metric"><div class="metric-label">At customs</div><div class="metric-val">5</div><div class="metric-sub">Avg 2.3 days clearance</div></div>
+          <div class="metric"><div class="metric-label">Unfinished orders</div><div class="metric-val">8</div><div class="metric-sub">Pending action</div></div>
+        </div>
+
+        <div class="sec-head" style="margin-top:4px;">Financial overview — Jun 2026</div>
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header"><span style="font-size:13px; font-weight:600;">Revenue & expenses</span><span style="font-size:12px; color:var(--text3);">Jun 2026</span></div>
+            <div class="card-body">
+              <div class="fin-row"><span>Revenue</span><span class="amount pos">$142,800</span></div>
+              <div class="fin-row"><span>Carrier costs</span><span class="amount neg">–$89,300</span></div>
+              <div class="fin-row"><span>Additional expenses</span><span class="amount neg">–$12,400</span></div>
+              <div class="fin-row"><span style="font-weight:500;">Expected profit (open)</span><span class="amount pos">$23,100</span></div>
+              <div class="fin-row"><span style="font-weight:600;">Actual profit (closed)</span><span class="amount pos" style="font-size:15px;">$18,000</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span style="font-size:13px; font-weight:600;">Receivables & payables</span></div>
+            <div class="card-body">
+              <div style="font-size:11px; font-weight:600; color:var(--text3); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em;">Clients</div>
+              <div class="fin-row"><span>Accounts receivable</span><span class="amount">$67,400</span></div>
+              <div class="fin-row"><span>Overdue</span><span class="amount neg">$8,200</span></div>
+              <div style="font-size:11px; font-weight:600; color:var(--text3); margin:12px 0 8px; text-transform:uppercase; letter-spacing:0.05em;">Carriers</div>
+              <div class="fin-row"><span>Owed to carriers</span><span class="amount neg">$41,600</span></div>
+              <div class="fin-row"><span>Overdue</span><span class="amount neg">$3,800</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span style="font-size:13px; font-weight:600;">Orders by status — Jun 2026</span></div>
+          <div class="card-body">
+            <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text2); margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+              <span>Created: <strong>5</strong></span>
+              <span>Received: <strong>2</strong></span>
+              <span>Internal transit: <strong>1</strong></span>
+              <span>Loaded: <strong>4</strong></span>
+              <span>Transit: <strong>11</strong></span>
+              <span>At the border: <strong>3</strong></span>
+              <span>At customs: <strong>5</strong></span>
+              <span>Arrived: <strong>4</strong></span>
+              <span>Delivered: <strong>9</strong></span>
+              <span>Closed: <strong>6</strong></span>
+            </div>
+            <div class="mini-bar">
+              <div class="bar-seg" style="width:10%; background:#b5d4f4;" title="Created: 5"></div>
+              <div class="bar-seg" style="width:4%; background:#c5bdf0;" title="Received: 2"></div>
+              <div class="bar-seg" style="width:2%; background:#a8d8ed;" title="Internal transit: 1"></div>
+              <div class="bar-seg" style="width:8%; background:#9fe1cb;" title="Loaded: 4"></div>
+              <div class="bar-seg" style="width:22%; background:#fac775;" title="Transit: 11"></div>
+              <div class="bar-seg" style="width:6%; background:#f5c4b3;" title="At the border: 3"></div>
+              <div class="bar-seg" style="width:10%; background:#f4c0d1;" title="At customs: 5"></div>
+              <div class="bar-seg" style="width:8%; background:#c0dd97;" title="Arrived: 4"></div>
+              <div class="bar-seg" style="width:18%; background:#5dcaa5;" title="Delivered: 9"></div>
+              <div class="bar-seg" style="width:12%; background:#c4c4c4;" title="Closed: 6"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span style="font-size:13px; font-weight:600;">Financial results per month — 2026</span></div>
+          <div class="tbl-scroll">
+          <table class="tbl">
+            <thead><tr>
+              <th>Month</th><th>Revenue</th><th>Cost</th><th>Expected profit</th><th>Actual profit</th><th>Received</th><th>Receivable</th><th>Paid</th><th>Payable</th>
+            </tr></thead>
+            <tbody>
+              <tr><td><strong>Jun</strong></td><td class="pos">$142,800</td><td class="neg">$89,300</td><td>$23,100</td><td class="pos">$18,000</td><td>$96,200</td><td>$67,400</td><td>$61,500</td><td>$41,600</td></tr>
+              <tr><td><strong>May</strong></td><td class="pos">$118,300</td><td class="neg">$74,100</td><td>$19,800</td><td class="pos">$16,400</td><td>$104,900</td><td>$22,100</td><td>$70,300</td><td>$12,800</td></tr>
+              <tr><td><strong>Apr</strong></td><td class="pos">$97,600</td><td class="neg">$61,800</td><td>$15,200</td><td class="pos">$13,100</td><td>$95,800</td><td>$4,300</td><td>$60,200</td><td>$2,400</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== ACCOUNTS PAGE ===================== -->
+      <div class="page" id="page-accounts">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+          <button class="btn btn-primary"><i class="ti ti-plus"></i> New account</button>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr>
+              <th>Company</th><th>Tax ID</th><th>Contact 1</th><th>Contact 2</th><th>Phone</th><th>Email</th><th>Outstanding</th><th>Orders</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Baku Steel LLC</strong></td>
+                <td class="muted">1402556671</td>
+                <td>Elçin Məmməd</td>
+                <td>Rauf İsmayılov</td>
+                <td>+994 50 123 4567</td>
+                <td>elcin@bakusteel.az</td>
+                <td style="color:#a32d2d; font-weight:600;">$8,200</td>
+                <td>12</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Invite portal user"><i class="ti ti-user-plus"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Caspian Foods</strong></td>
+                <td class="muted">1700338124</td>
+                <td>Nərmin Həsənova</td>
+                <td>—</td>
+                <td>+994 55 987 6543</td>
+                <td>nermn@caspianfoods.az</td>
+                <td style="color:#3b6d11; font-weight:600;">$0</td>
+                <td>7</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Invite portal user"><i class="ti ti-user-plus"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>AzTech Import</strong></td>
+                <td class="muted">1501447832</td>
+                <td>Tural Quliyev</td>
+                <td>Sevinc Rzayeva</td>
+                <td>+994 70 234 5678</td>
+                <td>tural@aztech.az</td>
+                <td style="color:#a32d2d; font-weight:600;">$2,400</td>
+                <td>9</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Invite portal user"><i class="ti ti-user-plus"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Silk Road Textiles</strong></td>
+                <td class="muted">1308822415</td>
+                <td>Aynur Babayeva</td>
+                <td>—</td>
+                <td>+994 51 456 7890</td>
+                <td>aynur@silkroad.az</td>
+                <td style="color:#3b6d11; font-weight:600;">$0</td>
+                <td>5</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Invite portal user"><i class="ti ti-user-plus"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Global Pharma AZ</strong></td>
+                <td class="muted">1604990287</td>
+                <td>Kamran Aliyev</td>
+                <td>—</td>
+                <td>+994 77 321 0987</td>
+                <td>k.aliyev@globalpharma.az</td>
+                <td style="color:#3b6d11; font-weight:600;">$0</td>
+                <td>4</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Invite portal user"><i class="ti ti-user-plus"></i></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================== CARRIERS PAGE ===================== -->
+      <div class="page" id="page-carriers">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+          <button class="btn btn-primary"><i class="ti ti-plus"></i> New carrier</button>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr>
+              <th>Company</th><th>Contact 1</th><th>Contact 2</th><th>Phone</th><th>Email</th><th>We owe</th><th>Orders</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Akın Logistics</strong></td>
+                <td>Mehmet Akın</td>
+                <td>Deniz Yılmaz</td>
+                <td>+90 532 411 2387</td>
+                <td>ops@akinlogistics.com.tr</td>
+                <td style="color:#a32d2d; font-weight:600;">$14,200</td>
+                <td>18</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Lufthansa Cargo</strong></td>
+                <td>Sales desk FRA</td>
+                <td>—</td>
+                <td>+49 69 696 0</td>
+                <td>cargo.fra@lufthansa.com</td>
+                <td style="color:#a32d2d; font-weight:600;">$3,600</td>
+                <td>6</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>COSCO Shipping</strong></td>
+                <td>Li Wei</td>
+                <td>—</td>
+                <td>+86 21 3588 6666</td>
+                <td>booking@cosco.cn</td>
+                <td style="color:#a32d2d; font-weight:600;">$7,200</td>
+                <td>4</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Baltic Rail Cargo</strong></td>
+                <td>Jānis Ozols</td>
+                <td>—</td>
+                <td>+371 6722 4455</td>
+                <td>dispatch@balticrail.lv</td>
+                <td style="color:#3b6d11; font-weight:600;">$0</td>
+                <td>3</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>AzPost Express</strong></td>
+                <td>Rəşad Hüseynov</td>
+                <td>—</td>
+                <td>+994 12 498 0011</td>
+                <td>express@azpost.az</td>
+                <td style="color:#3b6d11; font-weight:600;">$0</td>
+                <td>2</td>
+                <td><div class="act-btns"><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================== TRANSPORT PAGE ===================== -->
+      <div class="page" id="page-transport">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+          <button class="btn btn-primary"><i class="ti ti-plus"></i> New transport</button>
+        </div>
+
+        <div class="vehicle-card">
+          <div class="vh-header">
+            <div class="vh-icon" style="background:#ddeaf9; color:#1a3a5c;"><i class="ti ti-truck"></i></div>
+            <div style="flex:1;">
+              <div class="vh-id">TRK-0188 <span class="badge b-transit">Transit</span></div>
+              <div class="vh-route">Vehicle · Türkiye → Azerbaijan · Istanbul → Baku &nbsp;·&nbsp; Carrier: Akın Logistics &nbsp;·&nbsp; Loaded: Jun 1 &nbsp;·&nbsp; Planned arrival: Jun 12</div>
+            </div>
+            <div style="display:flex; gap:6px;"><div class="icon-btn"><i class="ti ti-eye"></i></div><div class="icon-btn"><i class="ti ti-edit"></i></div></div>
+          </div>
+          <div class="vh-stats">
+            <div class="vh-stat"><div class="vh-stat-label">Our orders / total</div><div class="vh-stat-val">3 / 5 orders</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Weight — ours / total</div><div class="vh-stat-val">8,400 / 18,000 kg</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Volume — ours / total</div><div class="vh-stat-val">24 / 52 m³</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Revenue (our cargo)</div><div class="vh-stat-val">$4,200</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Carrier cost (our share)</div><div class="vh-stat-val">$2,800</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Profit (our cargo)</div><div class="vh-stat-val" style="color:#3b6d11;">$1,400</div></div>
+          </div>
+        </div>
+
+        <div class="vehicle-card">
+          <div class="vh-header">
+            <div class="vh-icon" style="background:#d4f2e7; color:#085041;"><i class="ti ti-plane"></i></div>
+            <div style="flex:1;">
+              <div class="vh-id">AIR-044 <span class="badge b-arrived">Arrived</span></div>
+              <div class="vh-route">Air · Germany → Azerbaijan · Frankfurt → Baku &nbsp;·&nbsp; Carrier: Lufthansa Cargo &nbsp;·&nbsp; Arrived: Jun 7, 2026</div>
+            </div>
+            <div style="display:flex; gap:6px;"><div class="icon-btn"><i class="ti ti-eye"></i></div><div class="icon-btn"><i class="ti ti-edit"></i></div></div>
+          </div>
+          <div class="vh-stats">
+            <div class="vh-stat"><div class="vh-stat-label">Our orders / total</div><div class="vh-stat-val">1 / 3 orders</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Weight — ours / total</div><div class="vh-stat-val">620 / 2,100 kg</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Volume — ours / total</div><div class="vh-stat-val">4 / 12 m³</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Revenue (our cargo)</div><div class="vh-stat-val">$8,800</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Carrier cost (our share)</div><div class="vh-stat-val">$3,600</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Profit (our cargo)</div><div class="vh-stat-val" style="color:#3b6d11;">$5,200</div></div>
+          </div>
+        </div>
+
+        <div class="vehicle-card">
+          <div class="vh-header">
+            <div class="vh-icon" style="background:#fdefd1; color:#633806;"><i class="ti ti-ship"></i></div>
+            <div style="flex:1;">
+              <div class="vh-id">SEA-012 <span class="badge b-loaded">Loaded</span></div>
+              <div class="vh-route">Sea · China → Azerbaijan · Beijing → Baku &nbsp;·&nbsp; Carrier: COSCO Shipping &nbsp;·&nbsp; Loading: Jun 5 &nbsp;·&nbsp; Planned arrival: Jul 18</div>
+            </div>
+            <div style="display:flex; gap:6px;"><div class="icon-btn"><i class="ti ti-eye"></i></div><div class="icon-btn"><i class="ti ti-edit"></i></div></div>
+          </div>
+          <div class="vh-stats">
+            <div class="vh-stat"><div class="vh-stat-label">Our orders / total</div><div class="vh-stat-val">1 / 8 orders</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Weight — ours / total</div><div class="vh-stat-val">14,200 / 48,000 kg</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Volume — ours / total</div><div class="vh-stat-val">38 / 120 m³</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Revenue (our cargo)</div><div class="vh-stat-val">$11,500</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Carrier cost (our share)</div><div class="vh-stat-val">$7,200</div></div>
+            <div class="vh-stat"><div class="vh-stat-label">Profit (our cargo)</div><div class="vh-stat-val" style="color:#3b6d11;">$4,300</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== FINANCE PAGE ===================== -->
+      <div class="page" id="page-finance">
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-header"><span style="font-size:13px; font-weight:600;"><i class="ti ti-building" style="vertical-align:-2px; margin-right:6px;"></i>Clients</span></div>
+            <div class="card-body">
+              <div class="fin-row"><span>Total receivable</span><span class="amount">$67,400</span></div>
+              <div class="fin-row"><span>Total paid</span><span class="amount pos">$211,600</span></div>
+              <div class="fin-row"><span>Outstanding balance</span><span class="amount neg">$67,400</span></div>
+              <div class="fin-row"><span>Overdue payments</span><span class="amount neg">$8,200</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span style="font-size:13px; font-weight:600;"><i class="ti ti-truck" style="vertical-align:-2px; margin-right:6px;"></i>Carriers</span></div>
+            <div class="card-body">
+              <div class="fin-row"><span>Total payable</span><span class="amount neg">$41,600</span></div>
+              <div class="fin-row"><span>Total paid</span><span class="amount pos">$179,800</span></div>
+              <div class="fin-row"><span>Outstanding balance</span><span class="amount neg">$41,600</span></div>
+              <div class="fin-row"><span>Overdue</span><span class="amount neg">$3,800</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span style="font-size:13px; font-weight:600;">Financial results — 2026 YTD</span></div>
+          <div class="card-body">
+            <div class="fin-row"><span>Total revenue</span><span class="amount pos">$279,000</span></div>
+            <div class="fin-row"><span>Total carrier costs</span><span class="amount neg">–$179,800</span></div>
+            <div class="fin-row"><span>Additional expenses</span><span class="amount neg">–$41,700</span></div>
+            <div class="fin-row"><span>Expected profit (open shipments)</span><span class="amount pos">$23,100</span></div>
+            <div class="fin-row"><span style="font-weight:600; font-size:14px;">Actual profit (completed)</span><span class="amount pos" style="font-size:18px;">$57,500</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== DOCUMENTS PAGE ===================== -->
+      <div class="page" id="page-documents">
+        <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
+          <div class="search-wrap" style="flex:1; min-width:200px;">
+            <i class="ti ti-search"></i>
+            <input type="text" placeholder="Search by client, order #, transport, document type..." style="width:100%;">
+          </div>
+          <select class="field-input" style="width:180px;">
+            <option>All document types</option>
+            <option>CMR</option>
+            <option>AWB</option>
+            <option>Bill of lading</option>
+            <option>Invoice</option>
+            <option>Packing list</option>
+            <option>Certificate</option>
+            <option>Waybill</option>
+            <option>Cargo photos</option>
+          </select>
+          <button class="btn"><i class="ti ti-upload"></i> Upload document</button>
+        </div>
+
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-header">
+            <span style="font-size:13px; font-weight:600;">ORD-2026-041 · Baku Steel LLC</span>
+            <span style="font-size:11.5px; color:var(--text3);">Istanbul → Baku · <span class="badge b-transit">Transit</span></span>
+          </div>
+          <div class="card-body">
+            <div class="doc-list">
+              <div class="doc-item"><i class="ti ti-file-text"></i><div class="doc-name">CMR — TRK-0188</div><span class="doc-vis yes">Client visible</span><div class="doc-date">Jun 1, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+              <div class="doc-item"><i class="ti ti-file-invoice"></i><div class="doc-name">Invoice INV-2026-041</div><span class="doc-vis yes">Client visible</span><div class="doc-date">Jun 1, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+              <div class="doc-item"><i class="ti ti-certificate"></i><div class="doc-name">Certificate of origin</div><span class="doc-vis yes">Client visible</span><div class="doc-date">May 30, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+              <div class="doc-item"><i class="ti ti-clipboard-list"></i><div class="doc-name">Packing list</div><span class="doc-vis yes">Client visible</span><div class="doc-date">May 30, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+              <div class="doc-item"><i class="ti ti-photo"></i><div class="doc-name">Cargo photos (4 files)</div><span class="doc-vis no">Internal</span><div class="doc-date">Jun 1, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span style="font-size:13px; font-weight:600;">ORD-2026-039 · AzTech Import</span>
+            <span style="font-size:11.5px; color:var(--text3);">Frankfurt → Baku · <span class="badge b-arrived">Arrived</span></span>
+          </div>
+          <div class="card-body">
+            <div class="doc-list">
+              <div class="doc-item"><i class="ti ti-file-text"></i><div class="doc-name">AWB — AIR-044</div><span class="doc-vis yes">Client visible</span><div class="doc-date">Jun 2, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+              <div class="doc-item"><i class="ti ti-file-invoice"></i><div class="doc-name">Invoice INV-2026-039</div><span class="doc-vis yes">Client visible</span><div class="doc-date">Jun 2, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+              <div class="doc-item"><i class="ti ti-certificate"></i><div class="doc-name">Technical description</div><span class="doc-vis no">Internal</span><div class="doc-date">Jun 1, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== USERS & ROLES PAGE ===================== -->
+      <div class="page" id="page-users">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+          <button class="btn btn-primary"><i class="ti ti-user-plus"></i> Invite user</button>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr>
+              <th>Name</th><th>Email</th><th>Role</th><th>Linked account</th><th>Language</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Anar Hasanov</strong></td>
+                <td>anar@freightops.az</td>
+                <td><span class="badge b-role-admin">Admin</span></td>
+                <td class="muted">—</td>
+                <td>AZ</td>
+                <td><span class="badge b-delivered">Active</span></td>
+                <td><div class="act-btns"><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Deactivate"><i class="ti ti-user-off"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Leyla Mahmudova</strong></td>
+                <td>leyla@freightops.az</td>
+                <td><span class="badge b-role-op">Operator</span></td>
+                <td class="muted">—</td>
+                <td>AZ</td>
+                <td><span class="badge b-delivered">Active</span></td>
+                <td><div class="act-btns"><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Deactivate"><i class="ti ti-user-off"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Dmitri Volkov</strong></td>
+                <td>dmitri@freightops.az</td>
+                <td><span class="badge b-role-op">Operator</span></td>
+                <td class="muted">—</td>
+                <td>RU</td>
+                <td><span class="badge b-delivered">Active</span></td>
+                <td><div class="act-btns"><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Deactivate"><i class="ti ti-user-off"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Elçin Məmməd</strong></td>
+                <td>elcin@bakusteel.az</td>
+                <td><span class="badge b-role-client">Client</span></td>
+                <td>Baku Steel LLC</td>
+                <td>AZ</td>
+                <td><span class="badge b-delivered">Active</span></td>
+                <td><div class="act-btns"><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div><div class="icon-btn" title="Deactivate"><i class="ti ti-user-off"></i></div></div></td>
+              </tr>
+              <tr>
+                <td><strong>Tural Quliyev</strong></td>
+                <td>tural@aztech.az</td>
+                <td><span class="badge b-role-client">Client</span></td>
+                <td>AzTech Import</td>
+                <td>EN</td>
+                <td><span class="badge b-created">Invited</span></td>
+                <td><div class="act-btns"><div class="icon-btn" title="Resend invitation"><i class="ti ti-mail-forward"></i></div><div class="icon-btn" title="Edit"><i class="ti ti-edit"></i></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================== AUDIT LOG PAGE ===================== -->
+      <div class="page" id="page-audit">
+        <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;">
+          <select class="field-input" style="width:160px;"><option>All users</option><option>Anar Hasanov</option><option>Leyla Mahmudova</option><option>Dmitri Volkov</option></select>
+          <select class="field-input" style="width:160px;"><option>All entities</option><option>Order</option><option>Account</option><option>Carrier</option><option>Transport</option><option>Payment</option><option>User</option></select>
+          <input type="date" class="field-input" style="width:160px;" value="2026-06-01">
+          <input type="date" class="field-input" style="width:160px;" value="2026-06-12">
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr>
+              <th>Timestamp</th><th>User</th><th>Action</th><th>Entity</th><th>Change</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="muted">Jun 10, 2026 · 16:42</td><td>Leyla Mahmudova</td><td>Created</td><td>Order ORD-2026-043</td><td class="muted">—</td></tr>
+              <tr><td class="muted">Jun 9, 2026 · 11:18</td><td>Anar Hasanov</td><td>Status changed</td><td>Order ORD-2026-040</td><td>At the border → At customs</td></tr>
+              <tr><td class="muted">Jun 9, 2026 · 10:05</td><td>Dmitri Volkov</td><td>Payment added</td><td>Order ORD-2026-041</td><td>Received $2,000 from Baku Steel LLC</td></tr>
+              <tr><td class="muted">Jun 8, 2026 · 15:30</td><td>Leyla Mahmudova</td><td>Field edited</td><td>Order ORD-2026-038</td><td>Carrier cost: $1,500 → $1,650</td></tr>
+              <tr><td class="muted">Jun 8, 2026 · 09:12</td><td>Anar Hasanov</td><td>User invited</td><td>User tural@aztech.az</td><td>Client · AzTech Import</td></tr>
+              <tr><td class="muted">Jun 7, 2026 · 17:55</td><td>Anar Hasanov</td><td>Status changed</td><td>Order ORD-2026-039</td><td>At customs → Arrived</td></tr>
+              <tr><td class="muted">Jun 6, 2026 · 13:21</td><td>Dmitri Volkov</td><td>Document uploaded</td><td>Order ORD-2026-041</td><td>Certificate of origin (client visible)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================== CLIENT PORTAL PREVIEW ===================== -->
+      <div class="page" id="page-portal">
+        <div class="portal-banner"><i class="ti ti-info-circle"></i> Preview: this is what a client user (Elçin Məmməd, Baku Steel LLC) sees after signing in. Clients see only their own orders — no costs, profits, or other clients' data.</div>
+
+        <div class="card">
+          <div class="card-header"><span style="font-size:13px; font-weight:600;">My orders — Baku Steel LLC</span></div>
+          <table class="tbl">
+            <thead><tr>
+              <th>Order ID</th><th>Order title</th><th>Route</th><th>Status</th><th>Planned arrival</th><th>Invoice</th><th>Balance</th><th></th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><strong style="color:var(--navy);">ORD-2026-041</strong></td>
+                <td>Steel pipes — Q2 restock</td>
+                <td>Istanbul → Baku</td>
+                <td><span class="badge b-transit">Transit</span></td>
+                <td>Jun 12, 2026</td>
+                <td>$4,200</td>
+                <td class="neg" style="font-weight:600;">$2,200 due</td>
+                <td><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div></td>
+              </tr>
+              <tr>
+                <td><strong style="color:var(--navy);">ORD-2026-036</strong></td>
+                <td>Industrial equipment</td>
+                <td>Beijing → Baku</td>
+                <td><span class="badge b-loaded">Loaded</span></td>
+                <td>Jul 18, 2026</td>
+                <td>$11,500</td>
+                <td class="neg" style="font-weight:600;">$6,000 due</td>
+                <td><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div></td>
+              </tr>
+              <tr>
+                <td><strong style="color:var(--navy);">ORD-2026-027</strong></td>
+                <td>Steel sheets — Q1</td>
+                <td>Istanbul → Baku</td>
+                <td><span class="badge b-closed">Closed</span></td>
+                <td class="muted">Delivered Apr 2</td>
+                <td>$3,900</td>
+                <td class="pos" style="font-weight:600;">Paid</td>
+                <td><div class="icon-btn" title="View"><i class="ti ti-eye"></i></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><span style="font-size:13px; font-weight:600;">ORD-2026-041 — Shipment status</span></div>
+            <div class="card-body">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+                  <div class="tl-text"><div class="tl-status">Transit</div><div class="tl-date">Jun 4, 2026 · ETA Jun 12</div></div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+                  <div class="tl-text"><div class="tl-status">Loaded</div><div class="tl-date">Jun 2, 2026</div></div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-line"><div class="tl-dot"></div></div>
+                  <div class="tl-text"><div class="tl-status">Created</div><div class="tl-date">Jun 1, 2026</div></div>
+                </div>
+              </div>
+              <div style="border-top:0.5px solid var(--border); padding-top:12px; margin-top:4px;">
+                <div class="sec-head">Documents</div>
+                <div class="doc-list">
+                  <div class="doc-item"><i class="ti ti-file-text"></i><div class="doc-name">CMR — TRK-0188</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+                  <div class="doc-item"><i class="ti ti-file-invoice"></i><div class="doc-name">Invoice INV-2026-041</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+                </div>
+                <div class="fin-row" style="margin-top:10px;"><span>Invoiced</span><span>$4,200</span></div>
+                <div class="fin-row"><span>Paid</span><span class="amount pos">$2,000</span></div>
+                <div class="fin-row"><span>Outstanding</span><span class="amount neg">$2,200</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span style="font-size:13px; font-weight:600;">ORD-2026-041 — Comments</span></div>
+            <div class="card-body">
+              <div class="chat-thread">
+                <div class="chat-msg staff"><div class="chat-meta">Leyla Mahmudova (FreightOps) · Jun 2, 14:30</div>Cargo loaded in Istanbul, truck departs this evening. ETA Jun 12.</div>
+                <div class="chat-msg client"><div class="chat-meta">Elçin Məmməd · Jun 3, 09:12</div>Thanks. Please send the certificate of origin when available.</div>
+                <div class="chat-msg staff"><div class="chat-meta">Leyla Mahmudova (FreightOps) · Jun 3, 10:05</div>Uploaded to the documents section — see "Certificate of origin".</div>
+              </div>
+              <div class="chat-input-row">
+                <input type="text" class="field-input" placeholder="Write a comment...">
+                <button class="btn btn-primary"><i class="ti ti-send"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ===================== ORDER DETAIL MODAL ===================== -->
+<div class="modal-bg" id="modal-detail" onclick="handleModalBgClick(event,'modal-detail')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title" id="modal-order-title">ORD-2026-041 — Baku Steel LLC</span>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span class="badge b-transit" id="modal-status-badge">Transit</span>
+        <div class="icon-btn" onclick="closeModal('modal-detail')"><i class="ti ti-x"></i></div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <div class="tab on" id="tab-info" onclick="switchTab('info')">Order info</div>
+      <div class="tab" id="tab-finance" onclick="switchTab('finance')">Finance</div>
+      <div class="tab" id="tab-history" onclick="switchTab('history')">History</div>
+      <div class="tab" id="tab-docs" onclick="switchTab('docs')">Documents</div>
+      <div class="tab" id="tab-comments" onclick="switchTab('comments')">Comments</div>
+    </div>
+    <div class="modal-body" id="modal-content"></div>
+  </div>
+</div>
+
+<!-- ===================== NEW ORDER MODAL ===================== -->
+<div class="modal-bg" id="modal-neworder" onclick="handleModalBgClick(event,'modal-neworder')">
+  <div class="modal-box wide">
+    <div class="modal-head">
+      <span class="modal-title">New order</span>
+      <div class="icon-btn" onclick="closeModal('modal-neworder')"><i class="ti ti-x"></i></div>
+    </div>
+    <div class="modal-body">
+      <div class="sec-head">Order</div>
+      <div class="form-grid">
+        <div class="field-row"><div class="field-label">Order ID (auto)</div><input class="field-input" value="ORD-2026-044" disabled></div>
+        <div class="field-row"><div class="field-label">Order title</div><input class="field-input" placeholder="Brief description of the order"></div>
+        <div class="field-row"><div class="field-label">Client (account)</div><select class="field-input"><option>Select account…</option><option>Baku Steel LLC</option><option>Caspian Foods</option><option>AzTech Import</option><option>Silk Road Textiles</option><option>Global Pharma AZ</option></select></div>
+        <div class="field-row"><div class="field-label">Client order ID</div><input class="field-input" placeholder="Client's own reference"></div>
+        <div class="field-row"><div class="field-label">Carrier</div><select class="field-input"><option>Select carrier…</option><option>Akın Logistics</option><option>Lufthansa Cargo</option><option>COSCO Shipping</option><option>Baltic Rail Cargo</option><option>AzPost Express</option></select></div>
+        <div class="field-row"><div class="field-label">Route</div><input class="field-input" placeholder="e.g. Istanbul → Baku"></div>
+      </div>
+      <div class="sec-head" style="margin-top:6px;">Cargo</div>
+      <div class="form-grid">
+        <div class="field-row"><div class="field-label">Cargo description</div><input class="field-input"></div>
+        <div class="field-row"><div class="field-label">Packages / units</div><input class="field-input" type="number"></div>
+        <div class="field-row"><div class="field-label">Weight (kg)</div><input class="field-input" type="number"></div>
+        <div class="field-row"><div class="field-label">Volume (m³)</div><input class="field-input" type="number"></div>
+        <div class="field-row"><div class="field-label">Delivery terms (Incoterms 2020)</div><select class="field-input"><option>EXW</option><option>FCA</option><option>FAS</option><option>FOB</option><option>CFR</option><option>CIF</option><option>CPT</option><option>CIP</option><option>DAP</option><option>DPU</option><option>DDP</option></select></div>
+        <div class="field-row"><div class="field-label">Cargo delivery format</div><select class="field-input"><option>FCL — Full Container Load</option><option>LCL — Less than Container Load</option><option>FTL — Full Truck Load</option><option>LTL — Less than Truck Load</option></select></div>
+      </div>
+      <div class="sec-head" style="margin-top:6px;">Finance</div>
+      <div class="form-grid">
+        <div class="field-row"><div class="field-label">Client charge (selling price)</div><input class="field-input" type="number" placeholder="$"></div>
+        <div class="field-row"><div class="field-label">Carrier cost</div><input class="field-input" type="number" placeholder="$"></div>
+        <div class="field-row"><div class="field-label">Additional costs</div><input class="field-input" type="number" placeholder="$"></div>
+        <div class="field-row"><div class="field-label">Expected profit</div><input class="field-input" type="number" placeholder="$"></div>
+        <div class="field-row"><div class="field-label">Invoice number</div><input class="field-input"></div>
+        <div class="field-row"><div class="field-label">Invoice date</div><input class="field-input" type="date"></div>
+      </div>
+      <div class="sec-head" style="margin-top:6px;">Transportation</div>
+      <div style="border:0.5px dashed var(--border2); border-radius:var(--radius); padding:14px; margin-bottom:16px;">
+        <div class="form-grid">
+          <div class="field-row"><div class="field-label">Mode type</div><select class="field-input"><option>Vehicle</option><option>Air</option><option>Postal</option><option>Rail</option><option>Sea</option></select></div>
+          <div class="field-row"><div class="field-label">Transport mode number</div><input class="field-input" placeholder="e.g. TRK-0190"></div>
+          <div class="field-row"><div class="field-label">From</div><select class="field-input"><option>Country…</option><option>Türkiye</option><option>Germany</option><option>China</option><option>UAE</option><option>Italy</option></select></div>
+          <div class="field-row"><div class="field-label">To</div><select class="field-input"><option>Country…</option><option selected>Azerbaijan</option></select></div>
+          <div class="field-row"><div class="field-label">Loading date</div><input class="field-input" type="date"></div>
+          <div class="field-row"><div class="field-label">Planned arrival date</div><input class="field-input" type="date"></div>
+        </div>
+        <button class="btn btn-sm"><i class="ti ti-plus"></i> Add to existing transport instead</button>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn" onclick="closeModal('modal-neworder')">Cancel</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-neworder')">Create order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var currentOrderId = 'ORD-2026-041';
+
+  const TAB_CONTENT = {
+    info: `
+      <div class="grid2" style="margin-bottom:18px;">
+        <div>
+          <div class="field-row"><div class="field-label">Order title</div><div class="field-val">Steel pipes — Q2 restock</div></div>
+          <div class="field-row"><div class="field-label">Client</div><div class="field-val">Baku Steel LLC</div></div>
+          <div class="field-row"><div class="field-label">Client order ID</div><div class="field-val">BS-PO-2287</div></div>
+          <div class="field-row"><div class="field-label">Carrier</div><div class="field-val">Akın Logistics</div></div>
+          <div class="field-row"><div class="field-label">Route</div><div class="field-val">Istanbul → Baku</div></div>
+          <div class="field-row"><div class="field-label">Transport</div><div class="field-val">TRK-0188 (Vehicle)</div></div>
+          <div class="field-row"><div class="field-label">Cargo description</div><div class="field-val">Steel pipes</div></div>
+        </div>
+        <div>
+          <div class="field-row"><div class="field-label">Packages / units</div><div class="field-val">24 units</div></div>
+          <div class="field-row"><div class="field-label">Weight / volume</div><div class="field-val">8,400 kg · 24 m³</div></div>
+          <div class="field-row"><div class="field-label">Delivery terms (Incoterms 2020)</div><div class="field-val">CIP</div></div>
+          <div class="field-row"><div class="field-label">Cargo delivery format</div><div class="field-val">FTL — Full Truck Load</div></div>
+          <div class="field-row"><div class="field-label">Invoice</div><div class="field-val">INV-2026-041 · Jun 1, 2026</div></div>
+          <div class="field-row"><div class="field-label">Order created</div><div class="field-val">Jun 1, 2026 · Leyla Mahmudova</div></div>
+          <div class="field-row"><div class="field-label">Last modified</div><div class="field-val">Jun 4, 2026</div></div>
+        </div>
+      </div>
+      <div style="border-top:0.5px solid var(--border); padding-top:16px; margin-bottom:16px;">
+        <div style="font-size:13px; font-weight:600; margin-bottom:12px;">Financial summary</div>
+        <div class="grid3">
+          <div class="metric-sm"><div class="metric-label">Client charge</div><div class="metric-val" style="font-size:18px;">$4,200</div></div>
+          <div class="metric-sm"><div class="metric-label">Carrier cost</div><div class="metric-val" style="font-size:18px; color:#a32d2d;">$2,800</div></div>
+          <div class="metric-sm"><div class="metric-label">Actual profit (auto)</div><div class="metric-val" style="font-size:18px; color:#3b6d11;">$1,400</div></div>
+        </div>
+      </div>
+      <div style="border-top:0.5px solid var(--border); padding-top:16px;">
+        <div style="font-size:13px; font-weight:600; margin-bottom:10px;">Update status</div>
+        <select class="field-input" style="margin-bottom:14px;">
+          <option>Created</option>
+          <option>Received</option>
+          <option>Internal transit</option>
+          <option>Loaded</option>
+          <option selected>Transit</option>
+          <option>At the border</option>
+          <option>At customs</option>
+          <option>Arrived</option>
+          <option>Delivered</option>
+          <option>Closed</option>
+        </select>
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+          <button class="btn" onclick="closeModal('modal-detail')">Cancel</button>
+          <button class="btn btn-primary">Save changes</button>
+        </div>
+      </div>`,
+
+    finance: `
+      <div class="grid3" style="margin-bottom:18px;">
+        <div class="metric-sm"><div class="metric-label">Client charge</div><div class="metric-val" style="font-size:18px;">$4,200</div></div>
+        <div class="metric-sm"><div class="metric-label">Carrier cost</div><div class="metric-val" style="font-size:18px; color:#a32d2d;">$2,800</div></div>
+        <div class="metric-sm"><div class="metric-label">Additional costs</div><div class="metric-val" style="font-size:18px;">$0</div></div>
+      </div>
+      <div class="fin-row"><span>Expected profit (manual)</span><span class="amount pos">$1,400</span></div>
+      <div class="fin-row"><span>Actual profit (auto: charge − costs)</span><span class="amount pos">$1,400</span></div>
+      <div style="border-top:0.5px solid var(--border); padding-top:14px; margin-top:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:13px; font-weight:600;">Receivable from client <span class="badge b-transit" style="margin-left:6px;">Partly paid</span></div>
+          <button class="btn btn-sm"><i class="ti ti-plus"></i> Add payment</button>
+        </div>
+        <div class="fin-row"><span>Amount receivable (invoice INV-2026-041)</span><span>$4,200</span></div>
+        <div class="fin-row"><span>Received — Jun 3, 2026</span><span class="amount pos">$2,000</span></div>
+        <div class="fin-row"><span style="font-weight:600;">Delta (receivable − received)</span><span class="amount neg">$2,200</span></div>
+      </div>
+      <div style="border-top:0.5px solid var(--border); padding-top:14px; margin-top:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:13px; font-weight:600;">Payable to carrier <span class="badge b-transit" style="margin-left:6px;">Partly paid</span></div>
+          <button class="btn btn-sm"><i class="ti ti-plus"></i> Add payment</button>
+        </div>
+        <div class="fin-row"><span>Amount payable</span><span>$2,800</span></div>
+        <div class="fin-row"><span>Paid — Jun 2, 2026</span><span class="amount pos">$1,400</span></div>
+        <div class="fin-row"><span style="font-weight:600;">Delta (payable − paid)</span><span class="amount neg">$1,400</span></div>
+      </div>`,
+
+    history: `
+      <div style="font-size:13px; font-weight:600; margin-bottom:14px;">Delivery history</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+          <div class="tl-text"><div class="tl-status">Transit</div><div class="tl-date">Jun 4, 2026 · 09:14 · Updated by Anar Hasanov</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+          <div class="tl-text"><div class="tl-status">Loaded</div><div class="tl-date">Jun 2, 2026 · 14:22 · Updated by Anar Hasanov</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-line"><div class="tl-dot"></div></div>
+          <div class="tl-text"><div class="tl-status">Created</div><div class="tl-date">Jun 1, 2026 · 11:05 · Created by Leyla Mahmudova</div></div>
+        </div>
+      </div>
+      <div style="border-top:0.5px solid var(--border); padding-top:14px; margin-top:8px;">
+        <div style="font-size:13px; font-weight:600; margin-bottom:10px;">Payment history</div>
+        <div class="fin-row"><span>Invoice INV-2026-041 issued</span><span class="amount">$4,200 · Jun 1, 2026</span></div>
+        <div class="fin-row"><span>Payment received from Baku Steel LLC</span><span class="amount pos">$2,000 · Jun 3, 2026</span></div>
+        <div class="fin-row"><span>Payment sent to Akın Logistics</span><span class="amount neg">$1,400 · Jun 2, 2026</span></div>
+      </div>`,
+
+    docs: `
+      <div class="doc-list">
+        <div class="doc-item"><i class="ti ti-file-text"></i><div class="doc-name">CMR — TRK-0188</div><span class="doc-vis yes">Client visible</span><div class="doc-date">Jun 1, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+        <div class="doc-item"><i class="ti ti-file-invoice"></i><div class="doc-name">Invoice INV-2026-041</div><span class="doc-vis yes">Client visible</span><div class="doc-date">Jun 1, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+        <div class="doc-item"><i class="ti ti-certificate"></i><div class="doc-name">Certificate of origin</div><span class="doc-vis yes">Client visible</span><div class="doc-date">May 30, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+        <div class="doc-item"><i class="ti ti-clipboard-list"></i><div class="doc-name">Packing list</div><span class="doc-vis yes">Client visible</span><div class="doc-date">May 30, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+        <div class="doc-item"><i class="ti ti-photo"></i><div class="doc-name">Cargo photos (4 files)</div><span class="doc-vis no">Internal</span><div class="doc-date">Jun 1, 2026</div><div class="icon-btn" title="Download"><i class="ti ti-download"></i></div></div>
+      </div>
+      <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn"><i class="ti ti-upload"></i> Upload document</button>
+        <button class="btn"><i class="ti ti-file-invoice"></i> Generate invoice</button>
+        <button class="btn"><i class="ti ti-file-check"></i> Generate completion act</button>
+      </div>`,
+
+    comments: `
+      <div class="chat-thread">
+        <div class="chat-msg staff"><div class="chat-meta">Leyla Mahmudova (Operator) · Jun 2, 14:30</div>Cargo loaded in Istanbul, truck departs this evening. ETA Jun 12.</div>
+        <div class="chat-msg client"><div class="chat-meta">Elçin Məmməd (Baku Steel LLC) · Jun 3, 09:12</div>Thanks. Please send the certificate of origin when available.</div>
+        <div class="chat-msg staff"><div class="chat-meta">Leyla Mahmudova (Operator) · Jun 3, 10:05</div>Uploaded to the documents tab — see "Certificate of origin".</div>
+        <div class="chat-msg staff"><div class="chat-meta">Anar Hasanov (Admin) · Jun 4, 09:20</div>Status updated to Transit. Border crossing expected Jun 8.</div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" class="field-input" placeholder="Write a comment... (visible to the client)">
+        <button class="btn btn-primary"><i class="ti ti-send"></i> Send</button>
+      </div>`
+  };
+
+  function showPage(id, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+    const titles = {orders:'Orders', dashboard:'Dashboard', accounts:'Accounts', carriers:'Carriers', transport:'Transportation', finance:'Finance', documents:'Documents', users:'Users & Roles', audit:'Audit Log', portal:'Client portal — preview'};
+    document.getElementById('page-title').textContent = titles[id] || id;
+    const btn = document.getElementById('top-action');
+    const actionMap = {orders:'New Order', accounts:'New account', carriers:'New carrier', transport:'New transport', users:'Invite user'};
+    if (actionMap[id]) { btn.style.display=''; btn.innerHTML='<i class="ti ti-plus"></i> ' + actionMap[id]; }
+    else btn.style.display='none';
+  }
+
+  function openDetail(orderId, client, status) {
+    document.getElementById('modal-order-title').textContent = orderId + ' — ' + client;
+    var badge = document.getElementById('modal-status-badge');
+    var classMap = {created:'b-created', received:'b-received', internal:'b-internal', loaded:'b-loaded', transit:'b-transit', border:'b-border', customs:'b-customs', arrived:'b-arrived', delivered:'b-delivered', closed:'b-closed'};
+    var labelMap = {created:'Created', received:'Received', internal:'Internal transit', loaded:'Loaded', transit:'Transit', border:'At the border', customs:'At customs', arrived:'Arrived', delivered:'Delivered', closed:'Closed'};
+    badge.className = 'badge ' + (classMap[status] || 'b-created');
+    badge.textContent = labelMap[status] || status;
+    document.getElementById('modal-detail').classList.add('open');
+    switchTab('info');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  function handleModalBgClick(e, id) {
+    if (e.target === document.getElementById(id)) closeModal(id);
+  }
+
+  function switchTab(t) {
+    ['info','finance','history','docs','comments'].forEach(function(x) {
+      document.getElementById('tab-' + x).classList.toggle('on', x === t);
+    });
+    document.getElementById('modal-content').innerHTML = TAB_CONTENT[t] || '';
+  }
+
+  function openNewOrder() {
+    document.getElementById('modal-neworder').classList.add('open');
+  }
+
+  function filterStatus(el, status) {
+    document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('on'));
+    el.classList.add('on');
+    var rows = document.querySelectorAll('#orders-body tr');
+    rows.forEach(function(row) {
+      row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
+    });
+  }
+
+  document.querySelectorAll('.lang-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      this.closest('.lang-tabs').querySelectorAll('.lang-tab').forEach(t => t.classList.remove('on'));
+      this.classList.add('on');
+    });
+  });
+
+  document.querySelectorAll('.month-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.month-tab').forEach(t => t.classList.remove('on'));
+      this.classList.add('on');
+    });
+  });
+
+  switchTab('info');
+</script>
+</body>
+</html>
