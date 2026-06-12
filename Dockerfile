@@ -27,17 +27,18 @@ RUN npm ci
 FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=build /app/.next/standalone ./
-COPY --from=build /app/.next/static ./.next/static
-COPY --from=build /app/public ./public
-COPY --from=build /app/drizzle ./drizzle
-COPY --from=build /app/drizzle.config.ts ./
+COPY --chown=node:node --from=build /app/.next/standalone ./
+COPY --chown=node:node --from=build /app/.next/static ./.next/static
+COPY --chown=node:node --from=build /app/public ./public
+COPY --chown=node:node --from=build /app/drizzle ./drizzle
+COPY --chown=node:node --from=build /app/drizzle.config.ts ./
 # Copy drizzle-kit + its deps (esbuild with linux binaries, drizzle-orm, postgres driver)
-COPY --from=migrate-deps /migrate/node_modules/drizzle-kit ./node_modules/drizzle-kit
-COPY --from=migrate-deps /migrate/node_modules/drizzle-orm ./node_modules/drizzle-orm
-COPY --from=migrate-deps /migrate/node_modules/esbuild ./node_modules/esbuild
-COPY --from=migrate-deps /migrate/node_modules/@esbuild ./node_modules/@esbuild
-COPY --from=migrate-deps /migrate/node_modules/postgres ./node_modules/postgres
+COPY --chown=node:node --from=migrate-deps /migrate/node_modules/drizzle-kit ./node_modules/drizzle-kit
+COPY --chown=node:node --from=migrate-deps /migrate/node_modules/drizzle-orm ./node_modules/drizzle-orm
+COPY --chown=node:node --from=migrate-deps /migrate/node_modules/esbuild ./node_modules/esbuild
+COPY --chown=node:node --from=migrate-deps /migrate/node_modules/@esbuild ./node_modules/@esbuild
+COPY --chown=node:node --from=migrate-deps /migrate/node_modules/postgres ./node_modules/postgres
+USER node
 EXPOSE 3000
 # Use node directly on bin.cjs to avoid npx attempting a network download
 CMD ["sh", "-c", "node node_modules/drizzle-kit/bin.cjs migrate && node server.js"]

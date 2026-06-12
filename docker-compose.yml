@@ -43,6 +43,7 @@ services:
       S3_ACCESS_KEY: freightops
       S3_SECRET_KEY: freightops_dev
       S3_BUCKET: freightops-documents
+    # minio is not a runtime dependency until Phase 4 (document uploads)
     depends_on:
       postgres:
         condition: service_healthy
