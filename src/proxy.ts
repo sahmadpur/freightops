@@ -12,6 +12,6 @@ export function proxy(request: NextRequest) {
 export const config = {
   // Only /api/auth is public; all other /api/* routes are intentionally gated.
   matcher: [
-    "/((?!api/auth(?:/|$)|sign-in(?:/|$)|accept-invitation(?:/|$)|_next/static|_next/image|favicon\\.ico).*)",
+    "/((?!api/auth(?:/|$)|sign-in(?:/|$)|accept-invitation(?:/|$)|_next(?:/|$)|favicon\\.ico).*)",
   ],
 };
