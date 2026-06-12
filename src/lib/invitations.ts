@@ -14,6 +14,8 @@ export function invitationStatus(inv: InvitationCheck): InvitationState {
   return "valid";
 }
 
+// SECURITY: caller must verify the session has staff/admin role before calling this.
+// Do NOT expose via a "use server" action without a requireArea(...) guard.
 export async function createInvitation(params: {
   email: string;
   role: Role;
