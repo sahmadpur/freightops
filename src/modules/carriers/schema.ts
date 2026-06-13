@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { contactInputSchema, type ActionResult } from "@/modules/accounts/schema";
+import { contactInputSchema } from "@/modules/accounts/schema";
 
 export { contactInputSchema };
-export type { ActionResult };
+export type { ActionResult } from "@/lib/forms";
 
 export const carrierInputSchema = z.object({
   title: z.string().trim().min(1).max(300),

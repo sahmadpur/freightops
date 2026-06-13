@@ -1,4 +1,5 @@
 import { z } from "zod";
+export type { ActionResult } from "@/lib/forms";
 
 /** Drops whitespace-only entries, trims the rest. */
 const trimmedList = (max: number, validate?: (s: z.ZodString) => z.ZodString) =>
@@ -24,8 +25,3 @@ export const accountInputSchema = z.object({
 
 export type AccountInput = z.infer<typeof accountInputSchema>;
 export type ContactInput = z.infer<typeof contactInputSchema>;
-
-/** Shared shape for the form's typed result. */
-export type ActionResult =
-  | { ok: true; id: string }
-  | { ok: false; error?: string; fieldErrors?: Record<string, string[]> };

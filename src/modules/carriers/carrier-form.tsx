@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Field, inputCls, SubmitRow } from "@/components/ui/form";
 import { ContactsEditor, type EditableContact } from "@/components/contacts-editor";
 import { createCarrier, updateCarrier } from "./actions";
-import type { ActionResult } from "@/modules/accounts/schema";
+import type { ActionResult } from "@/lib/forms";
 
 export type CarrierFormInitial = {
   id?: string;
