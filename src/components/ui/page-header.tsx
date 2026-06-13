@@ -2,7 +2,7 @@ export function PageHeader({
   title,
   action,
 }: {
-  title: string;
+  title: React.ReactNode;
   action?: React.ReactNode;
 }) {
   return (
