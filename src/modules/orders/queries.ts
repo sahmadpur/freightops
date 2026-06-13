@@ -1,6 +1,6 @@
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { orders, accounts, carriers, transportModes, auditLog } from "@/db/schema";
+import { orders, accounts, carriers, transportModes, auditLog, orderStatusEnum } from "@/db/schema";
 import { PAGE_SIZE } from "@/components/ui/paginator";
 import type { OrderStatus } from "@/lib/order-status";
 
@@ -20,7 +20,9 @@ export type OrderListRow = {
 export async function listOrders(opts: { q?: string; status?: string; page?: number }) {
   const page = Math.max(1, opts.page ?? 1);
   const conds = [];
-  if (opts.status) conds.push(eq(orders.status, opts.status as OrderStatus));
+  if (opts.status && (orderStatusEnum.enumValues as readonly string[]).includes(opts.status)) {
+    conds.push(eq(orders.status, opts.status as OrderStatus));
+  }
   if (opts.q) {
     const like = `%${opts.q}%`;
     conds.push(or(ilike(orders.number, like), ilike(orders.title, like), ilike(orders.route, like), ilike(accounts.title, like)));

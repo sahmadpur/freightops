@@ -12,11 +12,13 @@ import type { ActionResult } from "@/lib/forms";
 const AUDITED_FIELDS = [
   "title", "clientOrderId", "accountId", "carrierId", "transportModeId", "route",
   "cargoDescription", "packages", "weightKg", "volumeM3", "incoterms", "deliveryFormat",
-  "status", "clientCharge", "carrierCost", "additionalCosts", "additionalCostsNote",
-  "expectedProfit", "invoiceNumber", "invoiceDate", "amountReceivable", "amountPayable",
+  "clientCharge", "carrierCost", "additionalCosts", "additionalCostsNote",
+  "expectedProfit", "invoiceNumber", "invoiceDate",
 ];
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+class TransportNotFound extends Error {}
 
 function toRow(data: OrderInput) {
   return {
@@ -41,11 +43,22 @@ function toRow(data: OrderInput) {
   };
 }
 
+// NOTE: choosing "new" transport while EDITING an order creates a fresh transport mode
+// and repoints the order; a previously inline-created mode is left unreferenced (appears
+// in the Transportation list). Acceptable for v1; revisit with orphan cleanup if needed.
+
 /** Resolve the transport sub-flow to a transportModeId, creating a new mode if requested. */
 async function resolveTransport(tx: Tx, data: OrderInput, userId: string): Promise<string | null> {
   const tr = data.transport;
   if (tr.mode === "none") return null;
-  if (tr.mode === "existing") return tr.transportModeId;
+  if (tr.mode === "existing") {
+    const exists = await tx.query.transportModes.findFirst({
+      where: eq(transportModes.id, tr.transportModeId),
+      columns: { id: true },
+    });
+    if (!exists) throw new TransportNotFound();
+    return tr.transportModeId;
+  }
   const [row] = await tx
     .insert(transportModes)
     .values({
@@ -71,21 +84,27 @@ export async function createOrder(input: unknown): Promise<ActionResult> {
   if (!parsed.success) return { ok: false, fieldErrors: parsed.error.flatten().fieldErrors };
   const data = parsed.data;
 
-  const id = await db.transaction(async (tx) => {
-    const transportModeId = await resolveTransport(tx, data, session.user.id);
-    const number = await nextOrderNumber(tx, new Date().getFullYear());
-    const [row] = await tx
-      .insert(orders)
-      .values({ ...toRow(data), transportModeId, number, createdBy: session.user.id })
-      .returning({ id: orders.id });
-    await recordAudit(tx, {
-      userId: session.user.id,
-      entityType: "order",
-      entityId: row.id,
-      action: "created",
+  let id: string;
+  try {
+    id = await db.transaction(async (tx) => {
+      const transportModeId = await resolveTransport(tx, data, session.user.id);
+      const number = await nextOrderNumber(tx, new Date().getFullYear());
+      const [row] = await tx
+        .insert(orders)
+        .values({ ...toRow(data), transportModeId, number, createdBy: session.user.id })
+        .returning({ id: orders.id });
+      await recordAudit(tx, {
+        userId: session.user.id,
+        entityType: "order",
+        entityId: row.id,
+        action: "created",
+      });
+      return row.id;
     });
-    return row.id;
-  });
+  } catch (e) {
+    if (e instanceof TransportNotFound) return { ok: false, fieldErrors: { transport: ["Transport mode not found"] } };
+    throw e;
+  }
 
   return { ok: true, id };
 }
@@ -96,24 +115,30 @@ export async function updateOrder(id: string, input: unknown): Promise<ActionRes
   if (!parsed.success) return { ok: false, fieldErrors: parsed.error.flatten().fieldErrors };
   const data = parsed.data;
 
-  const result = await db.transaction(async (tx) => {
-    const before = await tx.query.orders.findFirst({ where: eq(orders.id, id) });
-    if (!before) return "not_found" as const;
-    const transportModeId = await resolveTransport(tx, data, session.user.id);
-    const after = { ...toRow(data), transportModeId };
-    await tx.update(orders).set(after).where(eq(orders.id, id));
-    const changes = auditDiff(before, after, AUDITED_FIELDS);
-    if (changes.length > 0) {
-      await recordAudit(tx, {
-        userId: session.user.id,
-        entityType: "order",
-        entityId: id,
-        action: "updated",
-        changes,
-      });
-    }
-    return "ok" as const;
-  });
+  let result: "ok" | "not_found";
+  try {
+    result = await db.transaction(async (tx) => {
+      const before = await tx.query.orders.findFirst({ where: eq(orders.id, id) });
+      if (!before) return "not_found" as const;
+      const transportModeId = await resolveTransport(tx, data, session.user.id);
+      const after = { ...toRow(data), transportModeId };
+      await tx.update(orders).set(after).where(eq(orders.id, id));
+      const changes = auditDiff(before, after, AUDITED_FIELDS);
+      if (changes.length > 0) {
+        await recordAudit(tx, {
+          userId: session.user.id,
+          entityType: "order",
+          entityId: id,
+          action: "updated",
+          changes,
+        });
+      }
+      return "ok" as const;
+    });
+  } catch (e) {
+    if (e instanceof TransportNotFound) return { ok: false, fieldErrors: { transport: ["Transport mode not found"] } };
+    throw e;
+  }
 
   if (result === "not_found") return { ok: false, error: "not_found" };
   return { ok: true, id };
