@@ -50,7 +50,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <dl className="grid grid-cols-3 gap-3 text-sm">
             {row(t("fields.clientCharge"), order.clientCharge ? `$${order.clientCharge}` : "—")}
             {row(t("fields.carrierCost"), order.carrierCost ? `$${order.carrierCost}` : "—")}
+            {row(t("fields.additionalCosts"), order.additionalCosts ? `$${order.additionalCosts}` : "—")}
             {row(t("fields.expectedProfit"), order.expectedProfit ? `$${order.expectedProfit}` : "—")}
+            {order.additionalCostsNote ? row(t("fields.additionalCosts"), order.additionalCostsNote) : null}
           </dl>
         </CardBody>
       </Card>
