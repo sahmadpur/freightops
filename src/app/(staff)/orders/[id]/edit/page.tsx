@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
-import { OrderForm, blankOrderInitial } from "@/modules/orders/order-form";
+import { OrderForm } from "@/modules/orders/order-form";
+import { blankOrderInitial } from "@/modules/orders/order-form-initial";
 import { getOrder, orderFormData } from "@/modules/orders/queries";
 import { transportModeOptions } from "@/modules/transport/queries";
 

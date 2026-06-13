@@ -6,48 +6,13 @@ import { useTranslations } from "next-intl";
 import { Field, inputCls, SubmitRow } from "@/components/ui/form";
 import { createOrder, updateOrder } from "./actions";
 import type { ActionResult } from "@/lib/forms";
+import type { OrderFormInitial } from "./order-form-initial";
 
 const INCOTERMS = ["EXW", "FCA", "FAS", "FOB", "CFR", "CIF", "CPT", "CIP", "DAP", "DPU", "DDP"] as const;
 const DELIVERY_FORMATS = ["FCL", "LCL", "FTL", "LTL"] as const;
 const MODE_TYPES = ["vehicle", "air", "postal", "rail", "sea"] as const;
 
 type Option = { id: string; title?: string; number?: string; modeType?: string };
-type TransportMode = "none" | "existing" | "new";
-
-export type OrderFormInitial = {
-  id?: string;
-  title: string;
-  clientOrderId: string;
-  accountId: string;
-  carrierId: string;
-  route: string;
-  cargoDescription: string;
-  packages: string;
-  weightKg: string;
-  volumeM3: string;
-  incoterms: string;
-  deliveryFormat: string;
-  clientCharge: string;
-  carrierCost: string;
-  additionalCosts: string;
-  additionalCostsNote: string;
-  expectedProfit: string;
-  invoiceNumber: string;
-  invoiceDate: string;
-  transportMode: TransportMode;
-  transportModeId: string;
-  newTransport: {
-    modeType: string;
-    number: string;
-    fromCountry: string;
-    toCountry: string;
-    route: string;
-    loadingDate: string;
-    plannedArrivalDate: string;
-    totalWeightKg: string;
-    totalVolumeM3: string;
-  };
-};
 
 export function OrderForm({
   initial,
@@ -237,20 +202,4 @@ export function OrderForm({
       />
     </form>
   );
-}
-
-/** Blank initial values for the create form. */
-export function blankOrderInitial(): OrderFormInitial {
-  return {
-    title: "", clientOrderId: "", accountId: "", carrierId: "", route: "",
-    cargoDescription: "", packages: "", weightKg: "", volumeM3: "",
-    incoterms: "", deliveryFormat: "", clientCharge: "", carrierCost: "",
-    additionalCosts: "", additionalCostsNote: "", expectedProfit: "",
-    invoiceNumber: "", invoiceDate: "",
-    transportMode: "none", transportModeId: "",
-    newTransport: {
-      modeType: "vehicle", number: "", fromCountry: "", toCountry: "",
-      route: "", loadingDate: "", plannedArrivalDate: "", totalWeightKg: "", totalVolumeM3: "",
-    },
-  };
 }
