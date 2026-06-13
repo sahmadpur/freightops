@@ -4,6 +4,7 @@ import type { db } from "@/db";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
+/** Returns an ORD-YYYY-NNN string; seq is left-padded to 3 digits and never truncated. */
 export function formatOrderNumber(year: number, seq: number): string {
   return `ORD-${year}-${String(seq).padStart(3, "0")}`;
 }
