@@ -189,7 +189,8 @@
     "ordersByStatus": "Statusa görə sifarişlər",
     "monthlyResults": "Aylıq maliyyə nəticələri — {year}",
     "month": "Ay",
-    "noData": "Bu dövr üçün məlumat yoxdur"
+    "noData": "Bu dövr üçün məlumat yoxdur",
+    "balancesOverview": "Qalıq balanslar"
   },
   "payStatus": {
     "paid": "Ödənilib",

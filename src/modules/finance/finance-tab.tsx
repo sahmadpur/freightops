@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Field, inputCls } from "@/components/ui/form";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, toCents } from "@/lib/money";
 import type { OrderFinance, OrderPayment } from "./queries";
 import { addPayment, deletePayment, updateOrderFinancials } from "./actions";
 
@@ -164,7 +164,7 @@ function PaymentSection({
           <ul className="mb-3 divide-y divide-slate-100 text-sm">
             {payments.map((p) => (
               <li key={p.id} className="flex items-center justify-between py-2">
-                <span>{formatMoney(Math.round(Number(p.amount) * 100))}</span>
+                <span>{formatMoney(toCents(p.amount))}</span>
                 <span className="text-xs text-slate-400">
                   {new Date(p.paidAt).toISOString().slice(0, 10)}{p.note ? ` · ${p.note}` : ""}
                 </span>

@@ -189,7 +189,8 @@
     "ordersByStatus": "Заказы по статусам",
     "monthlyResults": "Финансовые результаты по месяцам — {year}",
     "month": "Месяц",
-    "noData": "Нет данных за период"
+    "noData": "Нет данных за период",
+    "balancesOverview": "Непогашенные балансы"
   },
   "payStatus": {
     "paid": "Оплачено",

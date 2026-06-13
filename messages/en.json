@@ -189,7 +189,8 @@
     "ordersByStatus": "Orders by status",
     "monthlyResults": "Financial results per month — {year}",
     "month": "Month",
-    "noData": "No data for this period"
+    "noData": "No data for this period",
+    "balancesOverview": "Outstanding balances"
   },
   "payStatus": {
     "paid": "Paid",

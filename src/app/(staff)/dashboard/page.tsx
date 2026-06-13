@@ -52,7 +52,7 @@ export default async function DashboardPage() {
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("financialOverview")}</span></CardHeader>
+          <CardHeader><span className="text-sm font-semibold">{t("balancesOverview")}</span></CardHeader>
           <CardBody>
             {fin(t("accountsReceivable"), d.financial.clients.outstandingCents)}
             {fin(t("owedToCarriers"), d.financial.carriers.outstandingCents, "neg")}
