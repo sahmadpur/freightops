@@ -7,6 +7,8 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { OrderDetailTabs } from "@/modules/orders/order-detail-tabs";
 import { StatusControl } from "@/modules/orders/status-control";
 import { getOrder } from "@/modules/orders/queries";
+import { orderFinance } from "@/modules/finance/queries";
+import { FinanceTab } from "@/modules/finance/finance-tab";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,6 +16,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const format = await getFormatter();
   const data = await getOrder(id);
   if (!data) notFound();
+  const finance = await orderFinance(id);
   const { order, accountTitle, carrierTitle, transportNumber, transportModeType, history } = data;
 
   const row = (label: string, value: React.ReactNode) => (
@@ -41,18 +44,6 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             {row(t("fields.incoterms"), order.incoterms)}
             {row(t("fields.deliveryFormat"), order.deliveryFormat)}
             {row(t("fields.invoiceNumber"), order.invoiceNumber)}
-          </dl>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("nav.finance")}</span></CardHeader>
-        <CardBody>
-          <dl className="grid grid-cols-3 gap-3 text-sm">
-            {row(t("fields.clientCharge"), order.clientCharge ? `$${order.clientCharge}` : "—")}
-            {row(t("fields.carrierCost"), order.carrierCost ? `$${order.carrierCost}` : "—")}
-            {row(t("fields.additionalCosts"), order.additionalCosts ? `$${order.additionalCosts}` : "—")}
-            {row(t("fields.expectedProfit"), order.expectedProfit ? `$${order.expectedProfit}` : "—")}
-            {order.additionalCostsNote ? row(t("fields.additionalCosts"), order.additionalCostsNote) : null}
           </dl>
         </CardBody>
       </Card>
@@ -100,7 +91,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </Link>
         }
       />
-      <OrderDetailTabs info={info} history={historyNode} />
+      <OrderDetailTabs
+        info={info}
+        finance={finance ? <FinanceTab orderId={order.id} finance={finance} /> : null}
+        history={historyNode}
+      />
     </div>
   );
 }
