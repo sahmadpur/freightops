@@ -37,7 +37,6 @@ export function AccountForm({ initial }: { initial: AccountFormInitial }) {
     setResult(r);
     if (r.ok) {
       router.push(`/accounts/${r.id}`);
-      router.refresh();
     }
   }
 

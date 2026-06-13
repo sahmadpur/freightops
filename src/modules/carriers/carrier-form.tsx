@@ -35,7 +35,6 @@ export function CarrierForm({ initial }: { initial: CarrierFormInitial }) {
     setResult(r);
     if (r.ok) {
       router.push(`/carriers/${r.id}`);
-      router.refresh();
     }
   }
 
