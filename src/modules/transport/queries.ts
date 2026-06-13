@@ -24,7 +24,9 @@ export type TransportListRow = {
 };
 
 function num(v: string | null): number {
-  return v ? Number(v) : 0;
+  if (!v) return 0;
+  const n = Number(v);
+  return Number.isNaN(n) ? 0 : n;
 }
 
 export async function listTransportModes(): Promise<TransportListRow[]> {
@@ -96,7 +98,8 @@ export async function getTransportMode(id: string) {
   return { mode, orders: modeOrders };
 }
 
-/** Lightweight list for the order form's "attach existing transport" dropdown. */
+/** Lightweight list for the order form's "attach existing transport" dropdown.
+ *  Capped at 500 to keep the dropdown manageable; revisit with search if exceeded. */
 export async function transportModeOptions() {
   return db
     .select({ id: transportModes.id, number: transportModes.number, modeType: transportModes.modeType })
