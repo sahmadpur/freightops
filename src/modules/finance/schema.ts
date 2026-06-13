@@ -10,7 +10,7 @@ const positiveAmount = z
   .refine((s) => Number(s) > 0, "Must be greater than zero");
 
 export const paymentInputSchema = z.object({
-  direction: z.enum(paymentDirectionEnum.enumValues as unknown as [string, ...string[]]),
+  direction: z.enum(paymentDirectionEnum.enumValues),
   amount: positiveAmount,
   paidAt: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be a date"),
   note: z.string().trim().max(500).optional().or(z.literal("")),
