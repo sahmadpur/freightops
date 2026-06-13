@@ -229,3 +229,8 @@ export const invitations = pgTable("invitations", {
   invitedBy: text("invited_by").references(() => user.id),
   createdAt: createdAt(),
 });
+
+export const orderCounters = pgTable("order_counters", {
+  year: integer("year").primaryKey(),
+  lastNumber: integer("last_number").notNull().default(0),
+});

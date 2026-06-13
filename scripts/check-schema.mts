@@ -4,6 +4,7 @@ const expected = [
   "user", "session", "account", "verification",
   "accounts", "carriers", "contacts", "transport_modes", "orders",
   "payments", "documents", "comments", "audit_log", "invitations",
+  "order_counters",
 ];
 
 const sql = postgres(process.env.DATABASE_URL!);
@@ -48,4 +49,4 @@ if (fkRows.length === 0) {
 }
 
 await sql.end();
-console.log("OK — schema verified: 14 tables, 10 enums, user→accounts FK");
+console.log("OK — schema verified: 15 tables, 10 enums, user→accounts FK");
