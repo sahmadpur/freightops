@@ -63,6 +63,9 @@ export async function financeTotals() {
   const [payAgg] = await db.select({ invoiced: sql<string>`coalesce(sum(${orders.amountPayable}), 0)` }).from(orders);
   const [inAgg] = await db.select({ total: sql<string>`coalesce(sum(${payments.amount}), 0)` }).from(payments).where(eq(payments.direction, "incoming"));
   const [outAgg] = await db.select({ total: sql<string>`coalesce(sum(${payments.amount}), 0)` }).from(payments).where(eq(payments.direction, "outgoing"));
+  // YTD profit/revenue figures are scoped to the current calendar year; the
+  // outstanding balances above are point-in-time and intentionally all-time.
+  const year = new Date().getFullYear();
   const [revAgg] = await db
     .select({
       revenue: sql<string>`coalesce(sum(${orders.clientCharge}), 0)`,
@@ -70,7 +73,8 @@ export async function financeTotals() {
       additional: sql<string>`coalesce(sum(${orders.additionalCosts}), 0)`,
       expectedProfit: sql<string>`coalesce(sum(${orders.expectedProfit}), 0)`,
     })
-    .from(orders);
+    .from(orders)
+    .where(sql`extract(year from ${orders.createdAt}) = ${year}`);
 
   const totalReceivable = toCents(recvAgg.invoiced);
   const totalPayable = toCents(payAgg.invoiced);
@@ -121,6 +125,8 @@ export async function dashboardData() {
 
   const totals = await financeTotals();
 
+  // Monthly results are scoped to the current year (matches the dashboard's year header).
+  const year = new Date().getFullYear();
   const monthly = await db
     .select({
       month: sql<string>`to_char(${orders.createdAt}, 'YYYY-MM')`,
@@ -130,6 +136,7 @@ export async function dashboardData() {
       expectedProfit: sql<string>`coalesce(sum(${orders.expectedProfit}), 0)`,
     })
     .from(orders)
+    .where(sql`extract(year from ${orders.createdAt}) = ${year}`)
     .groupBy(sql`to_char(${orders.createdAt}, 'YYYY-MM')`)
     .orderBy(desc(sql`to_char(${orders.createdAt}, 'YYYY-MM')`));
 
