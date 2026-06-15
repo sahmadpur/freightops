@@ -196,5 +196,37 @@
     "paid": "Ödənilib",
     "partly_paid": "Qismən ödənilib",
     "not_paid": "Ödənilməyib"
+  },
+  "documents": {
+    "title": "Sənədlər",
+    "tab": "Sənədlər",
+    "upload": "Sənəd yüklə",
+    "uploading": "Yüklənir...",
+    "fileLabel": "Fayl",
+    "typeLabel": "Sənəd növü",
+    "visibleToClient": "Müştəriyə görünür",
+    "clientVisible": "Müştəriyə görünür",
+    "internal": "Daxili",
+    "download": "Yüklə",
+    "remove": "Sil",
+    "noDocuments": "Hələ sənəd yoxdur",
+    "empty": "Hələ heç bir sənəd yüklənməyib.",
+    "searchPlaceholder": "Fayl adı, sifariş №, müştəri ilə axtar...",
+    "allTypes": "Bütün sənəd növləri",
+    "tooLarge": "Fayl çox böyükdür (maks. 20 MB)",
+    "badType": "Bu fayl növünə icazə verilmir",
+    "emptyFile": "Fayl boşdur",
+    "uploadFailed": "Yükləmə alınmadı"
+  },
+  "docType": {
+    "cmr": "CMR",
+    "awb": "AWB",
+    "bill_of_lading": "Konosament",
+    "invoice": "Qaimə",
+    "packing_list": "Qablaşdırma siyahısı",
+    "certificate": "Sertifikat",
+    "waybill": "Yük qaiməsi",
+    "cargo_photos": "Yük şəkilləri",
+    "other": "Digər"
   }
 }

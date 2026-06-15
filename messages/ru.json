@@ -196,5 +196,37 @@
     "paid": "Оплачено",
     "partly_paid": "Частично оплачено",
     "not_paid": "Не оплачено"
+  },
+  "documents": {
+    "title": "Документы",
+    "tab": "Документы",
+    "upload": "Загрузить документ",
+    "uploading": "Загрузка...",
+    "fileLabel": "Файл",
+    "typeLabel": "Тип документа",
+    "visibleToClient": "Виден клиенту",
+    "clientVisible": "Виден клиенту",
+    "internal": "Внутренний",
+    "download": "Скачать",
+    "remove": "Удалить",
+    "noDocuments": "Документов пока нет",
+    "empty": "Документы ещё не загружены.",
+    "searchPlaceholder": "Поиск по имени файла, № заказа, клиенту...",
+    "allTypes": "Все типы документов",
+    "tooLarge": "Файл слишком большой (макс. 20 МБ)",
+    "badType": "Этот тип файла не разрешён",
+    "emptyFile": "Файл пустой",
+    "uploadFailed": "Не удалось загрузить"
+  },
+  "docType": {
+    "cmr": "CMR",
+    "awb": "AWB",
+    "bill_of_lading": "Коносамент",
+    "invoice": "Счёт",
+    "packing_list": "Упаковочный лист",
+    "certificate": "Сертификат",
+    "waybill": "Накладная",
+    "cargo_photos": "Фото груза",
+    "other": "Прочее"
   }
 }

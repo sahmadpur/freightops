@@ -196,5 +196,37 @@
     "paid": "Paid",
     "partly_paid": "Partly paid",
     "not_paid": "Not paid"
+  },
+  "documents": {
+    "title": "Documents",
+    "tab": "Documents",
+    "upload": "Upload document",
+    "uploading": "Uploading...",
+    "fileLabel": "File",
+    "typeLabel": "Document type",
+    "visibleToClient": "Visible to client",
+    "clientVisible": "Client visible",
+    "internal": "Internal",
+    "download": "Download",
+    "remove": "Remove",
+    "noDocuments": "No documents yet",
+    "empty": "No documents have been uploaded yet.",
+    "searchPlaceholder": "Search by file name, order #, client...",
+    "allTypes": "All document types",
+    "tooLarge": "File is too large (max 20 MB)",
+    "badType": "That file type is not allowed",
+    "emptyFile": "The file is empty",
+    "uploadFailed": "Upload failed"
+  },
+  "docType": {
+    "cmr": "CMR",
+    "awb": "AWB",
+    "bill_of_lading": "Bill of lading",
+    "invoice": "Invoice",
+    "packing_list": "Packing list",
+    "certificate": "Certificate",
+    "waybill": "Waybill",
+    "cargo_photos": "Cargo photos",
+    "other": "Other"
   }
 }
