@@ -13,10 +13,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   if (!doc) return new NextResponse("Not found", { status: 404 });
 
   const { body, contentType } = await getObject(doc.s3Key);
+  // RFC 5987 filename* handles non-ASCII (Cyrillic/Azerbaijani) names; the plain
+  // filename is an ASCII-ish fallback for older clients.
+  const encoded = encodeURIComponent(doc.fileName);
   return new NextResponse(new Uint8Array(body), {
     headers: {
       "Content-Type": contentType,
-      "Content-Disposition": `attachment; filename="${encodeURIComponent(doc.fileName)}"`,
+      "Content-Disposition": `attachment; filename="${encoded}"; filename*=UTF-8''${encoded}`,
       "Content-Length": String(body.length),
     },
   });
