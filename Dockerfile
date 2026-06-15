@@ -32,6 +32,11 @@ RUN npm ci
 FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+# Next.js standalone server.js binds to $HOSTNAME; Docker otherwise sets it to the
+# container id, binding a single interface. Bind all interfaces so a reverse proxy
+# (Traefik) can reach the app. PORT keeps the listen port explicit.
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
 COPY --chown=node:node --from=build /app/.next/standalone ./
 COPY --chown=node:node --from=build /app/.next/static ./.next/static
 COPY --chown=node:node --from=build /app/public ./public

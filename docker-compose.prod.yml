@@ -86,6 +86,11 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       NODE_ENV: production
+      # Next.js standalone server binds to $HOSTNAME, which Docker otherwise sets
+      # to the container id (binds one interface). Force all-interfaces so Traefik
+      # can reach it on the proxy network.
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
     networks:
       - default   # reach db / minio / mailpit
       - proxy     # reached by Traefik
