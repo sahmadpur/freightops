@@ -93,3 +93,64 @@ export async function orderFormData() {
   ]);
   return { accountOpts, carrierOpts };
 }
+
+export type ClientOrderListRow = {
+  id: string;
+  number: string;
+  title: string;
+  route: string | null;
+  transportNumber: string | null;
+  status: OrderStatus;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+/** Orders belonging to one client account (portal My Orders), newest first. */
+export async function listClientOrders(accountId: string, opts: { q?: string; status?: string }): Promise<ClientOrderListRow[]> {
+  const conds = [eq(orders.accountId, accountId)];
+  if (opts.status && (orderStatusEnum.enumValues as readonly string[]).includes(opts.status)) {
+    conds.push(eq(orders.status, opts.status as OrderStatus));
+  }
+  if (opts.q) {
+    const like = `%${opts.q}%`;
+    conds.push(or(ilike(orders.number, like), ilike(orders.title, like), ilike(orders.route, like))!);
+  }
+  const rows = await db
+    .select({
+      id: orders.id,
+      number: orders.number,
+      title: orders.title,
+      route: orders.route,
+      transportNumber: transportModes.number,
+      status: orders.status,
+      createdAt: orders.createdAt,
+      updatedAt: orders.updatedAt,
+    })
+    .from(orders)
+    .leftJoin(transportModes, eq(orders.transportModeId, transportModes.id))
+    .where(and(...conds))
+    .orderBy(desc(orders.createdAt));
+  return rows as ClientOrderListRow[];
+}
+
+/**
+ * One order, but ONLY if it belongs to `accountId` (portal access guard).
+ * Returns null when the order doesn't exist or isn't owned by this client.
+ */
+export async function getClientOrder(id: string, accountId: string) {
+  const [row] = await db
+    .select({
+      order: orders,
+      accountTitle: accounts.title,
+      carrierTitle: carriers.title,
+      transportNumber: transportModes.number,
+      transportModeType: transportModes.modeType,
+    })
+    .from(orders)
+    .innerJoin(accounts, eq(orders.accountId, accounts.id))
+    .leftJoin(carriers, eq(orders.carrierId, carriers.id))
+    .leftJoin(transportModes, eq(orders.transportModeId, transportModes.id))
+    .where(and(eq(orders.id, id), eq(orders.accountId, accountId)))
+    .limit(1);
+  return row ?? null;
+}
