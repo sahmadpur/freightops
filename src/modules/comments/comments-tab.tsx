@@ -66,7 +66,12 @@ export function CommentsTab({
                   <div className="whitespace-pre-wrap break-words">{c.body}</div>
                 </div>
                 <span className="mt-0.5 text-[11px] text-slate-400">
-                  {c.authorName} · {new Date(c.createdAt).toLocaleString()}
+                  {c.authorName} ·{" "}
+                  {/* Timestamp renders in the viewer's locale/timezone, so the SSR (UTC) and
+                      client strings differ by design — suppress the expected hydration mismatch. */}
+                  <time suppressHydrationWarning dateTime={new Date(c.createdAt).toISOString()}>
+                    {new Date(c.createdAt).toLocaleString()}
+                  </time>
                 </span>
               </li>
             );
