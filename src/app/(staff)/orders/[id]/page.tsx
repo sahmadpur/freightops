@@ -11,15 +11,23 @@ import { orderFinance } from "@/modules/finance/queries";
 import { FinanceTab } from "@/modules/finance/finance-tab";
 import { listOrderDocuments } from "@/modules/documents/queries";
 import { DocumentsTab } from "@/modules/documents/documents-tab";
+import { listOrderComments } from "@/modules/comments/queries";
+import { CommentsTab } from "@/modules/comments/comments-tab";
+import { requireArea } from "@/lib/session";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const { session } = await requireArea("staff");
   const t = await getTranslations();
   const format = await getFormatter();
   const data = await getOrder(id);
   if (!data) notFound();
   // Independent of each other — fetch in parallel.
-  const [finance, orderDocuments] = await Promise.all([orderFinance(id), listOrderDocuments(id)]);
+  const [finance, orderDocuments, orderComments] = await Promise.all([
+    orderFinance(id),
+    listOrderDocuments(id),
+    listOrderComments(id),
+  ]);
   const { order, accountTitle, carrierTitle, transportNumber, transportModeType, history } = data;
 
   const row = (label: string, value: React.ReactNode) => (
@@ -98,6 +106,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         info={info}
         finance={finance ? <FinanceTab orderId={order.id} finance={finance} /> : null}
         documents={<DocumentsTab orderId={order.id} documents={orderDocuments} />}
+        comments={<CommentsTab orderId={id} comments={orderComments} currentUserId={session.user.id} />}
         history={historyNode}
       />
     </div>
