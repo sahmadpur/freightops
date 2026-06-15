@@ -1,0 +1,51 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import type { DocumentRow as DocRow } from "./queries";
+import { deleteDocument, setDocumentVisibility } from "./actions";
+
+export function DocumentRow({ doc }: { doc: DocRow }) {
+  const t = useTranslations("documents");
+  const td = useTranslations("docType");
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+
+  async function toggleVisibility() {
+    setBusy(true);
+    const r = await setDocumentVisibility(doc.id, { visibleToClient: !doc.visibleToClient });
+    setBusy(false);
+    if (r.ok) router.refresh();
+  }
+
+  async function remove() {
+    setBusy(true);
+    const r = await deleteDocument(doc.id);
+    setBusy(false);
+    if (r.ok) router.refresh();
+  }
+
+  return (
+    <li className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+      <span className="flex-1 truncate">
+        <span className="font-medium">{doc.fileName}</span>
+        <span className="ml-2 text-xs text-slate-400">{td(doc.docType)}</span>
+      </span>
+      <button
+        type="button"
+        onClick={toggleVisibility}
+        disabled={busy}
+        className={`rounded-full px-2 py-0.5 text-[10.5px] ${doc.visibleToClient ? "bg-[#d4f2e7] text-[#085041]" : "bg-slate-200 text-slate-600"} disabled:opacity-50`}
+      >
+        {doc.visibleToClient ? t("clientVisible") : t("internal")}
+      </button>
+      <a href={`/api/documents/${doc.id}/download`} className="text-xs text-[#1a3a5c] hover:underline">
+        {t("download")}
+      </a>
+      <button type="button" onClick={remove} disabled={busy} className="text-xs text-red-700 hover:underline disabled:opacity-50">
+        {t("remove")}
+      </button>
+    </li>
+  );
+}

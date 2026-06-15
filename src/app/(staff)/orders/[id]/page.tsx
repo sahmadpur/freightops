@@ -9,6 +9,8 @@ import { StatusControl } from "@/modules/orders/status-control";
 import { getOrder } from "@/modules/orders/queries";
 import { orderFinance } from "@/modules/finance/queries";
 import { FinanceTab } from "@/modules/finance/finance-tab";
+import { listOrderDocuments } from "@/modules/documents/queries";
+import { DocumentsTab } from "@/modules/documents/documents-tab";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -17,6 +19,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const data = await getOrder(id);
   if (!data) notFound();
   const finance = await orderFinance(id);
+  const orderDocuments = await listOrderDocuments(id);
   const { order, accountTitle, carrierTitle, transportNumber, transportModeType, history } = data;
 
   const row = (label: string, value: React.ReactNode) => (
@@ -94,6 +97,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <OrderDetailTabs
         info={info}
         finance={finance ? <FinanceTab orderId={order.id} finance={finance} /> : null}
+        documents={<DocumentsTab orderId={order.id} documents={orderDocuments} />}
         history={historyNode}
       />
     </div>
