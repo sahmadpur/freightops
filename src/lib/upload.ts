@@ -19,6 +19,9 @@ export type UploadCheck =
   | { ok: true }
   | { ok: false; reason: "empty" | "too_large" | "type" };
 
+// NOTE: file.type is the client-declared MIME type and can be spoofed. The allowlist
+// is defense-in-depth for an internal staff tool, not a hard security boundary; add
+// magic-number sniffing if untrusted uploads ever become possible.
 export function validateUpload(file: { name: string; type: string; size: number }): UploadCheck {
   if (file.size <= 0) return { ok: false, reason: "empty" };
   if (file.size > MAX_FILE_BYTES) return { ok: false, reason: "too_large" };
