@@ -235,5 +235,9 @@
     "placeholder": "Mesaj yazın…",
     "send": "Göndər",
     "sending": "Göndərilir…"
+  },
+  "portal": {
+    "noOrders": "Hələ sifarişiniz yoxdur",
+    "noDocuments": "Sənəd yoxdur"
   }
 }

@@ -235,5 +235,9 @@
     "placeholder": "Write a message…",
     "send": "Send",
     "sending": "Sending…"
+  },
+  "portal": {
+    "noOrders": "You have no orders yet",
+    "noDocuments": "No documents available"
   }
 }
