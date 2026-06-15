@@ -1,6 +1,6 @@
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { contacts, orders } from "@/db/schema";
+import { contacts, orders, user } from "@/db/schema";
 
 type SelectExecutor = Pick<typeof db, "select">;
 
@@ -34,4 +34,16 @@ export async function orderRecipients(tx: SelectExecutor, orderId: string): Prom
     for (const e of r.emails ?? []) if (e) bucket.add(e);
   }
   return { clientEmails: [...client], carrierEmails: [...carrier] };
+}
+
+/** Staff email(s) to notify about client activity on an order: the order's creator. */
+export async function staffRecipientsForOrder(tx: SelectExecutor, orderId: string): Promise<string[]> {
+  const [row] = await tx
+    .select({ email: user.email, active: user.active })
+    .from(orders)
+    .innerJoin(user, eq(orders.createdBy, user.id))
+    .where(eq(orders.id, orderId))
+    .limit(1);
+  if (!row || row.active === false || !row.email) return [];
+  return [row.email];
 }

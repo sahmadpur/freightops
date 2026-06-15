@@ -4,16 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { CommentRow } from "./queries";
-import { addComment } from "./actions";
+import type { ActionResult } from "@/lib/forms";
 
 export function CommentsTab({
   orderId,
   comments,
   currentUserId,
+  sendAction,
 }: {
   orderId: string;
   comments: CommentRow[];
   currentUserId: string;
+  sendAction: (orderId: string, input: { body: string }) => Promise<ActionResult>;
 }) {
   const t = useTranslations("comments");
   const router = useRouter();
@@ -36,7 +38,7 @@ export function CommentsTab({
     if (!text) return;
     setBusy(true);
     try {
-      const r = await addComment(orderId, { body: text });
+      const r = await sendAction(orderId, { body: text });
       if (r.ok) {
         setBody("");
         router.refresh();

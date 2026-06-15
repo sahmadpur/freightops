@@ -13,6 +13,7 @@ import { listOrderDocuments } from "@/modules/documents/queries";
 import { DocumentsTab } from "@/modules/documents/documents-tab";
 import { listOrderComments } from "@/modules/comments/queries";
 import { CommentsTab } from "@/modules/comments/comments-tab";
+import { addComment } from "@/modules/comments/actions";
 import { requireArea } from "@/lib/session";
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -106,7 +107,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         info={info}
         finance={finance ? <FinanceTab orderId={order.id} finance={finance} /> : null}
         documents={<DocumentsTab orderId={order.id} documents={orderDocuments} />}
-        comments={<CommentsTab orderId={id} comments={orderComments} currentUserId={session.user.id} />}
+        comments={<CommentsTab orderId={id} comments={orderComments} currentUserId={session.user.id} sendAction={addComment} />}
         history={historyNode}
       />
     </div>
