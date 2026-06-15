@@ -62,7 +62,7 @@ export function InviteUserForm({ accounts }: { accounts: { id: string; title: st
         type="button"
         onClick={submit}
         disabled={busy || !email || (role === "client" && !accountId)}
-        className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm text-white disabled:opacity-50"
+        className="btn-primary"
       >
         {t("sendInvite")}
       </button>

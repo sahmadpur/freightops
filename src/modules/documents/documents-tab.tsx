@@ -89,7 +89,7 @@ export function DocumentsTab({ orderId, documents }: { orderId: string; document
           <button
             type="submit"
             disabled={pending}
-            className="mb-1 rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="mb-1 btn-primary"
           >
             {pending ? t("uploading") : t("upload")}
           </button>

@@ -54,7 +54,7 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
             type="button"
             onClick={saveAmounts}
             disabled={savingAmounts}
-            className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="btn-primary"
           >
             {t("saveFinancials")}
           </button>
@@ -190,7 +190,7 @@ function PaymentSection({
             type="button"
             onClick={add}
             disabled={pending}
-            className="mb-3.5 rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="mb-3.5 btn-primary"
           >
             + {t("addPayment")}
           </button>

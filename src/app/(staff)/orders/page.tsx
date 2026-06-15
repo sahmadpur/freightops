@@ -29,7 +29,7 @@ export default async function OrdersPage({
       <Link
         key={label}
         href={href}
-        className={`rounded-full border px-3 py-1 text-xs ${active ? "border-[#1a3a5c] bg-[#1a3a5c] text-white" : "border-slate-300 text-slate-500 hover:bg-slate-50"}`}
+        className={`rounded-full border px-3 py-1 text-xs ${active ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 text-slate-500 hover:bg-slate-50"}`}
       >
         {label}
       </Link>
@@ -41,7 +41,7 @@ export default async function OrdersPage({
       <PageHeader
         title={t("nav.orders")}
         action={
-          <Link href="/orders/new" className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm font-medium text-white">
+          <Link href="/orders/new" className="btn-primary">
             + {t("orders.newOrder")}
           </Link>
         }
@@ -56,7 +56,7 @@ export default async function OrdersPage({
           name="q"
           defaultValue={q}
           placeholder={t("orders.searchPlaceholder")}
-          className="w-80 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#1a3a5c]"
+          className="w-80 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-600"
         />
       </form>
       <Card>
@@ -83,7 +83,7 @@ export default async function OrdersPage({
               {rows.map((r) => (
                 <tr key={r.id} className="border-t border-slate-100 hover:bg-slate-50">
                   <td className="px-3.5 py-2.5 whitespace-nowrap text-slate-500">{format.dateTime(r.createdAt, { dateStyle: "medium" })}</td>
-                  <td className="px-3.5 py-2.5 font-medium text-[#1a3a5c]">{r.number}</td>
+                  <td className="px-3.5 py-2.5 font-medium text-indigo-600">{r.number}</td>
                   <td className="px-3.5 py-2.5">{r.accountTitle}</td>
                   <td className="px-3.5 py-2.5">{r.title}</td>
                   <td className="px-3.5 py-2.5">{r.route ?? "—"}</td>
@@ -93,8 +93,8 @@ export default async function OrdersPage({
                   <td className="px-3.5 py-2.5 whitespace-nowrap text-slate-500">{format.dateTime(r.updatedAt, { dateStyle: "medium" })}</td>
                   <td className="px-3.5 py-2.5">
                     <span className="flex gap-2 text-xs">
-                      <Link className="text-[#1a3a5c] hover:underline" href={`/orders/${r.id}`}>{t("actions.view")}</Link>
-                      <Link className="text-[#1a3a5c] hover:underline" href={`/orders/${r.id}/edit`}>{t("actions.edit")}</Link>
+                      <Link className="text-indigo-600 hover:underline" href={`/orders/${r.id}`}>{t("actions.view")}</Link>
+                      <Link className="text-indigo-600 hover:underline" href={`/orders/${r.id}/edit`}>{t("actions.edit")}</Link>
                     </span>
                   </td>
                 </tr>

@@ -30,7 +30,7 @@ export function StatusControl({ orderId, current }: { orderId: string; current: 
         type="button"
         onClick={save}
         disabled={pending || status === current}
-        className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+        className="btn-primary"
       >
         {pending ? t("actions.saving") : t("actions.save")}
       </button>

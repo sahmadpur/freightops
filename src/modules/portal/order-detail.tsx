@@ -44,7 +44,7 @@ export async function PortalOrderDetail({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <Link href="/portal" className="text-sm text-[#1a3a5c] hover:underline">← {t("nav.myOrders")}</Link>
+        <Link href="/portal" className="text-sm text-indigo-600 hover:underline">← {t("nav.myOrders")}</Link>
       </div>
       <div className="flex items-center gap-3">
         <h1 className="text-lg font-semibold text-slate-900">{order.number}</h1>
@@ -76,7 +76,7 @@ export async function PortalOrderDetail({
                     <span className="font-medium">{d.fileName}</span>
                     <span className="ml-2 text-xs text-slate-400">{td(d.docType)}</span>
                   </span>
-                  <a href={`/api/documents/${d.id}/download`} className="text-xs text-[#1a3a5c] hover:underline">{t("documents.download")}</a>
+                  <a href={`/api/documents/${d.id}/download`} className="text-xs text-indigo-600 hover:underline">{t("documents.download")}</a>
                 </li>
               ))}
             </ul>

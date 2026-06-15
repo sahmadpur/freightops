@@ -74,7 +74,7 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
                     type="button"
                     disabled={isSelf || busyId === u.id}
                     onClick={() => toggleActive(u.id, !u.active)}
-                    className="text-xs text-[#1a3a5c] hover:underline disabled:opacity-40"
+                    className="text-xs text-indigo-600 hover:underline disabled:opacity-40"
                   >
                     {u.active ? t("deactivate") : t("activate")}
                   </button>

@@ -23,7 +23,7 @@ export default async function AccountsPage({
         action={
           <Link
             href="/accounts/new"
-            className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm font-medium text-white"
+            className="btn-primary"
           >
             + {t("accounts.newAccount")}
           </Link>
@@ -34,7 +34,7 @@ export default async function AccountsPage({
           name="q"
           defaultValue={q}
           placeholder={t("accounts.searchPlaceholder")}
-          className="w-72 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#1a3a5c]"
+          className="w-72 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-600"
         />
       </form>
       <Card>
@@ -70,10 +70,10 @@ export default async function AccountsPage({
                 <td className="px-3.5 py-2.5">{r.orderCount}</td>
                 <td className="px-3.5 py-2.5">
                   <span className="flex gap-2 text-xs">
-                    <Link className="text-[#1a3a5c] hover:underline" href={`/accounts/${r.id}`}>
+                    <Link className="text-indigo-600 hover:underline" href={`/accounts/${r.id}`}>
                       {t("actions.view")}
                     </Link>
-                    <Link className="text-[#1a3a5c] hover:underline" href={`/accounts/${r.id}/edit`}>
+                    <Link className="text-indigo-600 hover:underline" href={`/accounts/${r.id}/edit`}>
                       {t("actions.edit")}
                     </Link>
                   </span>

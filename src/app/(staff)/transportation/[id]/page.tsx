@@ -56,7 +56,7 @@ export default async function TransportDetailPage({ params }: { params: Promise<
                 {orders.map((o) => (
                   <tr key={o.id} className="border-t border-slate-100 first:border-0">
                     <td className="py-2">
-                      <Link href={`/orders/${o.id}`} className="font-medium text-[#1a3a5c] hover:underline">{o.number}</Link>
+                      <Link href={`/orders/${o.id}`} className="font-medium text-indigo-600 hover:underline">{o.number}</Link>
                     </td>
                     <td className="py-2">{o.title}</td>
                     <td className="py-2"><StatusBadge status={o.status} /></td>

@@ -5,7 +5,7 @@ import { Topbar } from "@/components/topbar";
 export default async function StaffLayout({ children }: { children: React.ReactNode }) {
   const { session, role } = await requireArea("staff");
   return (
-    <div className="flex h-screen bg-slate-100">
+    <div className="flex h-screen bg-slate-50">
       <Sidebar isAdmin={role === "admin"} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar userName={session.user.name} />

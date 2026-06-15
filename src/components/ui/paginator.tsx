@@ -28,13 +28,21 @@ export function Paginator({
       </span>
       <div className="flex gap-1">
         {page > 1 && (
-          <Link href={href(page - 1)} className="rounded-md border border-slate-200 px-2.5 py-1 hover:bg-slate-50">
+          <Link
+            href={href(page - 1)}
+            className="rounded-md border border-slate-200 px-2.5 py-1 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+          >
             ‹
           </Link>
         )}
-        <span className="rounded-md bg-[#1a3a5c] px-2.5 py-1 text-white">{page}</span>
+        <span className="rounded-md bg-gradient-to-r from-indigo-600 to-violet-600 px-2.5 py-1 font-semibold text-white shadow-btn">
+          {page}
+        </span>
         {page < pages && (
-          <Link href={href(page + 1)} className="rounded-md border border-slate-200 px-2.5 py-1 hover:bg-slate-50">
+          <Link
+            href={href(page + 1)}
+            className="rounded-md border border-slate-200 px-2.5 py-1 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+          >
             ›
           </Link>
         )}

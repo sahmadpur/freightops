@@ -45,7 +45,7 @@ export default async function DocumentsPage({
           {groups.map((g) => (
             <Card key={g.orderId}>
               <CardHeader>
-                <Link href={`/orders/${g.orderId}`} className="text-sm font-semibold text-[#1a3a5c] hover:underline">
+                <Link href={`/orders/${g.orderId}`} className="text-sm font-semibold text-indigo-600 hover:underline">
                   {g.orderNumber} · {g.orderTitle}
                 </Link>
                 <span className="text-xs text-slate-400">{g.accountTitle}</span>
@@ -63,7 +63,7 @@ export default async function DocumentsPage({
                       ) : (
                         <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10.5px] text-slate-600">{t("documents.internal")}</span>
                       )}
-                      <a href={`/api/documents/${d.id}/download`} className="text-xs text-[#1a3a5c] hover:underline">
+                      <a href={`/api/documents/${d.id}/download`} className="text-xs text-indigo-600 hover:underline">
                         {t("documents.download")}
                       </a>
                     </li>

@@ -30,7 +30,7 @@ export default async function AuditPage({
           {types.map((ty) => (<option key={ty} value={ty}>{ty}</option>))}
         </select>
         <input name="q" defaultValue={sp.q ?? ""} placeholder={t("search")} className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
-        <button type="submit" className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm text-white">{t("filter")}</button>
+        <button type="submit" className="btn-primary">{t("filter")}</button>
       </form>
 
       <Card>

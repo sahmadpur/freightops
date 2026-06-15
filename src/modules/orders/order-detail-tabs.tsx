@@ -23,7 +23,7 @@ export function OrderDetailTabs({
   const [tab, setTab] = useState<"info" | "finance" | "documents" | "comments" | "history">("info");
 
   const tabCls = (active: boolean) =>
-    `px-3.5 py-2 text-sm border-b-2 -mb-px ${active ? "border-[#1a3a5c] font-semibold text-[#1a3a5c]" : "border-transparent text-slate-500"}`;
+    `px-3.5 py-2 text-sm border-b-2 -mb-px ${active ? "border-indigo-600 font-semibold text-indigo-600" : "border-transparent text-slate-500"}`;
 
   return (
     <div>

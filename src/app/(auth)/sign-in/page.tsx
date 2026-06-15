@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
+import { Field, inputCls } from "@/components/ui/form";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -27,29 +28,37 @@ export default function SignInPage() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <h1 className="text-lg font-semibold text-slate-900">FreightOps — Sign in</h1>
-      <div>
-        <label className="block text-xs text-slate-500 mb-1" htmlFor="email">Email</label>
+      <div className="mb-6">
+        <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
+          Welcome back
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Sign in to your operations workspace.
+        </p>
+      </div>
+      <Field label="Email" htmlFor="email">
         <input
-          id="email" type="email" required value={email}
+          id="email"
+          type="email"
+          required
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className={inputCls}
         />
-      </div>
-      <div>
-        <label className="block text-xs text-slate-500 mb-1" htmlFor="password">Password</label>
+      </Field>
+      <Field label="Password" htmlFor="password">
         <input
-          id="password" type="password" required value={password}
+          id="password"
+          type="password"
+          required
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className={inputCls}
         />
-      </div>
+      </Field>
       {error && <p className="text-sm text-red-700">{error}</p>}
-      <button
-        type="submit" disabled={pending}
-        className="w-full rounded-lg bg-[#1a3a5c] text-white py-2 text-sm font-medium disabled:opacity-50"
-      >
-        {pending ? "Signing in..." : "Sign in"}
+      <button type="submit" disabled={pending} className="btn-primary w-full">
+        {pending ? "Signing in…" : "Sign in"}
       </button>
     </form>
   );

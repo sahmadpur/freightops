@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { acceptInvitation } from "./actions";
+import { Field, inputCls } from "@/components/ui/form";
 
 function AcceptForm() {
   const router = useRouter();
@@ -29,28 +30,37 @@ function AcceptForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <h1 className="text-lg font-semibold text-slate-900">Set up your account</h1>
-      <div>
-        <label className="block text-xs text-slate-500 mb-1" htmlFor="name">Full name</label>
-        <input
-          id="name" required value={name} onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-        />
+      <div className="mb-6">
+        <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
+          Set up your account
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
+          Choose a name and password to get started.
+        </p>
       </div>
-      <div>
-        <label className="block text-xs text-slate-500 mb-1" htmlFor="password">Password (min 8 chars)</label>
+      <Field label="Full name" htmlFor="name">
         <input
-          id="password" type="password" required minLength={8} value={password}
+          id="name"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className={inputCls}
+        />
+      </Field>
+      <Field label="Password (min 8 chars)" htmlFor="password">
+        <input
+          id="password"
+          type="password"
+          required
+          minLength={8}
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className={inputCls}
         />
-      </div>
+      </Field>
       {error && <p className="text-sm text-red-700">{error}</p>}
-      <button
-        type="submit" disabled={pending}
-        className="w-full rounded-lg bg-[#1a3a5c] text-white py-2 text-sm font-medium disabled:opacity-50"
-      >
-        {pending ? "Creating account..." : "Create account"}
+      <button type="submit" disabled={pending} className="btn-primary w-full">
+        {pending ? "Creating account…" : "Create account"}
       </button>
     </form>
   );
