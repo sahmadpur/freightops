@@ -62,7 +62,7 @@ export function ContactsEditor({
                   onChange={(e) => updateList(i, "phones", j, e.target.value)}
                 />
               ))}
-              <button type="button" onClick={() => addToList(i, "phones")} className="text-xs text-[#1a3a5c] hover:underline">
+              <button type="button" onClick={() => addToList(i, "phones")} className="text-xs text-indigo-600 hover:underline">
                 + {t("addPhone")}
               </button>
             </div>
@@ -77,7 +77,7 @@ export function ContactsEditor({
                   onChange={(e) => updateList(i, "emails", j, e.target.value)}
                 />
               ))}
-              <button type="button" onClick={() => addToList(i, "emails")} className="text-xs text-[#1a3a5c] hover:underline">
+              <button type="button" onClick={() => addToList(i, "emails")} className="text-xs text-indigo-600 hover:underline">
                 + {t("addEmail")}
               </button>
             </div>

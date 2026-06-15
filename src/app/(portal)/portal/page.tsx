@@ -31,7 +31,7 @@ export default async function MyOrdersPage({ searchParams }: { searchParams: Pro
               {orders.map((o) => (
                 <tr key={o.id} className="border-t border-slate-100 hover:bg-slate-50">
                   <td className="px-4 py-2">
-                    <Link href={`/portal/orders/${o.id}`} className="font-medium text-[#1a3a5c] hover:underline">
+                    <Link href={`/portal/orders/${o.id}`} className="font-medium text-indigo-600 hover:underline">
                       {o.number}
                     </Link>
                   </td>

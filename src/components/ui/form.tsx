@@ -1,5 +1,5 @@
 export const inputCls =
-  "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-[#1a3a5c] bg-white";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20";
 
 export function Field({
   label,
@@ -14,7 +14,10 @@ export function Field({
 }) {
   return (
     <div className="mb-3.5">
-      <label htmlFor={htmlFor} className="mb-1 block text-xs text-slate-500">
+      <label
+        htmlFor={htmlFor}
+        className="mb-1 block text-sm font-semibold text-slate-700"
+      >
         {label}
       </label>
       {children}
@@ -36,14 +39,10 @@ export function SubmitRow({
 }) {
   return (
     <div className="mt-4 flex justify-end gap-2">
-      <a href={cancelHref} className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
+      <a href={cancelHref} className="btn-secondary">
         {cancelLabel}
       </a>
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-      >
+      <button type="submit" disabled={pending} className="btn-primary">
         {saveLabel}
       </button>
     </div>

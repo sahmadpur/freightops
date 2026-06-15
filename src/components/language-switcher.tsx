@@ -30,7 +30,7 @@ export function LanguageSwitcher() {
           aria-label={`Switch to ${LOCALE_NAMES[l]}`}
           className={`px-2.5 py-1 rounded-full text-xs border ${
             l === current
-              ? "bg-[#1a3a5c] text-white border-[#1a3a5c]"
+              ? "bg-indigo-600 text-white border-indigo-600"
               : "text-slate-500 border-slate-300"
           }`}
         >

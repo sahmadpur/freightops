@@ -1,26 +1,89 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Corporate Trust design system
+ * ------------------------------
+ * Indigo (primary) + Violet (secondary) on a cool slate base. Indigo 600
+ * (#4F46E5) and Violet 600 (#7C3AED) ship in Tailwind's default palette, so
+ * components use `indigo-*` / `violet-*` directly. This file centralizes the
+ * pieces Tailwind can't express out of the box: the brand typeface, the
+ * colored-shadow elevation scale, and a couple of reusable surface classes.
+ *
+ * The app is a light-mode product surface (layouts paint their own slate
+ * backgrounds), so there is no prefers-color-scheme dark flip — that would
+ * invert text on the white cards.
+ */
+
+@theme {
+  /* Brand typeface — wired up in app/layout.tsx via next/font */
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+
+  /* Cool slate base */
+  --color-background: #f8fafc; /* slate-50 */
+  --color-surface: #ffffff;
+
+  /*
+   * Colored shadows are the visual signature: blue/violet-tinted elevation
+   * instead of neutral gray. Exposed as `shadow-soft`, `shadow-soft-lg`,
+   * `shadow-btn`, `shadow-glow` utilities.
+   */
+  --shadow-soft: 0 4px 20px -2px rgb(79 70 229 / 0.1);
+  --shadow-soft-lg: 0 10px 25px -5px rgb(79 70 229 / 0.15),
+    0 8px 10px -6px rgb(79 70 229 / 0.1);
+  --shadow-btn: 0 4px 14px 0 rgb(79 70 229 / 0.3);
+  --shadow-glow: 0 0 20px rgb(79 70 229 / 0.5);
+
+  /* Refined motion — gentle breathing for decorative floats */
+  --animate-float: float 7s ease-in-out infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: #0f172a; /* slate-900 */
+  font-family: var(--font-sans);
+}
+
+/*
+ * Reusable surface + control classes. Kept here (rather than repeated as long
+ * utility strings) so the brand's elevation and gradient language stays in one
+ * place. Components import the matching React primitives in components/ui.
+ */
+@layer components {
+  /* Primary CTA — indigo→violet gradient with a lift on hover */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg
+      bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-sm
+      font-semibold text-white shadow-btn transition-all duration-200
+      hover:-translate-y-0.5 hover:shadow-soft-lg focus-visible:outline-none
+      focus-visible:ring-2 focus-visible:ring-indigo-500
+      focus-visible:ring-offset-2 disabled:pointer-events-none
+      disabled:opacity-50;
+  }
+
+  /* Secondary — quiet white surface that warms toward indigo on hover */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border
+      border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700
+      transition-all duration-200 hover:border-indigo-300 hover:bg-slate-50
+      hover:text-indigo-700 focus-visible:outline-none focus-visible:ring-2
+      focus-visible:ring-indigo-500 focus-visible:ring-offset-2
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  /* Indigo→violet clipped to text, for headline emphasis */
+  .text-gradient {
+    @apply bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text
+      text-transparent;
+  }
 }

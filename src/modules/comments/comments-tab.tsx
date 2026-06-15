@@ -60,7 +60,7 @@ export function CommentsTab({
               <li key={c.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
                 <div
                   className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-                    mine ? "bg-[#1a3a5c] text-white" : "bg-slate-100 text-slate-800"
+                    mine ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-800"
                   }`}
                 >
                   <div className="whitespace-pre-wrap break-words">{c.body}</div>
@@ -86,13 +86,13 @@ export function CommentsTab({
           onChange={(e) => setBody(e.target.value)}
           placeholder={t("placeholder")}
           rows={2}
-          className="flex-1 resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-[#1a3a5c] focus:outline-none"
+          className="flex-1 resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none"
         />
         <button
           type="button"
           onClick={send}
           disabled={busy || body.trim().length === 0}
-          className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm text-white disabled:opacity-50"
+          className="btn-primary"
         >
           {busy ? t("sending") : t("send")}
         </button>

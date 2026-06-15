@@ -6,8 +6,10 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-4 flex items-center justify-between">
-      <h1 className="text-lg font-semibold text-slate-900">{title}</h1>
+    <div className="mb-5 flex items-center justify-between gap-4">
+      <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
+        {title}
+      </h1>
       {action}
     </div>
   );

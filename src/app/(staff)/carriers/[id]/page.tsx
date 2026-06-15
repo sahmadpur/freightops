@@ -79,7 +79,7 @@ export default async function CarrierDetailPage({ params }: { params: Promise<{ 
               <tbody>
                 {orders.map((o) => (
                   <tr key={o.id} className="border-t border-slate-100 first:border-0">
-                    <td className="py-2 font-medium text-[#1a3a5c]">{o.number}</td>
+                    <td className="py-2 font-medium text-indigo-600">{o.number}</td>
                     <td className="py-2">{o.title}</td>
                     <td className="py-2">
                       <StatusBadge status={o.status} />

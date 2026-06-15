@@ -15,7 +15,7 @@ export default async function TransportationPage() {
       <PageHeader
         title={t("nav.transportation")}
         action={
-          <Link href="/transportation/new" className="rounded-lg bg-[#1a3a5c] px-4 py-2 text-sm font-medium text-white">
+          <Link href="/transportation/new" className="btn-primary">
             + {t("transport.newTransport")}
           </Link>
         }
@@ -38,8 +38,8 @@ export default async function TransportationPage() {
                 </div>
               </div>
               <div className="flex gap-2 text-xs">
-                <Link className="text-[#1a3a5c] hover:underline" href={`/transportation/${m.id}`}>{t("actions.view")}</Link>
-                <Link className="text-[#1a3a5c] hover:underline" href={`/transportation/${m.id}/edit`}>{t("actions.edit")}</Link>
+                <Link className="text-indigo-600 hover:underline" href={`/transportation/${m.id}`}>{t("actions.view")}</Link>
+                <Link className="text-indigo-600 hover:underline" href={`/transportation/${m.id}/edit`}>{t("actions.edit")}</Link>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2">

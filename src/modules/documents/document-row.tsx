@@ -46,7 +46,7 @@ export function DocumentRow({ doc }: { doc: DocRow }) {
       >
         {doc.visibleToClient ? t("clientVisible") : t("internal")}
       </button>
-      <a href={`/api/documents/${doc.id}/download`} className="text-xs text-[#1a3a5c] hover:underline">
+      <a href={`/api/documents/${doc.id}/download`} className="text-xs text-indigo-600 hover:underline">
         {t("download")}
       </a>
       <button type="button" onClick={remove} disabled={busy} className="text-xs text-red-700 hover:underline disabled:opacity-50">
