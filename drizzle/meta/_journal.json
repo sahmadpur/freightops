@@ -15,6 +15,13 @@
       "when": 1781341702466,
       "tag": "0001_tidy_leper_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781531945031,
+      "tag": "0002_goofy_makkari",
+      "breakpoints": true
     }
   ]
 }

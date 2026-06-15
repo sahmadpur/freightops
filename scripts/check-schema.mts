@@ -4,7 +4,7 @@ const expected = [
   "user", "session", "account", "verification",
   "accounts", "carriers", "contacts", "transport_modes", "orders",
   "payments", "documents", "comments", "audit_log", "invitations",
-  "order_counters",
+  "order_counters", "notifications",
 ];
 
 const sql = postgres(process.env.DATABASE_URL!);
@@ -26,6 +26,7 @@ if (missing.length > 0) {
 const expectedEnums = [
   "user_role", "language", "order_status", "incoterms", "delivery_format",
   "mode_type", "payment_direction", "doc_type", "contact_parent", "document_parent",
+  "notification_status",
 ];
 const enumRows = await sql`
   select typname from pg_type where typtype = 'e'
@@ -49,4 +50,4 @@ if (fkRows.length === 0) {
 }
 
 await sql.end();
-console.log("OK — schema verified: 15 tables, 10 enums, user→accounts FK");
+console.log("OK — schema verified: 16 tables, 11 enums, user→accounts FK");

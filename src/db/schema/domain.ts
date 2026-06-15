@@ -55,6 +55,7 @@ export const docTypeEnum = pgEnum("doc_type", [
 ]);
 export const contactParentEnum = pgEnum("contact_parent", ["account", "carrier"]);
 export const documentParentEnum = pgEnum("document_parent", ["order", "transport_mode"]);
+export const notificationStatusEnum = pgEnum("notification_status", ["pending", "sent", "failed"]);
 
 const id = () => text("id").primaryKey().default(sql`gen_random_uuid()`);
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -234,3 +235,21 @@ export const orderCounters = pgTable("order_counters", {
   year: integer("year").primaryKey(),
   lastNumber: integer("last_number").notNull().default(0),
 });
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: id(),
+    toEmail: text("to_email").notNull(),
+    subject: text("subject").notNull(),
+    body: text("body").notNull(),
+    status: notificationStatusEnum("status").notNull().default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    lastError: text("last_error"),
+    relatedType: text("related_type"),
+    relatedId: text("related_id"),
+    createdAt: createdAt(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+  },
+  (t) => [index("notifications_status_idx").on(t.status)],
+);
