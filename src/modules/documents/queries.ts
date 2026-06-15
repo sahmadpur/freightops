@@ -93,3 +93,20 @@ export async function listDocumentsByOrder(opts: { q?: string; docType?: string 
   }
   return [...groups.values()];
 }
+
+/** Order documents that staff marked client-visible (portal order detail), newest first. */
+export async function listVisibleOrderDocuments(orderId: string): Promise<DocumentRow[]> {
+  const rows = await db
+    .select({
+      id: documents.id,
+      fileName: documents.fileName,
+      docType: documents.docType,
+      sizeBytes: documents.sizeBytes,
+      visibleToClient: documents.visibleToClient,
+      createdAt: documents.createdAt,
+    })
+    .from(documents)
+    .where(and(eq(documents.parentType, "order"), eq(documents.parentId, orderId), eq(documents.visibleToClient, true)))
+    .orderBy(desc(documents.createdAt));
+  return rows;
+}
