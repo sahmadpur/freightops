@@ -1,0 +1,106 @@
+# FreightOps — self-hosted production stack.
+#
+# Same routing pattern as the other apps on this server (saleswind, docai):
+#   Cloudflare ──tunnel──> Traefik (:80) ──Host()──> freightops-app ──> db/minio/mailpit
+#
+# Only the app joins Traefik's shared `proxy` network; everything else is
+# internal-only (no published ports). Build + run on the server:
+#
+#   cd /home/freightops
+#   cp .env.example .env      # first time only — fill in secrets
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Migrations run automatically on app start (drizzle-kit migrate, see Dockerfile).
+
+name: freightops
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: freightops-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Object storage for documents (used from Phase 4 on). Internal-only.
+  minio:
+    image: minio/minio:latest
+    container_name: freightops-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    volumes:
+      - miniodata:/data
+    networks:
+      - default
+
+  # Local SMTP sink. The notification worker sends here by default so invites
+  # and alerts don't error. Point SMTP_* at a real MTA in .env to deliver mail.
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: freightops-mailpit
+    restart: unless-stopped
+    environment:
+      MP_MAX_MESSAGES: "500"
+    networks:
+      - default
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: freightops-app:latest
+    container_name: freightops-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      # Canonical external origin so better-auth builds correct redirects and
+      # secure cookies (app runs behind Cloudflare->Traefik; browser is on https).
+      BETTER_AUTH_URL: https://${APP_HOST}
+      APP_BASE_URL: https://${APP_HOST}
+      S3_ENDPOINT: http://freightops-minio:9000
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_BUCKET: ${S3_BUCKET:-freightops-documents}
+      SMTP_HOST: ${SMTP_HOST:-freightops-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_FROM: ${SMTP_FROM:-FreightOps <no-reply@freightops.local>}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      NODE_ENV: production
+    networks:
+      - default   # reach db / minio / mailpit
+      - proxy     # reached by Traefik
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.freightops.entrypoints=web
+      - traefik.http.routers.freightops.rule=Host(`${APP_HOST}`)
+      - traefik.http.services.freightops.loadbalancer.server.port=3000
+
+volumes:
+  pgdata:
+  miniodata:
+
+networks:
+  default:
+  proxy:
+    external: true   # Traefik's shared network
