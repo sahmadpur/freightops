@@ -8,8 +8,13 @@ const POLL_MS = 15_000;
 const BATCH = 10;
 
 let started = false;
+// Reentrancy guard: if a tick overruns POLL_MS (e.g. a slow SMTP send), the next
+// interval must NOT start a second pass over the same still-pending rows (double-send).
+let running = false;
 
 async function tick(): Promise<void> {
+  if (running) return;
+  running = true;
   try {
     const pending = await db
       .select()
@@ -39,6 +44,8 @@ async function tick(): Promise<void> {
     }
   } catch (err) {
     console.error("[notifications] worker tick failed", err);
+  } finally {
+    running = false;
   }
 }
 

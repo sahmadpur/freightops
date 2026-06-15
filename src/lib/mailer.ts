@@ -11,6 +11,10 @@ function getTransport(): Transporter {
       auth: process.env.SMTP_USER
         ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
         : undefined,
+      // Bound how long a single send can hang so the worker tick can't stall on a dead MTA.
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 20_000,
     });
   }
   return transport;
