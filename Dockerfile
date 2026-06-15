@@ -7,13 +7,18 @@ FROM node:24-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Dummy values at build time: auth.ts throws if BETTER_AUTH_SECRET is absent
-# and db/index.ts opens a postgres connection on module load.
-# These are replaced by real env vars at runtime.
+# Dummy values at build time: auth.ts throws if BETTER_AUTH_SECRET is absent,
+# db/index.ts opens a postgres connection on module load, and s3.ts throws when
+# the S3_* vars are absent (the documents API route is evaluated during page-data
+# collection). The S3 client is constructed lazily, so dummy values are safe.
+# All of these are replaced by real env vars at runtime.
 ARG DATABASE_URL=postgres://dummy:dummy@localhost:5432/dummy
 ARG BETTER_AUTH_SECRET=build-time-dummy-secret-32chars!!
 ENV DATABASE_URL=$DATABASE_URL
 ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
+ENV S3_ENDPOINT=http://localhost:9000
+ENV S3_ACCESS_KEY=build-time-dummy
+ENV S3_SECRET_KEY=build-time-dummy
 RUN npm run build
 
 # Separate stage: install drizzle-kit and its runtime deps for the target platform.
