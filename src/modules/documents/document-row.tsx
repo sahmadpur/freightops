@@ -14,16 +14,22 @@ export function DocumentRow({ doc }: { doc: DocRow }) {
 
   async function toggleVisibility() {
     setBusy(true);
-    const r = await setDocumentVisibility(doc.id, { visibleToClient: !doc.visibleToClient });
-    setBusy(false);
-    if (r.ok) router.refresh();
+    try {
+      const r = await setDocumentVisibility(doc.id, { visibleToClient: !doc.visibleToClient });
+      if (r.ok) router.refresh();
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function remove() {
     setBusy(true);
-    const r = await deleteDocument(doc.id);
-    setBusy(false);
-    if (r.ok) router.refresh();
+    try {
+      const r = await deleteDocument(doc.id);
+      if (r.ok) router.refresh();
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (

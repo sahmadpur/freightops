@@ -9,6 +9,8 @@ import type { DocumentRow as DocRow } from "./queries";
 import { uploadDocument } from "./actions";
 import { DocumentRow } from "./document-row";
 
+// Mirror of docTypeEnum (src/db/schema). Hardcoded to keep the Drizzle schema out of
+// the client bundle, matching how order-form/status-control list their enums.
 const DOC_TYPES = ["cmr", "awb", "bill_of_lading", "invoice", "packing_list", "certificate", "waybill", "cargo_photos", "other"] as const;
 
 export function DocumentsTab({ orderId, documents }: { orderId: string; documents: DocRow[] }) {
@@ -33,20 +35,25 @@ export function DocumentsTab({ orderId, documents }: { orderId: string; document
     fd.set("parentId", orderId);
     fd.set("docType", docType);
     fd.set("visibleToClient", visible ? "true" : "false");
-    const r = await uploadDocument(fd);
-    setPending(false);
-    if (r.ok) {
-      if (fileRef.current) fileRef.current.value = "";
-      setVisible(false);
-      setDocType("other");
-      router.refresh();
-    } else {
-      const reason = r.error;
-      setError(
-        reason === "too_large" ? t("tooLarge") :
-        reason === "type" ? t("badType") :
-        reason === "empty" ? t("emptyFile") : t("uploadFailed"),
-      );
+    try {
+      const r = await uploadDocument(fd);
+      if (r.ok) {
+        if (fileRef.current) fileRef.current.value = "";
+        setVisible(false);
+        setDocType("other");
+        router.refresh();
+      } else {
+        const reason = r.error;
+        setError(
+          reason === "too_large" ? t("tooLarge") :
+          reason === "type" ? t("badType") :
+          reason === "empty" ? t("emptyFile") : t("uploadFailed"),
+        );
+      }
+    } catch {
+      setError(t("uploadFailed"));
+    } finally {
+      setPending(false);
     }
   }
 

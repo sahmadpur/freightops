@@ -58,7 +58,7 @@ export async function uploadDocument(formData: FormData): Promise<ActionResult> 
       });
     });
   } catch (err) {
-    await deleteObject(key).catch(() => {});
+    await deleteObject(key).catch((e) => console.error("[documents] orphan object cleanup failed:", key, e));
     throw err;
   }
 
@@ -83,7 +83,7 @@ export async function deleteDocument(documentId: string): Promise<ActionResult> 
   });
 
   if (result === "not_found") return { ok: false, error: "not_found" };
-  await deleteObject(result).catch(() => {});
+  await deleteObject(result).catch((e) => console.error("[documents] object delete failed for removed doc:", result, e));
   return { ok: true, id: documentId };
 }
 

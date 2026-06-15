@@ -18,8 +18,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const format = await getFormatter();
   const data = await getOrder(id);
   if (!data) notFound();
-  const finance = await orderFinance(id);
-  const orderDocuments = await listOrderDocuments(id);
+  // Independent of each other — fetch in parallel.
+  const [finance, orderDocuments] = await Promise.all([orderFinance(id), listOrderDocuments(id)]);
   const { order, accountTitle, carrierTitle, transportNumber, transportModeType, history } = data;
 
   const row = (label: string, value: React.ReactNode) => (
