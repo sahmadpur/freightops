@@ -228,5 +228,12 @@
     "waybill": "Waybill",
     "cargo_photos": "Cargo photos",
     "other": "Other"
+  },
+  "comments": {
+    "tab": "Comments",
+    "empty": "No comments yet",
+    "placeholder": "Write a message…",
+    "send": "Send",
+    "sending": "Sending…"
   }
 }

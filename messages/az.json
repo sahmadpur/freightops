@@ -228,5 +228,12 @@
     "waybill": "Yük qaiməsi",
     "cargo_photos": "Yük şəkilləri",
     "other": "Digər"
+  },
+  "comments": {
+    "tab": "Şərhlər",
+    "empty": "Hələ şərh yoxdur",
+    "placeholder": "Mesaj yazın…",
+    "send": "Göndər",
+    "sending": "Göndərilir…"
   }
 }
