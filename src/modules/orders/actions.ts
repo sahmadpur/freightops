@@ -8,6 +8,9 @@ import { nextOrderNumber } from "@/lib/order-number";
 import { requireArea } from "@/lib/session";
 import { orderInputSchema, statusChangeSchema, type OrderInput } from "./schema";
 import type { ActionResult } from "@/lib/forms";
+import { orderRecipients } from "@/modules/notifications/recipients";
+import { enqueueMany } from "@/modules/notifications/enqueue";
+import { orderCreatedEmail, orderStatusChangedEmail } from "@/modules/notifications/templates";
 
 const AUDITED_FIELDS = [
   "title", "clientOrderId", "accountId", "carrierId", "transportModeId", "route",
@@ -99,6 +102,17 @@ export async function createOrder(input: unknown): Promise<ActionResult> {
         entityId: row.id,
         action: "created",
       });
+      const { clientEmails, carrierEmails } = await orderRecipients(tx, row.id);
+      await enqueueMany(
+        tx,
+        [...clientEmails, ...carrierEmails],
+        orderCreatedEmail({
+          orderNumber: number,
+          orderTitle: data.title,
+          url: `${process.env.APP_BASE_URL}/orders/${row.id}`,
+        }),
+        { type: "order", id: row.id },
+      );
       return row.id;
     });
   } catch (e) {
@@ -162,6 +176,17 @@ export async function changeOrderStatus(id: string, input: unknown): Promise<Act
       action: "status_changed",
       changes: [{ field: "status", oldValue: before.status, newValue: status }],
     });
+    const { clientEmails } = await orderRecipients(tx, id);
+    await enqueueMany(
+      tx,
+      clientEmails,
+      orderStatusChangedEmail({
+        orderNumber: before.number,
+        status,
+        url: `${process.env.APP_BASE_URL}/orders/${id}`,
+      }),
+      { type: "order", id },
+    );
     return "ok" as const;
   });
 

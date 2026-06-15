@@ -2,6 +2,8 @@ import { randomBytes } from "node:crypto";
 import { db } from "@/db";
 import { invitations } from "@/db/schema";
 import type { Role } from "@/lib/roles";
+import { enqueueNotification } from "@/modules/notifications/enqueue";
+import { invitationEmail } from "@/modules/notifications/templates";
 
 export const INVITATION_TTL_DAYS = 7;
 
@@ -24,13 +26,23 @@ export async function createInvitation(params: {
 }): Promise<{ token: string; url: string }> {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + INVITATION_TTL_DAYS * 24 * 60 * 60 * 1000);
-  await db.insert(invitations).values({
-    email: params.email,
-    role: params.role,
-    accountId: params.accountId ?? null,
-    token,
-    expiresAt,
-    invitedBy: params.invitedBy,
+  const url = `${process.env.APP_BASE_URL}/accept-invitation?token=${token}`;
+  await db.transaction(async (tx) => {
+    await tx.insert(invitations).values({
+      email: params.email,
+      role: params.role,
+      accountId: params.accountId ?? null,
+      token,
+      expiresAt,
+      invitedBy: params.invitedBy,
+    });
+    const content = invitationEmail({ url, role: params.role });
+    await enqueueNotification(tx, {
+      toEmail: params.email,
+      subject: content.subject,
+      body: content.body,
+      relatedType: "invitation",
+    });
   });
-  return { token, url: `${process.env.APP_BASE_URL}/accept-invitation?token=${token}` };
+  return { token, url };
 }
