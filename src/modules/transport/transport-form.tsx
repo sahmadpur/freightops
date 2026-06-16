@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Field, inputCls, SubmitRow } from "@/components/ui/form";
+import { Card, CardBody } from "@/components/ui/card";
 import { createTransportMode, updateTransportMode } from "./actions";
 import type { ActionResult } from "@/lib/forms";
 
@@ -44,6 +45,8 @@ export function TransportForm({ initial }: { initial: TransportFormInitial }) {
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl">
+      <Card>
+        <CardBody>
       <div className="grid grid-cols-2 gap-x-4">
         <Field label={t("fields.modeType")} htmlFor="modeType" error={fe.modeType}>
           <select id="modeType" className={inputCls} value={v.modeType} onChange={(e) => set({ modeType: e.target.value })}>
@@ -78,13 +81,17 @@ export function TransportForm({ initial }: { initial: TransportFormInitial }) {
           <input id="totalVolumeM3" className={inputCls} value={v.totalVolumeM3} onChange={(e) => set({ totalVolumeM3: e.target.value })} />
         </Field>
       </div>
-      {result && !result.ok && result.error && <p className="text-sm text-red-700">{result.error}</p>}
+      {result && !result.ok && result.error && (
+        <p className="text-sm text-[rgb(var(--danger-fg))]">{result.error}</p>
+      )}
       <SubmitRow
         pending={pending}
         saveLabel={pending ? t("actions.saving") : t("actions.save")}
         cancelHref={initial.id ? `/transportation/${initial.id}` : "/transportation"}
         cancelLabel={t("actions.cancel")}
       />
+        </CardBody>
+      </Card>
     </form>
   );
 }

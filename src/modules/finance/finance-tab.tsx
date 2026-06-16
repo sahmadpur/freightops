@@ -87,9 +87,9 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
 
 function Stat({ label, value, positive }: { label: string; value: string; positive?: boolean }) {
   return (
-    <div className="rounded-md bg-slate-50 px-3 py-2">
-      <div className="text-[10.5px] text-slate-400">{label}</div>
-      <div className={`text-sm font-semibold ${positive ? "text-[#3b6d11]" : ""}`}>{value}</div>
+    <div className="rounded-[6px] bg-surface-hover px-3 py-2">
+      <div className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-ink-soft">{label}</div>
+      <div className={`text-sm font-semibold tabular-nums ${positive ? "text-emerald-600" : "text-ink"}`}>{value}</div>
     </div>
   );
 }
@@ -141,9 +141,13 @@ function PaymentSection({
   }
 
   const statusColor =
-    status === "paid" ? "bg-[#d4f2e7] text-[#085041]" :
-    status === "partly_paid" ? "bg-[#fdefd1] text-[#633806]" :
-    status === "not_paid" ? "bg-[#fde8df] text-[#712b13]" : "bg-slate-100 text-slate-500";
+    status === "paid"
+      ? "bg-[rgb(var(--approval-approved-bg))] text-[rgb(var(--approval-approved-fg))]"
+      : status === "partly_paid"
+        ? "bg-[rgb(var(--approval-pending-bg))] text-[rgb(var(--approval-pending-fg))]"
+        : status === "not_paid"
+          ? "bg-[rgb(var(--approval-rejected-bg))] text-[rgb(var(--approval-rejected-fg))]"
+          : "bg-surface-chip-active text-ink-soft";
 
   return (
     <Card>
@@ -159,16 +163,16 @@ function PaymentSection({
         </div>
 
         {payments.length === 0 ? (
-          <p className="mb-3 text-sm text-slate-400">{t("noPayments")}</p>
+          <p className="mb-3 text-sm text-ink-soft">{t("noPayments")}</p>
         ) : (
-          <ul className="mb-3 divide-y divide-slate-100 text-sm">
+          <ul className="mb-3 divide-y divide-edge-soft text-sm">
             {payments.map((p) => (
               <li key={p.id} className="flex items-center justify-between py-2">
-                <span>{formatMoney(toCents(p.amount))}</span>
-                <span className="text-xs text-slate-400">
+                <span className="font-medium tabular-nums">{formatMoney(toCents(p.amount))}</span>
+                <span className="font-mono text-[11px] text-ink-soft">
                   {new Date(p.paidAt).toISOString().slice(0, 10)}{p.note ? ` · ${p.note}` : ""}
                 </span>
-                <button type="button" onClick={() => remove(p.id)} className="text-xs text-red-700 hover:underline">
+                <button type="button" onClick={() => remove(p.id)} className="text-xs text-[rgb(var(--danger-fg))] hover:underline">
                   {t("remove")}
                 </button>
               </li>
@@ -195,7 +199,7 @@ function PaymentSection({
             + {t("addPayment")}
           </button>
         </div>
-        {error && <p className="text-sm text-red-700">{error}</p>}
+        {error && <p className="text-sm text-[rgb(var(--danger-fg))]">{error}</p>}
       </CardBody>
     </Card>
   );

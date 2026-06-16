@@ -21,20 +21,20 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <div className="flex gap-1">
+    <div className="inline-flex items-center rounded-full border border-edge-chip bg-surface-card p-[2px]">
       {LOCALES.map((l) => (
         <button
           key={l}
           onClick={() => choose(l)}
           aria-pressed={l === current}
           aria-label={`Switch to ${LOCALE_NAMES[l]}`}
-          className={`px-2.5 py-1 rounded-full text-xs border ${
+          className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors ${
             l === current
-              ? "bg-indigo-600 text-white border-indigo-600"
-              : "text-slate-500 border-slate-300"
+              ? "bg-brand text-brand-pale"
+              : "text-ink-soft hover:text-brand"
           }`}
         >
-          {l.toUpperCase()}
+          {l}
         </button>
       ))}
     </div>

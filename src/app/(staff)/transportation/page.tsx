@@ -59,9 +59,9 @@ export default async function TransportationPage() {
 
 function Stat({ label, value, positive }: { label: string; value: string; positive?: boolean }) {
   return (
-    <div className="rounded-md bg-slate-50 px-3 py-2">
-      <div className="text-[10.5px] text-slate-400">{label}</div>
-      <div className={`text-sm font-semibold ${positive ? "text-[#3b6d11]" : ""}`}>{value}</div>
+    <div className="rounded-[6px] bg-surface-hover px-3 py-2">
+      <div className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-ink-soft">{label}</div>
+      <div className={`text-sm font-semibold tabular-nums ${positive ? "text-emerald-600" : "text-ink"}`}>{value}</div>
     </div>
   );
 }

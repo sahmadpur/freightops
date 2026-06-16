@@ -1,27 +1,33 @@
 export const inputCls =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20";
+  "w-full rounded-[5px] border border-edge-chip bg-surface-hover px-3 py-2 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-soft/55 focus:border-edge-focus";
 
 export function Field({
   label,
   htmlFor,
   error,
   children,
+  className = "",
 }: {
   label: string;
   htmlFor?: string;
   error?: string[];
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="mb-3.5">
+    <div className={`mb-3.5 ${className}`}>
       <label
         htmlFor={htmlFor}
-        className="mb-1 block text-sm font-semibold text-slate-700"
+        className="mb-1.5 block font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft"
       >
         {label}
       </label>
       {children}
-      {error && error.length > 0 && <p className="mt-1 text-xs text-red-700">{error[0]}</p>}
+      {error && error.length > 0 && (
+        <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.06em] text-[rgb(var(--danger-fg))]">
+          {error[0]}
+        </p>
+      )}
     </div>
   );
 }

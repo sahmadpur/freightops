@@ -42,7 +42,7 @@ export function DocumentRow({ doc }: { doc: DocRow }) {
         type="button"
         onClick={toggleVisibility}
         disabled={busy}
-        className={`rounded-full px-2 py-0.5 text-[10.5px] ${doc.visibleToClient ? "bg-[#d4f2e7] text-[#085041]" : "bg-slate-200 text-slate-600"} disabled:opacity-50`}
+        className={`rounded-full px-2 py-0.5 text-[10.5px] ${doc.visibleToClient ? "bg-[rgb(var(--approval-approved-bg))] text-[rgb(var(--approval-approved-fg))]" : "bg-surface-chip-active text-ink-soft"} disabled:opacity-50`}
       >
         {doc.visibleToClient ? t("clientVisible") : t("internal")}
       </button>

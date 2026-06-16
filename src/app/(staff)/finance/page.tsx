@@ -10,9 +10,13 @@ export default async function FinancePage() {
   const year = new Date().getFullYear();
 
   const fin = (label: string, cents: number, tone?: "pos" | "neg") => (
-    <div className="flex items-center justify-between border-b border-slate-100 py-2 text-sm last:border-0">
-      <span>{label}</span>
-      <span className={`font-semibold ${tone === "pos" ? "text-[#3b6d11]" : tone === "neg" ? "text-[#a32d2d]" : ""}`}>
+    <div className="flex items-center justify-between border-b border-edge-soft py-2 text-sm last:border-0">
+      <span className="text-ink-soft">{label}</span>
+      <span
+        className={`font-semibold tabular-nums ${
+          tone === "pos" ? "text-emerald-600" : tone === "neg" ? "text-rose-600" : "text-ink"
+        }`}
+      >
         {formatMoney(cents)}
       </span>
     </div>

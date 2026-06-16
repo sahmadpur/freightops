@@ -19,8 +19,8 @@ export function StatusBadge({ status }: { status: string }) {
   const t = useTranslations("status");
   return (
     <span
-      className={`inline-block whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium ${
-        STATUS_COLORS[status] ?? "bg-slate-100 text-slate-600"
+      className={`inline-block whitespace-nowrap rounded-[10px] px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.08em] ${
+        STATUS_COLORS[status] ?? "bg-[#e8e8e8] text-[#444444]"
       }`}
     >
       {t(status)}

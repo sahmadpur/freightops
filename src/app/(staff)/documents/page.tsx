@@ -59,9 +59,9 @@ export default async function DocumentsPage({
                         <span className="ml-2 text-xs text-slate-400">{t(`docType.${d.docType}`)}</span>
                       </span>
                       {d.visibleToClient ? (
-                        <span className="rounded-full bg-[#d4f2e7] px-2 py-0.5 text-[10.5px] text-[#085041]">{t("documents.clientVisible")}</span>
+                        <span className="rounded-full bg-[rgb(var(--approval-approved-bg))] px-2 py-0.5 text-[10.5px] text-[rgb(var(--approval-approved-fg))]">{t("documents.clientVisible")}</span>
                       ) : (
-                        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10.5px] text-slate-600">{t("documents.internal")}</span>
+                        <span className="rounded-full bg-surface-chip-active px-2 py-0.5 text-[10.5px] text-ink-soft">{t("documents.internal")}</span>
                       )}
                       <a href={`/api/documents/${d.id}/download`} className="text-xs text-indigo-600 hover:underline">
                         {t("documents.download")}

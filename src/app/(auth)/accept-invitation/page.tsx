@@ -30,11 +30,17 @@ function AcceptForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      <div className="mb-6">
-        <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
+      <div className="mb-7">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="h-px w-4 bg-brand-accent" aria-hidden="true" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-soft">
+            New account
+          </span>
+        </div>
+        <h1 className="font-display text-[34px] font-light leading-[1.05] tracking-[-0.01em] text-brand-deep">
           Set up your account
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-2 text-[13.5px] text-ink-soft">
           Choose a name and password to get started.
         </p>
       </div>

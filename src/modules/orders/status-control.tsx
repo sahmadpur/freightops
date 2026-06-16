@@ -22,8 +22,8 @@ export function StatusControl({ orderId, current }: { orderId: string; current: 
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <select className={`${inputCls} w-auto`} value={status} onChange={(e) => setStatus(e.target.value)}>
+    <div className="flex flex-wrap items-center gap-2">
+      <select className={`${inputCls} min-w-0 flex-1`} value={status} onChange={(e) => setStatus(e.target.value)}>
         {STATUSES.map((s) => (<option key={s} value={s}>{t(`status.${s}`)}</option>))}
       </select>
       <button

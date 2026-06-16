@@ -17,7 +17,9 @@
     "documents": "Sənədlər",
     "users": "İstifadəçilər və rollar",
     "audit": "Audit jurnalı",
-    "myOrders": "Sifarişlərim"
+    "myOrders": "Sifarişlərim",
+    "sectionLibrary": "Kitabxana",
+    "sectionManage": "İdarəetmə"
   },
   "status": {
     "created": "Yaradılıb",
@@ -61,7 +63,7 @@
     "orderId": "Sifariş nömrəsi",
     "orderTitle": "Sifarişin adı",
     "clientOrderId": "Müştəri sifariş nömrəsi",
-    "client": "Müştəri (hesab)",
+    "client": "Müştəri",
     "carrier": "Daşıyıcı",
     "route": "Marşrut",
     "cargoDescription": "Yükün təsviri",
@@ -71,7 +73,7 @@
     "incoterms": "Çatdırılma şərtləri (Incoterms 2020)",
     "deliveryFormat": "Yük çatdırılma formatı",
     "status": "Status",
-    "clientCharge": "Müştəri haqqı (satış qiyməti)",
+    "clientCharge": "Məbləğ",
     "carrierCost": "Daşıyıcı xərci",
     "additionalCosts": "Əlavə xərclər",
     "expectedProfit": "Gözlənilən mənfəət",
@@ -123,7 +125,10 @@
     "tabHistory": "Tarixçə",
     "updateStatus": "Statusu dəyiş",
     "deliveryHistory": "Çatdırılma tarixçəsi",
-    "noHistory": "Hələ tarixçə yoxdur"
+    "noHistory": "Hələ tarixçə yoxdur",
+    "sectionConsignment": "Göndəriş",
+    "sectionCargo": "Yük",
+    "sectionBilling": "Faktura"
   },
   "transport": {
     "title": "Nəqliyyat",

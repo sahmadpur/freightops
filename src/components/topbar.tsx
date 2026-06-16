@@ -18,17 +18,17 @@ export function Topbar({ userName }: { userName: string }) {
     .toUpperCase();
 
   return (
-    <header className="flex items-center gap-3 border-b border-slate-200 bg-white/80 px-5 py-2.5 backdrop-blur-sm">
+    <header className="flex items-center gap-3 border-b border-edge-soft bg-surface-card px-[22px] py-2">
       <div className="flex-1" />
       <LanguageSwitcher />
       <div className="flex items-center gap-2">
         <span
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 text-[11px] font-bold text-white"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-chip text-[11px] font-semibold text-brand-pale"
           aria-hidden="true"
         >
           {initials}
         </span>
-        <span className="text-sm font-medium text-slate-700">{userName}</span>
+        <span className="text-[12.5px] text-ink">{userName}</span>
       </div>
       <button
         onClick={async () => {
@@ -39,7 +39,7 @@ export function Topbar({ userName }: { userName: string }) {
           }
           router.push("/sign-in");
         }}
-        className="btn-secondary px-3 py-1.5"
+        className="btn-secondary"
       >
         {t("signOut")}
       </button>

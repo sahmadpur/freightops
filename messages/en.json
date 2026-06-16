@@ -17,7 +17,9 @@
     "documents": "Documents",
     "users": "Users & Roles",
     "audit": "Audit Log",
-    "myOrders": "My orders"
+    "myOrders": "My orders",
+    "sectionLibrary": "Library",
+    "sectionManage": "Manage"
   },
   "status": {
     "created": "Created",
@@ -61,7 +63,7 @@
     "orderId": "Order ID",
     "orderTitle": "Order title",
     "clientOrderId": "Client order ID",
-    "client": "Client (account)",
+    "client": "Client",
     "carrier": "Carrier",
     "route": "Route",
     "cargoDescription": "Cargo description",
@@ -71,7 +73,7 @@
     "incoterms": "Delivery terms (Incoterms 2020)",
     "deliveryFormat": "Cargo delivery format",
     "status": "Status",
-    "clientCharge": "Client charge (selling price)",
+    "clientCharge": "Charge",
     "carrierCost": "Carrier cost",
     "additionalCosts": "Additional costs",
     "expectedProfit": "Expected profit",
@@ -123,7 +125,10 @@
     "tabHistory": "History",
     "updateStatus": "Update status",
     "deliveryHistory": "Delivery history",
-    "noHistory": "No history yet"
+    "noHistory": "No history yet",
+    "sectionConsignment": "Consignment",
+    "sectionCargo": "Cargo",
+    "sectionBilling": "Billing"
   },
   "transport": {
     "title": "Transportation",

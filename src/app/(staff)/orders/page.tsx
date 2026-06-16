@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { getTranslations, getFormatter } from "next-intl/server";
-import { Card } from "@/components/ui/card";
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Paginator } from "@/components/ui/paginator";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { OrdersTable } from "@/modules/orders/orders-table";
 import { listOrders } from "@/modules/orders/queries";
 import { orderStatusEnum } from "@/db/schema";
 
@@ -17,7 +16,6 @@ export default async function OrdersPage({
   const status = sp.status || undefined;
   const page = Number(sp.page) || 1;
   const t = await getTranslations();
-  const format = await getFormatter();
   const { rows, total } = await listOrders({ q, status, page });
 
   const pill = (label: string, value: string | undefined, active: boolean) => {
@@ -59,50 +57,7 @@ export default async function OrdersPage({
           className="w-80 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-600"
         />
       </form>
-      <Card>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-[12.5px]">
-            <thead>
-              <tr className="bg-slate-50 text-left text-[11.5px] text-slate-500">
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.createdAt")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.orderId")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.client")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.orderTitle")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.route")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.transport")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.clientCharge")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.status")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.lastModified")}</th>
-                <th className="px-3.5 py-2.5 font-semibold">{t("fields.actionsCol")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.length === 0 && (
-                <tr><td colSpan={10} className="px-3.5 py-8 text-center text-slate-400">{t("orders.empty")}</td></tr>
-              )}
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t border-slate-100 hover:bg-slate-50">
-                  <td className="px-3.5 py-2.5 whitespace-nowrap text-slate-500">{format.dateTime(r.createdAt, { dateStyle: "medium" })}</td>
-                  <td className="px-3.5 py-2.5 font-medium text-indigo-600">{r.number}</td>
-                  <td className="px-3.5 py-2.5">{r.accountTitle}</td>
-                  <td className="px-3.5 py-2.5">{r.title}</td>
-                  <td className="px-3.5 py-2.5">{r.route ?? "—"}</td>
-                  <td className="px-3.5 py-2.5">{r.transportNumber ?? "—"}</td>
-                  <td className="px-3.5 py-2.5">{r.clientCharge ? `$${Number(r.clientCharge).toLocaleString("en-US")}` : "—"}</td>
-                  <td className="px-3.5 py-2.5"><StatusBadge status={r.status} /></td>
-                  <td className="px-3.5 py-2.5 whitespace-nowrap text-slate-500">{format.dateTime(r.updatedAt, { dateStyle: "medium" })}</td>
-                  <td className="px-3.5 py-2.5">
-                    <span className="flex gap-2 text-xs">
-                      <Link className="text-indigo-600 hover:underline" href={`/orders/${r.id}`}>{t("actions.view")}</Link>
-                      <Link className="text-indigo-600 hover:underline" href={`/orders/${r.id}/edit`}>{t("actions.edit")}</Link>
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      <OrdersTable rows={rows} />
       <Paginator page={page} total={total} basePath="/orders" params={{ ...(q ? { q } : {}), ...(status ? { status } : {}) }} />
     </div>
   );

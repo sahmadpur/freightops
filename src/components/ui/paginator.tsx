@@ -22,7 +22,7 @@ export function Paginator({
   };
 
   return (
-    <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+    <div className="mt-3 flex items-center justify-between font-mono text-[11px] tracking-[0.04em] text-ink-soft">
       <span>
         {Math.min((page - 1) * PAGE_SIZE + 1, total)}–{Math.min(page * PAGE_SIZE, total)} / {total}
       </span>
@@ -30,18 +30,18 @@ export function Paginator({
         {page > 1 && (
           <Link
             href={href(page - 1)}
-            className="rounded-md border border-slate-200 px-2.5 py-1 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+            className="rounded-[5px] border border-edge-chip px-2.5 py-1 transition-colors hover:bg-surface-chip-active hover:text-brand"
           >
             ‹
           </Link>
         )}
-        <span className="rounded-md bg-gradient-to-r from-indigo-600 to-violet-600 px-2.5 py-1 font-semibold text-white shadow-btn">
+        <span className="rounded-[5px] border border-brand bg-brand px-2.5 py-1 font-medium text-brand-pale">
           {page}
         </span>
         {page < pages && (
           <Link
             href={href(page + 1)}
-            className="rounded-md border border-slate-200 px-2.5 py-1 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+            className="rounded-[5px] border border-edge-chip px-2.5 py-1 transition-colors hover:bg-surface-chip-active hover:text-brand"
           >
             ›
           </Link>

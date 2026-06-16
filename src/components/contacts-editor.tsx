@@ -32,15 +32,15 @@ export function ContactsEditor({
       {/* Index keys are fine here: rows are only user-edited, inputs are controlled,
           and state lives in the parent form. Not suitable for sorted/filtered lists. */}
       {contacts.map((c, i) => (
-        <div key={i} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+        <div key={i} className="rounded-[6px] border border-edge-soft bg-surface-hover p-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500">
+            <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">
               {t("contacts")} {i + 1}
             </span>
             <button
               type="button"
               onClick={() => onChange(contacts.filter((_, idx) => idx !== i))}
-              className="text-xs text-red-700 hover:underline"
+              className="text-xs text-[rgb(var(--danger-fg))] hover:underline"
             >
               {t("remove")}
             </button>
@@ -53,7 +53,7 @@ export function ContactsEditor({
           />
           <div className="mt-2 grid grid-cols-2 gap-3">
             <div>
-              <div className="mb-1 text-xs text-slate-500">{t("phones")}</div>
+              <div className="mb-1 font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">{t("phones")}</div>
               {c.phones.map((p, j) => (
                 <input
                   key={j}
@@ -62,12 +62,12 @@ export function ContactsEditor({
                   onChange={(e) => updateList(i, "phones", j, e.target.value)}
                 />
               ))}
-              <button type="button" onClick={() => addToList(i, "phones")} className="text-xs text-indigo-600 hover:underline">
+              <button type="button" onClick={() => addToList(i, "phones")} className="text-xs text-brand hover:underline">
                 + {t("addPhone")}
               </button>
             </div>
             <div>
-              <div className="mb-1 text-xs text-slate-500">{t("emails")}</div>
+              <div className="mb-1 font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">{t("emails")}</div>
               {c.emails.map((m, j) => (
                 <input
                   key={j}
@@ -77,7 +77,7 @@ export function ContactsEditor({
                   onChange={(e) => updateList(i, "emails", j, e.target.value)}
                 />
               ))}
-              <button type="button" onClick={() => addToList(i, "emails")} className="text-xs text-indigo-600 hover:underline">
+              <button type="button" onClick={() => addToList(i, "emails")} className="text-xs text-brand hover:underline">
                 + {t("addEmail")}
               </button>
             </div>
@@ -87,7 +87,7 @@ export function ContactsEditor({
       <button
         type="button"
         onClick={() => onChange([...contacts, emptyContact()])}
-        className="rounded-lg border border-dashed border-slate-300 px-3 py-2 text-sm text-slate-500 hover:bg-slate-50"
+        className="rounded-[6px] border border-dashed border-edge-chip px-3 py-2 text-sm text-ink-soft hover:bg-surface-hover"
       >
         + {t("addContact")}
       </button>

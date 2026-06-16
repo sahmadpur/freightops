@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Field, inputCls, SubmitRow } from "@/components/ui/form";
+import { Card, CardBody } from "@/components/ui/card";
 import { ContactsEditor, type EditableContact } from "@/components/contacts-editor";
 import { createAccount, updateAccount } from "./actions";
 import type { ActionResult } from "./schema";
@@ -44,6 +45,8 @@ export function AccountForm({ initial }: { initial: AccountFormInitial }) {
 
   return (
     <form onSubmit={onSubmit} className="max-w-2xl">
+      <Card>
+        <CardBody>
       <Field label={t("fields.companyTitle")} htmlFor="title" error={fieldErrors.title}>
         <input id="title" required className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} />
       </Field>
@@ -59,13 +62,17 @@ export function AccountForm({ initial }: { initial: AccountFormInitial }) {
       <Field label={t("fields.contacts")} error={fieldErrors.contacts}>
         <ContactsEditor contacts={contacts} onChange={setContacts} />
       </Field>
-      {result && !result.ok && result.error && <p className="text-sm text-red-700">{result.error}</p>}
+      {result && !result.ok && result.error && (
+        <p className="text-sm text-[rgb(var(--danger-fg))]">{result.error}</p>
+      )}
       <SubmitRow
         pending={pending}
         saveLabel={pending ? t("actions.saving") : t("actions.save")}
         cancelHref={initial.id ? `/accounts/${initial.id}` : "/accounts"}
         cancelLabel={t("actions.cancel")}
       />
+        </CardBody>
+      </Card>
     </form>
   );
 }

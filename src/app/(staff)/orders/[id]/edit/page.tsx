@@ -9,6 +9,7 @@ import { transportModeOptions } from "@/modules/transport/queries";
 export default async function EditOrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const t = await getTranslations("orders");
+  const tn = await getTranslations("nav");
   const [data, { accountOpts, carrierOpts }, transportOpts] = await Promise.all([
     getOrder(id),
     orderFormData(),
@@ -43,8 +44,8 @@ export default async function EditOrderPage({ params }: { params: Promise<{ id: 
   };
 
   return (
-    <div>
-      <PageHeader title={t("editOrder")} />
+    <div className="mx-auto max-w-[1400px]">
+      <PageHeader eyebrow={tn("orders")} title={t("editOrder")} />
       <OrderForm initial={initial} accountOpts={accountOpts} carrierOpts={carrierOpts} transportOpts={transportOpts} />
     </div>
   );

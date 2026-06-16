@@ -17,7 +17,9 @@
     "documents": "Документы",
     "users": "Пользователи и роли",
     "audit": "Журнал аудита",
-    "myOrders": "Мои заказы"
+    "myOrders": "Мои заказы",
+    "sectionLibrary": "Библиотека",
+    "sectionManage": "Управление"
   },
   "status": {
     "created": "Создан",
@@ -61,7 +63,7 @@
     "orderId": "Номер заказа",
     "orderTitle": "Название заказа",
     "clientOrderId": "Номер заказа клиента",
-    "client": "Клиент (аккаунт)",
+    "client": "Клиент",
     "carrier": "Перевозчик",
     "route": "Маршрут",
     "cargoDescription": "Описание груза",
@@ -71,7 +73,7 @@
     "incoterms": "Условия поставки (Инкотермс 2020)",
     "deliveryFormat": "Формат доставки груза",
     "status": "Статус",
-    "clientCharge": "Сумма клиента (цена продажи)",
+    "clientCharge": "Сумма",
     "carrierCost": "Расходы перевозчика",
     "additionalCosts": "Дополнительные расходы",
     "expectedProfit": "Ожидаемая прибыль",
@@ -123,7 +125,10 @@
     "tabHistory": "История",
     "updateStatus": "Изменить статус",
     "deliveryHistory": "История доставки",
-    "noHistory": "Истории пока нет"
+    "noHistory": "Истории пока нет",
+    "sectionConsignment": "Отправление",
+    "sectionCargo": "Груз",
+    "sectionBilling": "Счёт"
   },
   "transport": {
     "title": "Транспорт",

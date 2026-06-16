@@ -1,89 +1,319 @@
 @import "tailwindcss";
 
 /*
- * Corporate Trust design system
- * ------------------------------
- * Indigo (primary) + Violet (secondary) on a cool slate base. Indigo 600
- * (#4F46E5) and Violet 600 (#7C3AED) ship in Tailwind's default palette, so
- * components use `indigo-*` / `violet-*` directly. This file centralizes the
- * pieces Tailwind can't express out of the box: the brand typeface, the
- * colored-shadow elevation scale, and a couple of reusable surface classes.
+ * FreightOps — "The Forwarder's Desk" design system
+ * --------------------------------------------------
+ * An editorial, archival language for a paperwork-heavy trade: international
+ * freight forwarding lives on waybills, CMR consignment notes, customs
+ * declarations and ledgers. The surface reads like a well-kept forwarder's
+ * desk — warm paper, a serious deep-forest-green ink, a lime accent used
+ * sparingly, and three typographic voices (serif display / humanist sans /
+ * monospace metadata).
  *
- * The app is a light-mode product surface (layouts paint their own slate
- * backgrounds), so there is no prefers-color-scheme dark flip — that would
- * invert text on the white cards.
+ * Colors are space-separated RGB channels consumed via rgb(var(--token)),
+ * so every token supports opacity. The semantic tokens below are also mapped
+ * onto Tailwind's indigo/violet/slate/emerald/rose scales so the wider app
+ * inherits the palette without rewriting every utility string.
+ *
+ * Light mode only — layouts paint their own paper/surface backgrounds and the
+ * product has no theme toggle. (A dark token-flip is a clean future addition.)
  */
 
-@theme {
-  /* Brand typeface — wired up in app/layout.tsx via next/font */
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, sans-serif;
+:root {
+  /* Brand — navy primary, signal-cyan accent */
+  --brand: 0 29 61; /* #001d3d deep navy (PRIMARY) */
+  --brand-hover: 12 47 84; /* #0c2f54 */
+  --brand-deep: 0 18 38; /* #001226 darkest — headings */
+  --brand-accent: 56 189 248; /* #38bdf8 signal cyan accent */
+  --brand-light: 186 225 251; /* #bae1fb light sky */
+  --brand-pale: 230 244 251; /* #e6f4fb — text/icon ON a navy button */
+  --brand-chip: 30 70 110; /* #1e466e */
 
-  /* Cool slate base */
-  --color-background: #f8fafc; /* slate-50 */
-  --color-surface: #ffffff;
+  /* Paper — cool ivory chrome for auth / editorial surfaces */
+  --paper: 238 241 246; /* #eef1f6 */
+  --paper-dim: 226 232 240; /* #e2e8f0 */
+  --paper-edge: 203 214 227; /* #cbd6e3 */
 
-  /*
-   * Colored shadows are the visual signature: blue/violet-tinted elevation
-   * instead of neutral gray. Exposed as `shadow-soft`, `shadow-soft-lg`,
-   * `shadow-btn`, `shadow-glow` utilities.
-   */
-  --shadow-soft: 0 4px 20px -2px rgb(79 70 229 / 0.1);
-  --shadow-soft-lg: 0 10px 25px -5px rgb(79 70 229 / 0.15),
-    0 8px 10px -6px rgb(79 70 229 / 0.1);
-  --shadow-btn: 0 4px 14px 0 rgb(79 70 229 / 0.3);
-  --shadow-glow: 0 0 20px rgb(79 70 229 / 0.5);
+  /* Ink — body text */
+  --ink: 17 28 39; /* #111c27 near-black cool */
+  --ink-soft: 90 107 123; /* #5a6b7b secondary text */
 
-  /* Refined motion — gentle breathing for decorative floats */
-  --animate-float: float 7s ease-in-out infinite;
+  /* Surface scale — the app workspace (cool blue-grey) */
+  --surface: 243 245 248; /* #f3f5f8 page background */
+  --surface-card: 255 255 255; /* cards, tables, inputs */
+  --surface-hover: 240 246 252; /* #f0f6fc row hover */
+  --surface-thead: 238 243 249; /* #eef3f9 table header */
+  --surface-chip-active: 226 236 247; /* #e2ecf7 active filter chip */
+
+  /* Edges / borders */
+  --edge-soft: 226 232 240; /* #e2e8f0 subtle dividers */
+  --edge-chip: 203 214 227; /* #cbd6e3 visible input/btn borders */
+  --edge-focus: 56 189 248; /* #38bdf8 cyan focus ring */
+
+  /* Status dots */
+  --dot-done: 99 153 34;
+  --dot-progress: 239 159 39;
+  --dot-pending: 148 163 184; /* #94a3b8 cool grey */
+  --dot-failed: 201 73 73;
+
+  /* Approval / workflow states (bg / fg / edge) */
+  --approval-pending-bg: 255 251 235;
+  --approval-pending-fg: 180 83 9;
+  --approval-pending-edge: 253 230 138;
+  --approval-approved-bg: 236 253 245;
+  --approval-approved-fg: 4 120 87;
+  --approval-approved-edge: 167 243 208;
+  --approval-rejected-bg: 255 241 242;
+  --approval-rejected-fg: 159 18 57;
+  --approval-rejected-edge: 254 205 211;
+
+  /* Destructive chrome */
+  --danger-bg: 253 241 241;
+  --danger-fg: 201 73 73;
+  --danger-edge: 224 180 180;
+
+  /* Sidebar — decoupled from brand on purpose */
+  --sidebar-bg: 0 24 47; /* #00182f deep navy */
+  --sidebar-fg: 230 244 251; /* #e6f4fb — active nav text */
+  --sidebar-fg-soft: 159 180 201; /* #9fb4c9 — inactive nav text */
+  --sidebar-chip: 30 70 110; /* #1e466e avatar bg */
 }
 
-@keyframes float {
-  0%,
-  100% {
+@theme inline {
+  /* Typefaces — display (serif) + mono wired in layout.tsx via next/font.
+     Body is a humanist system stack (Calibri family) per the design DNA. */
+  --font-sans: Calibri, Aptos, "Segoe UI", Arial, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, "Iowan Old Style", serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+
+  /* Cool-paper base */
+  --color-background: rgb(var(--surface));
+  --color-surface: rgb(var(--surface-card));
+
+  /* Semantic tokens (rgb wrappers → opacity works via color-mix) */
+  --color-brand: rgb(var(--brand));
+  --color-brand-hover: rgb(var(--brand-hover));
+  --color-brand-deep: rgb(var(--brand-deep));
+  --color-brand-accent: rgb(var(--brand-accent));
+  --color-brand-light: rgb(var(--brand-light));
+  --color-brand-pale: rgb(var(--brand-pale));
+  --color-brand-chip: rgb(var(--brand-chip));
+
+  --color-paper: rgb(var(--paper));
+  --color-paper-dim: rgb(var(--paper-dim));
+  --color-paper-edge: rgb(var(--paper-edge));
+
+  --color-ink: rgb(var(--ink));
+  --color-ink-soft: rgb(var(--ink-soft));
+
+  --color-surface-card: rgb(var(--surface-card));
+  --color-surface-hover: rgb(var(--surface-hover));
+  --color-surface-thead: rgb(var(--surface-thead));
+  --color-surface-chip-active: rgb(var(--surface-chip-active));
+
+  --color-edge-soft: rgb(var(--edge-soft));
+  --color-edge-chip: rgb(var(--edge-chip));
+  --color-edge-focus: rgb(var(--edge-focus));
+
+  --color-dot-done: rgb(var(--dot-done));
+  --color-dot-progress: rgb(var(--dot-progress));
+  --color-dot-pending: rgb(var(--dot-pending));
+  --color-dot-failed: rgb(var(--dot-failed));
+
+  --color-sidebar: rgb(var(--sidebar-bg));
+  --color-sidebar-fg: rgb(var(--sidebar-fg));
+  --color-sidebar-fg-soft: rgb(var(--sidebar-fg-soft));
+  --color-sidebar-chip: rgb(var(--sidebar-chip));
+
+  /* ----- Remap Tailwind's default scales onto the forwarder palette so the
+     long tail of indigo/violet/slate/emerald/rose utilities re-skins for free. */
+
+  /* indigo + violet → forest green (primary brand family) */
+  --color-indigo-50: rgb(var(--surface-chip-active));
+  --color-indigo-100: rgb(var(--brand-pale));
+  --color-indigo-200: rgb(var(--brand-light));
+  --color-indigo-300: rgb(var(--edge-chip));
+  --color-indigo-400: rgb(var(--brand-chip));
+  --color-indigo-500: rgb(var(--brand-chip));
+  --color-indigo-600: rgb(var(--brand));
+  --color-indigo-700: rgb(var(--brand-hover));
+  --color-indigo-800: rgb(var(--brand-deep));
+  --color-indigo-900: rgb(var(--brand-deep));
+
+  --color-violet-50: rgb(var(--surface-chip-active));
+  --color-violet-100: rgb(var(--brand-pale));
+  --color-violet-200: rgb(var(--brand-light));
+  --color-violet-300: rgb(var(--edge-chip));
+  --color-violet-400: rgb(var(--brand-chip));
+  --color-violet-500: rgb(var(--brand-chip));
+  --color-violet-600: rgb(var(--brand-chip));
+  --color-violet-700: rgb(var(--brand-hover));
+  --color-violet-800: rgb(var(--brand-deep));
+  --color-violet-900: rgb(var(--brand-deep));
+
+  /* slate → ink / paper / edge (chrome, text, borders) */
+  --color-slate-50: rgb(var(--surface));
+  --color-slate-100: rgb(var(--edge-soft));
+  --color-slate-200: rgb(var(--edge-chip));
+  --color-slate-300: rgb(var(--edge-chip));
+  --color-slate-400: rgb(var(--ink-soft));
+  --color-slate-500: rgb(var(--ink-soft));
+  --color-slate-600: rgb(var(--ink-soft));
+  --color-slate-700: rgb(var(--ink));
+  --color-slate-800: rgb(var(--ink));
+  --color-slate-900: rgb(var(--ink));
+
+  /* emerald → "indexed/positive" green */
+  --color-emerald-50: rgb(var(--approval-approved-bg));
+  --color-emerald-500: rgb(var(--dot-done));
+  --color-emerald-600: rgb(var(--dot-done));
+  --color-emerald-700: rgb(var(--brand-hover));
+
+  /* rose + red → the danger red */
+  --color-rose-50: rgb(var(--danger-bg));
+  --color-rose-500: rgb(var(--danger-fg));
+  --color-rose-600: rgb(var(--danger-fg));
+  --color-rose-700: rgb(var(--approval-rejected-fg));
+  --color-red-50: rgb(var(--danger-bg));
+  --color-red-500: rgb(var(--danger-fg));
+  --color-red-600: rgb(var(--danger-fg));
+  --color-red-700: rgb(var(--danger-fg));
+  --color-red-800: rgb(var(--approval-rejected-fg));
+
+  /* Motion — gentle archival drift, never bouncy */
+  --animate-rise: riseFade 0.8s cubic-bezier(0.2, 0.65, 0.2, 1) both;
+  --animate-float1: cardFloat1 9s ease-in-out infinite;
+  --animate-float2: cardFloat2 11s ease-in-out infinite;
+  --animate-stamp: stampPulse 4s ease-in-out infinite;
+}
+
+@keyframes riseFade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes cardFloat1 {
+  0%,
+  100% {
+    transform: rotate(-5.5deg) translateY(0);
+  }
   50% {
-    transform: translateY(-12px);
+    transform: rotate(-5deg) translateY(-7px);
+  }
+}
+
+@keyframes cardFloat2 {
+  0%,
+  100% {
+    transform: rotate(4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3.5deg) translateY(-5px);
+  }
+}
+
+@keyframes stampPulse {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
 body {
-  background: var(--color-background);
-  color: #0f172a; /* slate-900 */
+  background: rgb(var(--surface));
+  color: rgb(var(--ink));
   font-family: var(--font-sans);
 }
 
 /*
- * Reusable surface + control classes. Kept here (rather than repeated as long
- * utility strings) so the brand's elevation and gradient language stays in one
- * place. Components import the matching React primitives in components/ui.
+ * Reusable surface + control classes — keep the brand's button and editorial
+ * recipes in one place. The working UI is flat and border-defined; drama is
+ * reserved for chrome and editorial surfaces.
  */
 @layer components {
-  /* Primary CTA — indigo→violet gradient with a lift on hover */
+  /* Primary action — solid deep-green "stamp" button */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-lg
-      bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-sm
-      font-semibold text-white shadow-btn transition-all duration-200
-      hover:-translate-y-0.5 hover:shadow-soft-lg focus-visible:outline-none
-      focus-visible:ring-2 focus-visible:ring-indigo-500
-      focus-visible:ring-offset-2 disabled:pointer-events-none
-      disabled:opacity-50;
-  }
-
-  /* Secondary — quiet white surface that warms toward indigo on hover */
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-lg border
-      border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700
-      transition-all duration-200 hover:border-indigo-300 hover:bg-slate-50
-      hover:text-indigo-700 focus-visible:outline-none focus-visible:ring-2
-      focus-visible:ring-indigo-500 focus-visible:ring-offset-2
+    @apply inline-flex items-center justify-center gap-1.5 rounded-[6px]
+      border border-brand bg-brand px-3.5 py-1.5 text-[12px] font-medium
+      text-brand-pale transition-colors hover:bg-brand-hover
+      focus-visible:outline-none focus-visible:ring-2
+      focus-visible:ring-edge-focus focus-visible:ring-offset-1
       disabled:pointer-events-none disabled:opacity-50;
   }
 
-  /* Indigo→violet clipped to text, for headline emphasis */
+  /* Secondary — quiet paper surface that warms toward green on hover */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-[6px]
+      border border-edge-chip bg-surface-card px-3.5 py-1.5 text-[12px]
+      font-medium text-brand transition-colors hover:bg-surface-chip-active
+      focus-visible:outline-none focus-visible:ring-2
+      focus-visible:ring-edge-focus focus-visible:ring-offset-1
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  /* The signature label treatment: mono · uppercase · wide-tracked. */
+  .eyebrow {
+    @apply font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft;
+  }
+
+  /* Kept for back-compat with the old gradient wordmark — now flat brand. */
   .text-gradient {
-    @apply bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text
-      text-transparent;
+    @apply text-brand;
+  }
+}
+
+/* Staggered editorial entrance — children rise-fade in sequence. */
+.stagger > * {
+  animation: var(--animate-rise);
+}
+.stagger > *:nth-child(1) {
+  animation-delay: 0s;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 0.15s;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 0.2s;
+}
+.stagger > *:nth-child(6) {
+  animation-delay: 0.25s;
+}
+.stagger > *:nth-child(7) {
+  animation-delay: 0.3s;
+}
+
+/* Paper grain — low-opacity turbulence under hero/auth panels. */
+.bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 320px;
+}
+.bg-grain-light {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 320px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger > *,
+  .animate-float1,
+  .animate-float2,
+  .animate-stamp,
+  .animate-rise {
+    animation: none !important;
   }
 }
