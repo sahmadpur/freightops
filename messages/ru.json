@@ -97,7 +97,9 @@
     "lastModified": "Изменено",
     "selectAccount": "Выберите клиента…",
     "selectCarrier": "Выберите перевозчика…",
-    "selectTransport": "Выберите транспорт…"
+    "selectTransport": "Выберите транспорт…",
+    "actNumber": "Номер акта",
+    "actDate": "Дата акта"
   },
   "accounts": {
     "newAccount": "Новый клиент",
@@ -230,9 +232,29 @@
     "invoice": "Счёт",
     "packing_list": "Упаковочный лист",
     "certificate": "Сертификат",
+    "act": "Акт",
     "waybill": "Накладная",
     "cargo_photos": "Фото груза",
     "other": "Прочее"
+  },
+  "docgen": {
+    "title": "Сформировать документ",
+    "typeLabel": "Документ",
+    "docInvoice": "Счёт (инвойс)",
+    "docAct": "Акт выполненных работ",
+    "languageLabel": "Язык",
+    "lang_en": "English",
+    "lang_ru": "Русский",
+    "lang_az": "Azərbaycanca",
+    "numberLabel": "Номер",
+    "autoNumber": "Автонумерация",
+    "dateLabel": "Дата",
+    "visibleToClient": "Виден клиенту",
+    "generate": "Сформировать PDF",
+    "generating": "Формирование…",
+    "failed": "Не удалось сформировать документ",
+    "notFound": "Заказ не найден",
+    "hint": "PDF сохраняется в документы заказа. Показанный номер резервируется только при формировании."
   },
   "comments": {
     "tab": "Комментарии",

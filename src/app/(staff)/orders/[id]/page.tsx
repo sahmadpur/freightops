@@ -10,6 +10,8 @@ import { orderFinance } from "@/modules/finance/queries";
 import { FinanceTab } from "@/modules/finance/finance-tab";
 import { listOrderDocuments } from "@/modules/documents/queries";
 import { DocumentsTab } from "@/modules/documents/documents-tab";
+import { peekNextDocNumber } from "@/modules/docgen/queries";
+import { GenerateDocumentSection } from "@/modules/docgen/generate-document-section";
 import { listOrderComments } from "@/modules/comments/queries";
 import { CommentsTab } from "@/modules/comments/comments-tab";
 import { addComment } from "@/modules/comments/actions";
@@ -24,11 +26,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const data = await getOrder(id);
   if (!data) notFound();
   // Independent of each other — fetch in parallel.
-  const [finance, orderDocuments, orderComments] = await Promise.all([
-    orderFinance(id),
-    listOrderDocuments(id),
-    listOrderComments(id),
-  ]);
+  const currentYear = new Date().getFullYear();
+  const [finance, orderDocuments, orderComments, nextInvoiceNumber, nextActNumber] =
+    await Promise.all([
+      orderFinance(id),
+      listOrderDocuments(id),
+      listOrderComments(id),
+      peekNextDocNumber("invoice", currentYear),
+      peekNextDocNumber("act", currentYear),
+    ]);
   const { order, accountTitle, carrierTitle, transportNumber, transportModeType, history } = data;
 
   const info = (
@@ -64,7 +70,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <SectionRule>{t("orders.sectionBilling")}</SectionRule>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
           <DefRow label={t("fields.invoiceNumber")} value={order.invoiceNumber} />
+          <DefRow label={t("fields.invoiceDate")} value={order.invoiceDate} />
           <DefRow label={t("fields.deliveryFormat")} value={order.deliveryFormat} />
+          <DefRow label={t("fields.actNumber")} value={order.actNumber} />
+          <DefRow label={t("fields.actDate")} value={order.actDate} />
         </dl>
       </section>
     </div>
@@ -170,7 +179,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <OrderDetailTabs
             info={info}
             finance={finance ? <FinanceTab orderId={order.id} finance={finance} /> : null}
-            documents={<DocumentsTab orderId={order.id} documents={orderDocuments} />}
+            documents={
+              <div className="space-y-6">
+                <DocumentsTab orderId={order.id} documents={orderDocuments} />
+                <GenerateDocumentSection
+                  orderId={order.id}
+                  nextNumbers={{ invoice: nextInvoiceNumber, act: nextActNumber }}
+                />
+              </div>
+            }
             comments={
               <CommentsTab
                 orderId={id}

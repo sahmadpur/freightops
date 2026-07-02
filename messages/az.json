@@ -97,7 +97,9 @@
     "lastModified": "Dəyişdirilib",
     "selectAccount": "Müştəri seçin…",
     "selectCarrier": "Daşıyıcı seçin…",
-    "selectTransport": "Nəqliyyat seçin…"
+    "selectTransport": "Nəqliyyat seçin…",
+    "actNumber": "Akt nömrəsi",
+    "actDate": "Akt tarixi"
   },
   "accounts": {
     "newAccount": "Yeni müştəri",
@@ -230,9 +232,29 @@
     "invoice": "Qaimə",
     "packing_list": "Qablaşdırma siyahısı",
     "certificate": "Sertifikat",
+    "act": "Akt",
     "waybill": "Yük qaiməsi",
     "cargo_photos": "Yük şəkilləri",
     "other": "Digər"
+  },
+  "docgen": {
+    "title": "Sənəd yarat",
+    "typeLabel": "Sənəd",
+    "docInvoice": "Hesab-faktura",
+    "docAct": "Görülmüş işlər aktı",
+    "languageLabel": "Dil",
+    "lang_en": "English",
+    "lang_ru": "Русский",
+    "lang_az": "Azərbaycanca",
+    "numberLabel": "Nömrə",
+    "autoNumber": "Avtomatik nömrə",
+    "dateLabel": "Tarix",
+    "visibleToClient": "Müştəriyə görünür",
+    "generate": "PDF yarat",
+    "generating": "Yaradılır…",
+    "failed": "Sənədi yaratmaq mümkün olmadı",
+    "notFound": "Sifariş tapılmadı",
+    "hint": "PDF sifarişin sənədlərinə yazılır. Göstərilən nömrə yalnız yaratma zamanı rezerv olunur."
   },
   "comments": {
     "tab": "Şərhlər",

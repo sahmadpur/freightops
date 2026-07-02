@@ -97,7 +97,9 @@
     "lastModified": "Last modified",
     "selectAccount": "Select account…",
     "selectCarrier": "Select carrier…",
-    "selectTransport": "Select transport…"
+    "selectTransport": "Select transport…",
+    "actNumber": "ACT number",
+    "actDate": "ACT date"
   },
   "accounts": {
     "newAccount": "New account",
@@ -230,9 +232,29 @@
     "invoice": "Invoice",
     "packing_list": "Packing list",
     "certificate": "Certificate",
+    "act": "ACT",
     "waybill": "Waybill",
     "cargo_photos": "Cargo photos",
     "other": "Other"
+  },
+  "docgen": {
+    "title": "Generate document",
+    "typeLabel": "Document",
+    "docInvoice": "Invoice",
+    "docAct": "ACT (acceptance certificate)",
+    "languageLabel": "Language",
+    "lang_en": "English",
+    "lang_ru": "Русский",
+    "lang_az": "Azərbaycanca",
+    "numberLabel": "Number",
+    "autoNumber": "Auto number",
+    "dateLabel": "Date",
+    "visibleToClient": "Visible to client",
+    "generate": "Generate PDF",
+    "generating": "Generating…",
+    "failed": "Generation failed",
+    "notFound": "Order not found",
+    "hint": "The PDF is saved to this order's documents. The previewed number is reserved only when you generate."
   },
   "comments": {
     "tab": "Comments",

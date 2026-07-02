@@ -32,6 +32,14 @@ RUN npm ci
 FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+# Chromium for HTML→PDF document generation (puppeteer-core drives the distro
+# build; see src/lib/pdf.ts). ttf-dejavu covers Latin + Cyrillic + Azerbaijani ə.
+# dl-cdn.alpinelinux.org is unreliable from some networks — fall back to the
+# kernel.org mirror if the default CDN fails.
+RUN apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-dejavu || \
+    { sed -i 's#https://dl-cdn.alpinelinux.org#https://mirrors.edge.kernel.org#' /etc/apk/repositories && \
+      apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-dejavu; }
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 # Next.js standalone server.js binds to $HOSTNAME; Docker otherwise sets it to the
 # container id, binding a single interface. Bind all interfaces so a reverse proxy
 # (Traefik) can reach the app. PORT keeps the listen port explicit.

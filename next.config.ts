@@ -10,7 +10,9 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || ".next",
   // nodemailer is Node-only (used by the notification worker via instrumentation).
   // Opt it out of bundling so it isn't pulled into the browser/edge compile graph.
-  serverExternalPackages: ["nodemailer"],
+  // puppeteer-core (HTML→PDF document generation) is in Next's default external
+  // list already; kept explicit here for the same reason.
+  serverExternalPackages: ["nodemailer", "puppeteer-core"],
 };
 
 export default withNextIntl(nextConfig);

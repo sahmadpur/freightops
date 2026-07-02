@@ -11,7 +11,7 @@ import { DocumentRow } from "./document-row";
 
 // Mirror of docTypeEnum (src/db/schema). Hardcoded to keep the Drizzle schema out of
 // the client bundle, matching how order-form/status-control list their enums.
-const DOC_TYPES = ["cmr", "awb", "bill_of_lading", "invoice", "packing_list", "certificate", "waybill", "cargo_photos", "other"] as const;
+const DOC_TYPES = ["cmr", "awb", "bill_of_lading", "invoice", "packing_list", "certificate", "act", "waybill", "cargo_photos", "other"] as const;
 
 export function DocumentsTab({ orderId, documents }: { orderId: string; documents: DocRow[] }) {
   const t = useTranslations("documents");

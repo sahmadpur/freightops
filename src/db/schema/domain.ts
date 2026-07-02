@@ -9,6 +9,7 @@ import {
   date,
   jsonb,
   index,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { userRoleEnum } from "./enums";
@@ -49,6 +50,7 @@ export const docTypeEnum = pgEnum("doc_type", [
   "invoice",
   "packing_list",
   "certificate",
+  "act",
   "waybill",
   "cargo_photos",
   "other",
@@ -143,6 +145,8 @@ export const orders = pgTable(
     expectedProfit: numeric("expected_profit", { precision: 12, scale: 2 }),
     invoiceNumber: text("invoice_number"),
     invoiceDate: date("invoice_date"),
+    actNumber: text("act_number"),
+    actDate: date("act_date"),
     amountReceivable: numeric("amount_receivable", { precision: 12, scale: 2 }),
     amountPayable: numeric("amount_payable", { precision: 12, scale: 2 }),
     createdAt: createdAt(),
@@ -235,6 +239,20 @@ export const orderCounters = pgTable("order_counters", {
   year: integer("year").primaryKey(),
   lastNumber: integer("last_number").notNull().default(0),
 });
+
+export const docCounterKindEnum = pgEnum("doc_counter_kind", ["invoice", "act"]);
+
+// Per-year sequences for generated documents (invoice / ACT numbers), same
+// row-lock upsert pattern as orderCounters. See src/lib/doc-number.ts.
+export const docCounters = pgTable(
+  "doc_counters",
+  {
+    kind: docCounterKindEnum("kind").notNull(),
+    year: integer("year").notNull(),
+    lastNumber: integer("last_number").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.kind, t.year] })],
+);
 
 export const notifications = pgTable(
   "notifications",

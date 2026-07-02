@@ -46,7 +46,9 @@ services:
   app-dev:
     image: node:24-alpine
     working_dir: /app
-    command: sh -c "npm install && npm run db:migrate && npm run dev"
+    # chromium + ttf-dejavu: HTML→PDF document generation (src/lib/pdf.ts).
+    # Falls back to the kernel.org mirror when dl-cdn is unreachable.
+    command: sh -c "{ apk add --no-cache chromium ttf-dejavu || { sed -i 's#https://dl-cdn.alpinelinux.org#https://mirrors.edge.kernel.org#' /etc/apk/repositories && apk add --no-cache chromium ttf-dejavu; }; } && npm install && npm run db:migrate && npm run dev"
     ports:
       - "3000:3000"
     environment:
@@ -55,6 +57,7 @@ services:
       BETTER_AUTH_URL: http://localhost:3000
       APP_BASE_URL: http://localhost:3000
       NEXT_DIST_DIR: .next-docker
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
       S3_ENDPOINT: http://minio:9000
       S3_ACCESS_KEY: freightops
       S3_SECRET_KEY: freightops_dev
