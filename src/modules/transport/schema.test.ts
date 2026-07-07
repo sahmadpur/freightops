@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { transportModeInputSchema } from "./schema";
 
 const valid = {
-  modeType: "vehicle",
+  modeType: "truck",
   number: "TRK-0188",
   fromCountry: "Türkiye",
   toCountry: "Azerbaijan",

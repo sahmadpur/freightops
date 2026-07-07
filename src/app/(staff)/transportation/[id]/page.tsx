@@ -34,7 +34,7 @@ export default async function TransportDetailPage({ params }: { params: Promise<
         <CardHeader><span className="text-sm font-semibold">{t("nav.transportation")}</span></CardHeader>
         <CardBody>
           <dl className="grid grid-cols-2 gap-3 text-sm">
-            {row(t("fields.modeType"), mode.modeType)}
+            {row(t("fields.modeType"), t(`transportModes.${mode.modeType}`))}
             {row(t("fields.route"), mode.route)}
             {row(t("fields.fromCountry"), mode.fromCountry)}
             {row(t("fields.toCountry"), mode.toCountry)}

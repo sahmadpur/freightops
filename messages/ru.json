@@ -40,7 +40,13 @@
     "save": "Сохранить",
     "cancel": "Отмена",
     "back": "Назад",
-    "saving": "Сохранение..."
+    "saving": "Сохранение...",
+    "archive": "Архивировать",
+    "restore": "Восстановить",
+    "confirmArchive": "Архивировать запись? Она будет скрыта из списков, но её можно восстановить.",
+    "hasOrders": "Нельзя архивировать — есть активные заказы.",
+    "showArchived": "Показать архив",
+    "showActive": "Показать активные"
   },
   "fields": {
     "companyTitle": "Название компании",
@@ -99,7 +105,13 @@
     "selectCarrier": "Выберите перевозчика…",
     "selectTransport": "Выберите транспорт…",
     "actNumber": "Номер акта",
-    "actDate": "Дата акта"
+    "actDate": "Дата акта",
+    "paidByCustomer": "Оплата клиента",
+    "paidToCarrier": "Оплата перевозчику",
+    "documents": "Док.",
+    "carrierInvoiceNumber": "№ счёта перевозчика",
+    "carrierInvoiceDate": "Дата счёта перевозчика",
+    "exchangeRate": "Курс (AZN/USD)"
   },
   "accounts": {
     "newAccount": "Новый клиент",
@@ -176,7 +188,22 @@
     "additionalExpenses": "Дополнительные расходы",
     "expectedProfitOpen": "Ожидаемая прибыль (открытые)",
     "actualProfitCompleted": "Фактическая прибыль (завершённые)",
-    "remove": "Удалить"
+    "remove": "Удалить",
+    "expectedProfit": "Ожидаемая прибыль",
+    "revenue": "Выручка",
+    "carrierCost": "Стоимость перевозчика",
+    "revenueLines": "Выручка",
+    "costLines": "Стоимость перевозчика",
+    "addLine": "Добавить строку",
+    "lineDescription": "Описание",
+    "lineAmount": "Сумма (USD)",
+    "lineNote": "Примечание",
+    "noLines": "Пока нет строк",
+    "reportOfAccounts": "Отчёт по счетам",
+    "filterByStatus": "Фильтр по статусу",
+    "clearFilter": "Сбросить",
+    "orderDetails": "Детали заказа",
+    "noRows": "Нет подходящих строк"
   },
   "dashboard": {
     "title": "Дашборд",
@@ -235,7 +262,8 @@
     "act": "Акт",
     "waybill": "Накладная",
     "cargo_photos": "Фото груза",
-    "other": "Прочее"
+    "other": "Прочее",
+    "carrier_invoice": "Счёт перевозчика"
   },
   "docgen": {
     "title": "Сформировать документ",
@@ -243,6 +271,7 @@
     "docInvoice": "Счёт (инвойс)",
     "docAct": "Акт выполненных работ",
     "languageLabel": "Язык",
+    "currencyLabel": "Валюта",
     "lang_en": "English",
     "lang_ru": "Русский",
     "lang_az": "Azərbaycanca",
@@ -304,5 +333,13 @@
     "search": "Поиск",
     "filter": "Фильтр",
     "noAuditEntries": "Нет записей аудита"
+  },
+  "transportModes": {
+    "truck": "Грузовик",
+    "container": "Контейнер",
+    "air": "Авиа",
+    "postal": "Почта",
+    "rail": "Ж/Д",
+    "sea": "Море"
   }
 }

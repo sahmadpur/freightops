@@ -16,6 +16,7 @@ import {
   transportModes,
   orders,
   payments,
+  orderFinanceLines,
   comments,
   auditLog,
   orderCounters,
@@ -112,9 +113,9 @@ async function main() {
     .values([
       { modeType: "rail", number: "BTK-7741", fromCountry: "AZ", toCountry: "GE", route: "Alyat → Tbilisi", loadingDate: iso(5, 12), plannedArrivalDate: iso(5, 16), totalWeightKg: num(42000), totalVolumeM3: num(76), createdBy: by },
       { modeType: "sea", number: "MSC-AZ-2031", fromCountry: "CN", toCountry: "AZ", route: "Shanghai → Baku (via Aktau)", loadingDate: iso(3, 2), plannedArrivalDate: iso(4, 1), totalWeightKg: num(180000), totalVolumeM3: num(320), createdBy: by },
-      { modeType: "vehicle", number: "TRK-3390", fromCountry: "AZ", toCountry: "TR", route: "Baku → Istanbul", loadingDate: iso(6, 4), plannedArrivalDate: iso(6, 9), totalWeightKg: num(21000), totalVolumeM3: num(58), createdBy: by },
+      { modeType: "truck", number: "TRK-3390", fromCountry: "AZ", toCountry: "TR", route: "Baku → Istanbul", loadingDate: iso(6, 4), plannedArrivalDate: iso(6, 9), totalWeightKg: num(21000), totalVolumeM3: num(58), createdBy: by },
       { modeType: "air", number: "LH-8800", fromCountry: "DE", toCountry: "AZ", route: "Frankfurt → Baku", loadingDate: iso(6, 11), plannedArrivalDate: iso(6, 12), totalWeightKg: num(3400), totalVolumeM3: num(14), createdBy: by },
-      { modeType: "vehicle", number: "TRK-3412", fromCountry: "GE", toCountry: "AZ", route: "Poti → Baku", loadingDate: iso(2, 18), plannedArrivalDate: iso(2, 22), totalWeightKg: num(18500), totalVolumeM3: num(44), createdBy: by },
+      { modeType: "truck", number: "TRK-3412", fromCountry: "GE", toCountry: "AZ", route: "Poti → Baku", loadingDate: iso(2, 18), plannedArrivalDate: iso(2, 22), totalWeightKg: num(18500), totalVolumeM3: num(44), createdBy: by },
     ])
     .returning({ id: transportModes.id, number: transportModes.number });
   const tm = Object.fromEntries(tmRows.map((t) => [t.number, t.id]));
@@ -168,7 +169,8 @@ async function main() {
   for (const s of seeds) {
     seq += 1;
     const number = `ORD-${YEAR}-${String(seq).padStart(3, "0")}`;
-    const expectedProfit = s.client - s.carrierCost - s.additional;
+    // Carrier cost rollup now folds in the old "additional" costs (see finance lines below).
+    const totalCarrierCost = s.carrierCost + s.additional;
     const when = day(s.month, s.date);
     const [row] = await db
       .insert(orders)
@@ -187,19 +189,24 @@ async function main() {
         deliveryFormat: s.deliveryFormat as never,
         status: s.status as never,
         clientCharge: s.client ? money(s.client) : null,
-        carrierCost: s.carrierCost ? money(s.carrierCost) : null,
-        additionalCosts: s.additional ? money(s.additional) : null,
-        additionalCostsNote: s.addNote ?? null,
-        expectedProfit: s.client ? money(expectedProfit) : null,
+        carrierCost: totalCarrierCost ? money(totalCarrierCost) : null,
+        exchangeRate: "1.7000",
         invoiceNumber: s.invoiced ? `INV-${YEAR}-${String(seq).padStart(3, "0")}` : null,
         invoiceDate: s.invoiced ? iso(s.month, Math.min(28, s.date + 1)) : null,
         amountReceivable: s.invoiced ? money(s.client) : null,
-        amountPayable: s.invoiced && s.carrierCost ? money(s.carrierCost) : null,
+        amountPayable: s.invoiced && totalCarrierCost ? money(totalCarrierCost) : null,
         createdAt: when,
         updatedAt: when,
         createdBy: by,
       })
       .returning({ id: orders.id, number: orders.number });
+
+    // Itemized finance lines matching the rollups above.
+    const lines = [];
+    if (s.client) lines.push({ orderId: row.id, side: "revenue" as const, description: "Freight forwarding services", amount: money(s.client), createdBy: by });
+    if (s.carrierCost) lines.push({ orderId: row.id, side: "cost" as const, description: "Carrier cost", amount: money(s.carrierCost), createdBy: by });
+    if (s.additional) lines.push({ orderId: row.id, side: "cost" as const, description: s.addNote ?? "Additional costs", amount: money(s.additional), createdBy: by });
+    if (lines.length) await db.insert(orderFinanceLines).values(lines);
 
     // Payments
     if (s.pay && s.invoiced) {

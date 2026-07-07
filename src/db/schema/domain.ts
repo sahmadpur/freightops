@@ -41,13 +41,22 @@ export const incotermsEnum = pgEnum("incoterms", [
   "DDP",
 ]);
 export const deliveryFormatEnum = pgEnum("delivery_format", ["FCL", "LCL", "FTL", "LTL"]);
-export const modeTypeEnum = pgEnum("mode_type", ["vehicle", "air", "postal", "rail", "sea"]);
+export const modeTypeEnum = pgEnum("mode_type", [
+  "truck",
+  "container",
+  "air",
+  "postal",
+  "rail",
+  "sea",
+]);
 export const paymentDirectionEnum = pgEnum("payment_direction", ["incoming", "outgoing"]);
+export const financeLineSideEnum = pgEnum("finance_line_side", ["revenue", "cost"]);
 export const docTypeEnum = pgEnum("doc_type", [
   "cmr",
   "awb",
   "bill_of_lading",
   "invoice",
+  "carrier_invoice",
   "packing_list",
   "certificate",
   "act",
@@ -74,6 +83,8 @@ export const accounts = pgTable("accounts", {
   taxId: text("tax_id"),
   address: text("address"),
   notes: text("notes"),
+  // Soft delete: archived rows are hidden from lists but retained (recoverable).
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
   createdBy: createdBy(),
@@ -84,6 +95,7 @@ export const carriers = pgTable("carriers", {
   title: text("title").notNull(),
   address: text("address"),
   notes: text("notes"),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
   createdBy: createdBy(),
@@ -138,17 +150,24 @@ export const orders = pgTable(
     deliveryFormat: deliveryFormatEnum("delivery_format"),
     status: orderStatusEnum("status").notNull().default("created"),
     // v1 is single-currency (USD) per BRD; revisit if multi-currency lands.
+    // Rollups of order_finance_lines (recomputed on any line change):
+    // clientCharge = Σ revenue lines, carrierCost = Σ cost lines. Both in USD.
     clientCharge: numeric("client_charge", { precision: 12, scale: 2 }),
     carrierCost: numeric("carrier_cost", { precision: 12, scale: 2 }),
-    additionalCosts: numeric("additional_costs", { precision: 12, scale: 2 }),
-    additionalCostsNote: text("additional_costs_note"),
-    expectedProfit: numeric("expected_profit", { precision: 12, scale: 2 }),
+    // FX rate: AZN per 1 USD (amounts are stored in USD; AZN is shown as computed).
+    exchangeRate: numeric("exchange_rate", { precision: 12, scale: 4 }),
+    // Customer payment invoice (the one the app generates / bills the client).
     invoiceNumber: text("invoice_number"),
     invoiceDate: date("invoice_date"),
+    // Carrier invoice — the invoice received FROM the carrier (recorded, not generated).
+    carrierInvoiceNumber: text("carrier_invoice_number"),
+    carrierInvoiceDate: date("carrier_invoice_date"),
     actNumber: text("act_number"),
     actDate: date("act_date"),
     amountReceivable: numeric("amount_receivable", { precision: 12, scale: 2 }),
     amountPayable: numeric("amount_payable", { precision: 12, scale: 2 }),
+    // Soft delete: archived orders are hidden from lists/aggregates but retained.
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     createdBy: createdBy(),
@@ -177,6 +196,26 @@ export const payments = pgTable(
   (t) => [index("payments_order_id_idx").on(t.orderId)],
 );
 
+// Itemized revenue / carrier-cost lines for an order. Their sums are cached on
+// orders.clientCharge (revenue) and orders.carrierCost (cost). All amounts USD.
+export const orderFinanceLines = pgTable(
+  "order_finance_lines",
+  {
+    id: id(),
+    orderId: text("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    side: financeLineSideEnum("side").notNull(),
+    description: text("description").notNull(),
+    amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+    note: text("note"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: createdAt(),
+    createdBy: createdBy(),
+  },
+  (t) => [index("order_finance_lines_order_id_idx").on(t.orderId)],
+);
+
 // Polymorphic parent — no DB-level FK; application code must delete children when deleting the parent.
 export const documents = pgTable("documents", {
   id: id(),
@@ -184,6 +223,9 @@ export const documents = pgTable("documents", {
   parentId: text("parent_id").notNull(),
   fileName: text("file_name").notNull(),
   docType: docTypeEnum("doc_type").notNull().default("other"),
+  // Currency of a generated invoice/ACT (chosen per document). Null for
+  // uploaded documents and for invoices/ACTs generated before this field.
+  currency: text("currency"),
   sizeBytes: integer("size_bytes"),
   s3Key: text("s3_key").notNull(),
   visibleToClient: boolean("visible_to_client").notNull().default(false),

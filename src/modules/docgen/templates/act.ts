@@ -19,8 +19,8 @@ export function renderActHtml(data: ActData, lang: DocLanguage): string {
   </tr></table>
   <p class="terms">${esc(t.body(data.order.number))}</p>
   ${orderMetaBlock(data.order, t)}
-  ${linesTable(data.lines, data.totalCents, t)}
+  ${linesTable(data.lines, data.totalCents, data.currency, lang, t)}
   <p class="terms">${esc(t.noClaims)}</p>
   ${signaturesBlock(t.executor, t.customer, data, t)}`;
-  return docShell(`${t.docTitle} ${data.number}`, body);
+  return docShell(`${t.docTitle} ${data.number}`, body, lang);
 }

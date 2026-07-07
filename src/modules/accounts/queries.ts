@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { accounts, contacts, orders } from "@/db/schema";
 import { PAGE_SIZE } from "@/components/ui/paginator";
@@ -12,16 +12,19 @@ export type AccountListRow = {
   contact2Name: string | null;
 };
 
-export async function listAccounts(opts: { q?: string; page?: number }) {
+export async function listAccounts(opts: { q?: string; page?: number; archived?: boolean }) {
   const page = Math.max(1, opts.page ?? 1);
-  const where = opts.q ? ilike(accounts.title, `%${opts.q}%`) : undefined;
+  const where = and(
+    opts.archived ? isNotNull(accounts.deletedAt) : isNull(accounts.deletedAt),
+    opts.q ? ilike(accounts.title, `%${opts.q}%`) : undefined,
+  );
 
   const rows = await db
     .select({
       id: accounts.id,
       title: accounts.title,
       taxId: accounts.taxId,
-      orderCount: sql<number>`(select count(*) from ${orders} o where o.account_id = ${accounts.id})`.mapWith(Number),
+      orderCount: sql<number>`(select count(*) from ${orders} o where o.account_id = ${accounts.id} and o.deleted_at is null)`.mapWith(Number),
     })
     .from(accounts)
     .where(where)

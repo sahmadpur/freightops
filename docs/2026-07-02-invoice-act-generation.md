@@ -40,11 +40,50 @@ Order detail → Documents tab → **Generate document** card
 
 ## Provisional pieces (replace when the client sends real templates)
 
-- `src/modules/docgen/issuer.ts` — **placeholder company requisites** (name,
-  VÖEN, bank details, signatory). Swap in real values.
-- `src/modules/docgen/templates/{invoice,act}.ts` + `strings.ts` — provisional
-  layout/wording. Only these files should change when the real templates arrive;
-  the data payload, numbering, and pipeline stay as-is.
+- ~~`src/modules/docgen/issuer.ts` — placeholder company requisites~~ **Done
+  (2026-07-06):** real RedLine Supply MMC requisites transcribed from the
+  client's `RDL-AZL HF.xlsx` (VÖEN, Kapital Bank account/code/corr-account,
+  director). See the 2026-07-06 update below.
+- ~~`src/modules/docgen/templates/{invoice,act}.ts` + `strings.ts` —
+  provisional wording~~ **Reworked to match the client templates (2026-07-06).**
+- Signature/stamp scan (`image2.png` in the HF template) is intentionally *not*
+  embedded — the signature/stamp areas are left blank for wet-ink signing.
+
+## 2026-07-06 update — real templates, currency, numbering, amount-in-words
+
+The client supplied their branded templates (`tmp/RDL-AZL HF.xlsx` invoice,
+`tmp/AKT RDL-AZL.xlsx` ACT). Wired them in:
+
+- **Issuer requisites** (`issuer.ts`): real «Redline Supply» MMC values, plus
+  new fields `bankCode` / `bankTaxId` / `correspondentAccount` (rendered in the
+  bank-details block with labels Kod / Bank VÖEN / M/h).
+- **Logo** (`templates/logo.ts`): RedLine wordmark embedded as a base64
+  `data:` URI (extracted from the HF template) and shown in a header band with a
+  red rule. No binary committed; Chromium loads it without a file/network fetch.
+- **Per-document currency** (AZN / USD), chosen in the generate form. New
+  `currency` on `generateDocInputSchema`, `DocData`, and a `documents.currency`
+  column (migration `0004_tiresome_grey_gargoyle.sql`, nullable — null for
+  uploads and pre-existing docs). Amounts are taken *as-is* in the chosen
+  currency (no FX); numeric grouping stays consistent, the currency code and the
+  amount-in-words carry the meaning. Default AZN.
+- **Amount-in-words** (`src/lib/amount-in-words.ts`): trilingual integer→words
+  (AZ authoritative, RU with plural/gender agreement, EN), currency nouns for
+  AZN/USD. Renders e.g. `Yeddi yüz on dörd manat 00 qəpik`. Fully unit-tested.
+- **Numbering** now matches the client: invoice `RL-DDMMYY###` (date-embedded),
+  ACT `AKT № NN`. `formatDocNumber` moved to a client-safe pure module
+  (`src/lib/doc-number-format.ts`) so the generate form re-derives the preview
+  as the user edits the date; `peekNextDocNumber` → `peekNextDocSeq` (returns
+  the raw sequence, formatted client-side). The per-(kind, year) counter and
+  atomic allocation are unchanged. **Assumption:** invoice sequence is per-year
+  (date disambiguates); ACT `AKT № NN` labels repeat across years — revisit if
+  the client needs year-unique ACT numbers.
+- **Azerbaijani casing:** `docShell` now sets `<html lang>` so CSS
+  `text-transform: uppercase` yields dotted `İ` (e.g. `SİFARİŞÇİ`), and
+  `amountInWords` capitalises with `toLocaleUpperCase(lang)`.
+
+Verified: typecheck + 131 unit tests + changed-file lint green; real PDFs
+rendered through Chromium in AZ/RU/EN for both invoice and ACT, AZN and USD —
+logo, glyphs, requisites, currency, numbering and amount-in-words all correct.
 
 ## Environment / ops notes
 
@@ -73,5 +112,11 @@ Order detail → Documents tab → **Generate document** card
 
 - Emailing generated documents (mailer is plain-text only; needs attachment
   support in `src/lib/mailer.ts`).
-- Real client templates + real issuer requisites (see above).
-- Multi-currency and a settings UI for requisites are out of scope for v1.
+- ~~Real client templates + real issuer requisites~~ — done 2026-07-06.
+- A settings UI for editable requisites is still out of scope (hard-coded in
+  `issuer.ts`). Currency is now per-document (AZN/USD); further currencies just
+  need adding to `DOC_CURRENCIES` + noun tables in `amount-in-words.ts`.
+- ACT `AKT № NN` numbers repeat across years (see assumption above).
+- `tmp/rename.jpeg` is an unrelated mockup of a **payments/reconciliation**
+  table (carriers payable / clients receivable / paid / delta) — a separate
+  future feature, not part of docgen.

@@ -18,14 +18,12 @@ type DetailOrder = {
 
 export async function PortalOrderDetail({
   order,
-  carrierTitle,
   transportNumber,
   documents,
   comments,
   currentUserId,
 }: {
   order: DetailOrder;
-  carrierTitle: string | null;
   transportNumber: string | null;
   documents: DocumentRow[];
   comments: CommentRow[];
@@ -56,7 +54,6 @@ export async function PortalOrderDetail({
         <CardBody>
           <dl className="grid grid-cols-2 gap-3 text-sm">
             {row(t("fields.route"), order.route)}
-            {row(t("fields.carrier"), carrierTitle)}
             {row(t("fields.transport"), transportNumber)}
             {row(t("fields.cargoDescription"), order.cargoDescription)}
           </dl>

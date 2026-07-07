@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { orders, transportModes } from "@/db/schema";
+import { orderFinanceLines, orders, transportModes } from "@/db/schema";
 import { auditDiff, recordAudit } from "@/lib/audit";
 import { nextOrderNumber } from "@/lib/order-number";
 import { requireArea } from "@/lib/session";
@@ -12,11 +12,13 @@ import { orderRecipients } from "@/modules/notifications/recipients";
 import { enqueueMany } from "@/modules/notifications/enqueue";
 import { orderCreatedEmail, orderStatusChangedEmail } from "@/modules/notifications/templates";
 
+// Money rollups (clientCharge/carrierCost) are edited via finance lines, not the
+// order form, so they're audited by the finance-line actions instead.
 const AUDITED_FIELDS = [
   "title", "clientOrderId", "accountId", "carrierId", "transportModeId", "route",
   "cargoDescription", "packages", "weightKg", "volumeM3", "incoterms", "deliveryFormat",
-  "clientCharge", "carrierCost", "additionalCosts", "additionalCostsNote",
-  "expectedProfit", "invoiceNumber", "invoiceDate",
+  "exchangeRate", "invoiceNumber", "invoiceDate",
+  "carrierInvoiceNumber", "carrierInvoiceDate",
 ];
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -36,13 +38,11 @@ function toRow(data: OrderInput) {
     volumeM3: data.volumeM3 || null,
     incoterms: data.incoterms || null,
     deliveryFormat: data.deliveryFormat || null,
-    clientCharge: data.clientCharge || null,
-    carrierCost: data.carrierCost || null,
-    additionalCosts: data.additionalCosts || null,
-    additionalCostsNote: data.additionalCostsNote || null,
-    expectedProfit: data.expectedProfit || null,
+    exchangeRate: data.exchangeRate || null,
     invoiceNumber: data.invoiceNumber || null,
     invoiceDate: data.invoiceDate || null,
+    carrierInvoiceNumber: data.carrierInvoiceNumber || null,
+    carrierInvoiceDate: data.carrierInvoiceDate || null,
   };
 }
 
@@ -94,8 +94,24 @@ export async function createOrder(input: unknown): Promise<ActionResult> {
       const number = await nextOrderNumber(tx, new Date().getFullYear());
       const [row] = await tx
         .insert(orders)
-        .values({ ...toRow(data), transportModeId, number, createdBy: session.user.id })
+        .values({
+          ...toRow(data),
+          // Rollups seeded from quick-entry totals below; refined via finance lines.
+          clientCharge: data.clientCharge || null,
+          carrierCost: data.carrierCost || null,
+          transportModeId,
+          number,
+          createdBy: session.user.id,
+        })
         .returning({ id: orders.id });
+      // Seed one revenue and one cost line from the quick-entry totals so the
+      // itemized Finance tab starts consistent with the order's rollups.
+      const seedLines = [];
+      if (data.clientCharge)
+        seedLines.push({ orderId: row.id, side: "revenue" as const, description: "Freight forwarding services", amount: data.clientCharge, createdBy: session.user.id });
+      if (data.carrierCost)
+        seedLines.push({ orderId: row.id, side: "cost" as const, description: "Carrier cost", amount: data.carrierCost, createdBy: session.user.id });
+      if (seedLines.length) await tx.insert(orderFinanceLines).values(seedLines);
       await recordAudit(tx, {
         userId: session.user.id,
         entityType: "order",
@@ -120,6 +136,30 @@ export async function createOrder(input: unknown): Promise<ActionResult> {
     throw e;
   }
 
+  return { ok: true, id };
+}
+
+/** Soft-delete (archive) an order — hidden from lists/aggregates but retained. */
+export async function archiveOrder(id: string): Promise<ActionResult> {
+  const { session } = await requireArea("staff");
+  const result = await db.transaction(async (tx) => {
+    const row = await tx.query.orders.findFirst({ where: eq(orders.id, id) });
+    if (!row) return "not_found" as const;
+    await tx.update(orders).set({ deletedAt: new Date() }).where(eq(orders.id, id));
+    await recordAudit(tx, { userId: session.user.id, entityType: "order", entityId: id, action: "archived" });
+    return "ok" as const;
+  });
+  if (result === "not_found") return { ok: false, error: "not_found" };
+  return { ok: true, id };
+}
+
+/** Restore a previously archived order. */
+export async function restoreOrder(id: string): Promise<ActionResult> {
+  const { session } = await requireArea("staff");
+  await db.transaction(async (tx) => {
+    await tx.update(orders).set({ deletedAt: null }).where(eq(orders.id, id));
+    await recordAudit(tx, { userId: session.user.id, entityType: "order", entityId: id, action: "restored" });
+  });
   return { ok: true, id };
 }
 

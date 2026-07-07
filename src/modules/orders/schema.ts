@@ -33,13 +33,21 @@ export const orderInputSchema = z.object({
   volumeM3: numericString,
   incoterms: optEnum(incotermsEnum.enumValues),
   deliveryFormat: optEnum(deliveryFormatEnum.enumValues),
+  // Quick-entry totals used ONLY on create to seed the first revenue/cost line;
+  // thereafter clientCharge/carrierCost are rollups maintained by finance-line edits.
   clientCharge: numericString,
   carrierCost: numericString,
-  additionalCosts: numericString,
-  additionalCostsNote: optText(1000),
-  expectedProfit: numericString,
+  // FX rate AZN per 1 USD; up to 4 decimals.
+  exchangeRate: z
+    .string()
+    .trim()
+    .regex(/^\d+(\.\d{1,4})?$/, "Must be a number")
+    .optional()
+    .or(z.literal("")),
   invoiceNumber: optText(100),
   invoiceDate: dateString,
+  carrierInvoiceNumber: optText(100),
+  carrierInvoiceDate: dateString,
   transport: transportSchema,
 });
 

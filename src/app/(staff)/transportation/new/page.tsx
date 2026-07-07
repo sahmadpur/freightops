@@ -9,7 +9,7 @@ export default async function NewTransportPage() {
       <PageHeader title={t("newTransport")} />
       <TransportForm
         initial={{
-          modeType: "vehicle",
+          modeType: "truck",
           number: "",
           fromCountry: "",
           toCountry: "",

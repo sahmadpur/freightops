@@ -27,7 +27,6 @@ export default async function PortalOrderPage({ params }: { params: Promise<{ id
         status: data.order.status,
         cargoDescription: data.order.cargoDescription,
       }}
-      carrierTitle={data.carrierTitle}
       transportNumber={data.transportNumber}
       documents={documents}
       comments={comments}

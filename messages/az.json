@@ -40,7 +40,13 @@
     "save": "Yadda saxla",
     "cancel": "Ləğv et",
     "back": "Geri",
-    "saving": "Yadda saxlanılır..."
+    "saving": "Yadda saxlanılır...",
+    "archive": "Arxivləşdir",
+    "restore": "Bərpa et",
+    "confirmArchive": "Bu qeyd arxivləşdirilsin? Siyahılardan gizlədiləcək, lakin bərpa edilə bilər.",
+    "hasOrders": "Arxivləşdirmək olmaz — aktiv sifarişlər var.",
+    "showArchived": "Arxivi göstər",
+    "showActive": "Aktivləri göstər"
   },
   "fields": {
     "companyTitle": "Şirkətin adı",
@@ -99,7 +105,13 @@
     "selectCarrier": "Daşıyıcı seçin…",
     "selectTransport": "Nəqliyyat seçin…",
     "actNumber": "Akt nömrəsi",
-    "actDate": "Akt tarixi"
+    "actDate": "Akt tarixi",
+    "paidByCustomer": "Müştəri ödənişi",
+    "paidToCarrier": "Daşıyıcıya ödəniş",
+    "documents": "Sənəd",
+    "carrierInvoiceNumber": "Daşıyıcı hesab №",
+    "carrierInvoiceDate": "Daşıyıcı hesab tarixi",
+    "exchangeRate": "Məzənnə (AZN/USD)"
   },
   "accounts": {
     "newAccount": "Yeni müştəri",
@@ -176,7 +188,22 @@
     "additionalExpenses": "Əlavə xərclər",
     "expectedProfitOpen": "Gözlənilən mənfəət (açıq)",
     "actualProfitCompleted": "Faktiki mənfəət (tamamlanmış)",
-    "remove": "Sil"
+    "remove": "Sil",
+    "expectedProfit": "Gözlənilən mənfəət",
+    "revenue": "Gəlir",
+    "carrierCost": "Daşıyıcı xərci",
+    "revenueLines": "Gəlir",
+    "costLines": "Daşıyıcı xərci",
+    "addLine": "Sətir əlavə et",
+    "lineDescription": "Təsvir",
+    "lineAmount": "Məbləğ (USD)",
+    "lineNote": "Qeyd",
+    "noLines": "Hələ sətir yoxdur",
+    "reportOfAccounts": "Hesablar üzrə hesabat",
+    "filterByStatus": "Statusa görə filtr",
+    "clearFilter": "Təmizlə",
+    "orderDetails": "Sifariş təfərrüatları",
+    "noRows": "Uyğun sətir yoxdur"
   },
   "dashboard": {
     "title": "İdarə paneli",
@@ -235,7 +262,8 @@
     "act": "Akt",
     "waybill": "Yük qaiməsi",
     "cargo_photos": "Yük şəkilləri",
-    "other": "Digər"
+    "other": "Digər",
+    "carrier_invoice": "Daşıyıcı hesabı"
   },
   "docgen": {
     "title": "Sənəd yarat",
@@ -243,6 +271,7 @@
     "docInvoice": "Hesab-faktura",
     "docAct": "Görülmüş işlər aktı",
     "languageLabel": "Dil",
+    "currencyLabel": "Valyuta",
     "lang_en": "English",
     "lang_ru": "Русский",
     "lang_az": "Azərbaycanca",
@@ -304,5 +333,13 @@
     "search": "Axtarış",
     "filter": "Filtr",
     "noAuditEntries": "Audit qeydi yoxdur"
+  },
+  "transportModes": {
+    "truck": "Yük maşını",
+    "container": "Konteyner",
+    "air": "Hava",
+    "postal": "Poçt",
+    "rail": "Dəmir yolu",
+    "sea": "Dəniz"
   }
 }

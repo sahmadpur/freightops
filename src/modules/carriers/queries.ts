@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { carriers, contacts, orders } from "@/db/schema";
 import { PAGE_SIZE } from "@/components/ui/paginator";
@@ -11,15 +11,18 @@ export type CarrierListRow = {
   contact2Name: string | null;
 };
 
-export async function listCarriers(opts: { q?: string; page?: number }) {
+export async function listCarriers(opts: { q?: string; page?: number; archived?: boolean }) {
   const page = Math.max(1, opts.page ?? 1);
-  const where = opts.q ? ilike(carriers.title, `%${opts.q}%`) : undefined;
+  const where = and(
+    opts.archived ? isNotNull(carriers.deletedAt) : isNull(carriers.deletedAt),
+    opts.q ? ilike(carriers.title, `%${opts.q}%`) : undefined,
+  );
 
   const rows = await db
     .select({
       id: carriers.id,
       title: carriers.title,
-      orderCount: sql<number>`(select count(*) from ${orders} o where o.carrier_id = ${carriers.id})`.mapWith(Number),
+      orderCount: sql<number>`(select count(*) from ${orders} o where o.carrier_id = ${carriers.id} and o.deleted_at is null)`.mapWith(Number),
     })
     .from(carriers)
     .where(where)

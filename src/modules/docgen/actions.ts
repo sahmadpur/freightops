@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { documents, orders } from "@/db/schema";
 import { recordAudit } from "@/lib/audit";
 import { nextDocNumber } from "@/lib/doc-number";
-import { toCents } from "@/lib/money";
+import { convertUsdToAzn, toCents } from "@/lib/money";
 import { htmlToPdf } from "@/lib/pdf";
 import { deleteObject, putObject } from "@/lib/s3";
 import { requireArea } from "@/lib/session";
@@ -22,15 +22,18 @@ import type { ActionResult } from "@/lib/forms";
 
 function buildLines(row: OrderForDocgen, input: GenerateDocInput): DocLine[] {
   const t = COMMON_STRINGS[input.language];
-  const lines: DocLine[] = [
-    { description: t.serviceForOrder(row.number), amountCents: toCents(row.clientCharge) },
-  ];
-  const additional = toCents(row.additionalCosts);
-  if (additional > 0) {
-    lines.push({
-      description: row.additionalCostsNote || t.additionalCharges,
-      amountCents: additional,
-    });
+  // Itemized revenue lines (USD); fall back to the single clientCharge rollup.
+  const lines: DocLine[] =
+    row.revenueLines.length > 0
+      ? row.revenueLines.map((l) => ({ description: l.description, amountCents: toCents(l.amount) }))
+      : [{ description: t.serviceForOrder(row.number), amountCents: toCents(row.clientCharge) }];
+  // Amounts are stored in USD; convert to AZN at the order's rate when the
+  // document currency is AZN (falls back to the USD value if no rate is set).
+  if (input.currency === "AZN") {
+    return lines.map((l) => ({
+      ...l,
+      amountCents: convertUsdToAzn(l.amountCents, row.exchangeRate) ?? l.amountCents,
+    }));
   }
   return lines;
 }
@@ -48,10 +51,9 @@ export async function generateOrderDocument(input: unknown): Promise<ActionResul
 
   // Allocate the number first in its own small transaction (auto mode only).
   // A failure later in the flow leaves a gap in the sequence — accepted for v1.
-  const year = Number(d.date.slice(0, 4));
   const number =
     d.numberMode === "auto"
-      ? await db.transaction((tx) => nextDocNumber(tx, d.kind, year))
+      ? await db.transaction((tx) => nextDocNumber(tx, d.kind, d.date))
       : d.number!;
 
   const lines = buildLines(row, d);
@@ -60,6 +62,7 @@ export async function generateOrderDocument(input: unknown): Promise<ActionResul
     client: { title: row.accountTitle, taxId: row.accountTaxId, address: row.accountAddress },
     number,
     date: d.date,
+    currency: d.currency,
     order: {
       number: row.number,
       clientOrderId: row.clientOrderId,
@@ -91,6 +94,7 @@ export async function generateOrderDocument(input: unknown): Promise<ActionResul
         parentId: d.orderId,
         fileName,
         docType: d.kind,
+        currency: d.currency,
         sizeBytes: pdf.length,
         s3Key: key,
         visibleToClient: d.visibleToClient,

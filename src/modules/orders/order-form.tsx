@@ -6,12 +6,12 @@ import { useTranslations } from "next-intl";
 import { Field, inputCls } from "@/components/ui/form";
 import { SectionRule } from "@/components/ui/record";
 import { createOrder, updateOrder } from "./actions";
+import { TRANSPORT_MODES } from "../transport/modes";
 import type { ActionResult } from "@/lib/forms";
 import type { OrderFormInitial } from "./order-form-initial";
 
 const INCOTERMS = ["EXW", "FCA", "FAS", "FOB", "CFR", "CIF", "CPT", "CIP", "DAP", "DPU", "DDP"] as const;
 const DELIVERY_FORMATS = ["FCL", "LCL", "FTL", "LTL"] as const;
-const MODE_TYPES = ["vehicle", "air", "postal", "rail", "sea"] as const;
 
 type Option = { id: string; title?: string; number?: string; modeType?: string };
 
@@ -60,11 +60,11 @@ export function OrderForm({
       deliveryFormat: v.deliveryFormat,
       clientCharge: v.clientCharge,
       carrierCost: v.carrierCost,
-      additionalCosts: v.additionalCosts,
-      additionalCostsNote: v.additionalCostsNote,
-      expectedProfit: v.expectedProfit,
+      exchangeRate: v.exchangeRate,
       invoiceNumber: v.invoiceNumber,
       invoiceDate: v.invoiceDate,
+      carrierInvoiceNumber: v.carrierInvoiceNumber,
+      carrierInvoiceDate: v.carrierInvoiceDate,
       transport: buildTransport(),
     };
     const r = v.id ? await updateOrder(v.id, payload) : await createOrder(payload);
@@ -137,23 +137,30 @@ export function OrderForm({
       <section className="mb-8">
         <SectionRule>{t("nav.finance")}</SectionRule>
         <div className={gridCls}>
-          <Field label={t("fields.clientCharge")} htmlFor="clientCharge" error={fe.clientCharge}>
-            <input id="clientCharge" className={inputCls} value={v.clientCharge} onChange={(e) => set({ clientCharge: e.target.value })} />
-          </Field>
-          <Field label={t("fields.carrierCost")} htmlFor="carrierCost" error={fe.carrierCost}>
-            <input id="carrierCost" className={inputCls} value={v.carrierCost} onChange={(e) => set({ carrierCost: e.target.value })} />
-          </Field>
-          <Field label={t("fields.additionalCosts")} htmlFor="additionalCosts" error={fe.additionalCosts}>
-            <input id="additionalCosts" className={inputCls} value={v.additionalCosts} onChange={(e) => set({ additionalCosts: e.target.value })} />
-          </Field>
-          <Field label={t("fields.expectedProfit")} htmlFor="expectedProfit" error={fe.expectedProfit}>
-            <input id="expectedProfit" className={inputCls} value={v.expectedProfit} onChange={(e) => set({ expectedProfit: e.target.value })} />
+          {!v.id && (
+            <>
+              <Field label={t("fields.clientCharge")} htmlFor="clientCharge" error={fe.clientCharge}>
+                <input id="clientCharge" className={inputCls} value={v.clientCharge} onChange={(e) => set({ clientCharge: e.target.value })} />
+              </Field>
+              <Field label={t("fields.carrierCost")} htmlFor="carrierCost" error={fe.carrierCost}>
+                <input id="carrierCost" className={inputCls} value={v.carrierCost} onChange={(e) => set({ carrierCost: e.target.value })} />
+              </Field>
+            </>
+          )}
+          <Field label={t("fields.exchangeRate")} htmlFor="exchangeRate" error={fe.exchangeRate}>
+            <input id="exchangeRate" className={inputCls} placeholder="AZN / 1 USD" value={v.exchangeRate} onChange={(e) => set({ exchangeRate: e.target.value })} />
           </Field>
           <Field label={t("fields.invoiceNumber")} htmlFor="invoiceNumber" error={fe.invoiceNumber}>
             <input id="invoiceNumber" className={inputCls} value={v.invoiceNumber} onChange={(e) => set({ invoiceNumber: e.target.value })} />
           </Field>
           <Field label={t("fields.invoiceDate")} htmlFor="invoiceDate" error={fe.invoiceDate}>
             <input id="invoiceDate" type="date" className={inputCls} value={v.invoiceDate} onChange={(e) => set({ invoiceDate: e.target.value })} />
+          </Field>
+          <Field label={t("fields.carrierInvoiceNumber")} htmlFor="carrierInvoiceNumber" error={fe.carrierInvoiceNumber}>
+            <input id="carrierInvoiceNumber" className={inputCls} value={v.carrierInvoiceNumber} onChange={(e) => set({ carrierInvoiceNumber: e.target.value })} />
+          </Field>
+          <Field label={t("fields.carrierInvoiceDate")} htmlFor="carrierInvoiceDate" error={fe.carrierInvoiceDate}>
+            <input id="carrierInvoiceDate" type="date" className={inputCls} value={v.carrierInvoiceDate} onChange={(e) => set({ carrierInvoiceDate: e.target.value })} />
           </Field>
         </div>
       </section>
@@ -173,7 +180,7 @@ export function OrderForm({
             <Field label={t("fields.transportMode")} htmlFor="transportModeId" error={fe.transport}>
               <select id="transportModeId" className={inputCls} value={v.transportModeId} onChange={(e) => set({ transportModeId: e.target.value })}>
                 <option value="">{t("fields.selectTransport")}</option>
-                {transportOpts.map((o) => (<option key={o.id} value={o.id}>{o.number} ({o.modeType})</option>))}
+                {transportOpts.map((o) => (<option key={o.id} value={o.id}>{o.number} ({o.modeType ? t(`transportModes.${o.modeType}`) : "—"})</option>))}
               </select>
             </Field>
           </div>
@@ -182,7 +189,7 @@ export function OrderForm({
           <div className={`${gridCls} rounded-[6px] border border-dashed border-edge-chip bg-surface-hover p-4`}>
             <Field label={t("fields.modeType")} htmlFor="ntModeType">
               <select id="ntModeType" className={inputCls} value={v.newTransport.modeType} onChange={(e) => setNew({ modeType: e.target.value })}>
-                {MODE_TYPES.map((m) => (<option key={m} value={m}>{m}</option>))}
+                {TRANSPORT_MODES.map((m) => (<option key={m} value={m}>{t(`transportModes.${m}`)}</option>))}
               </select>
             </Field>
             <Field label={t("fields.transportNumber")} htmlFor="ntNumber">
