@@ -16,6 +16,9 @@ export type CommonStrings = {
   bankDetails: string;
   bank: string;
   account: string;
+  bankCode: string;
+  bankTaxId: string;
+  correspondentAccount: string;
   swift: string;
   orderRef: string;
   clientRef: string;
@@ -27,10 +30,11 @@ export type CommonStrings = {
   incoterms: string;
   colNo: string;
   colDescription: string;
+  /** Base amount-column label; the currency code is appended by the template. */
   colAmount: string;
   total: string;
   vatNote: string;
-  currency: string;
+  amountInWordsLabel: string;
   serviceForOrder: (orderNumber: string) => string;
   additionalCharges: string;
   signature: string;
@@ -63,6 +67,9 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     bankDetails: "Bank details",
     bank: "Bank",
     account: "Account / IBAN",
+    bankCode: "Bank code",
+    bankTaxId: "Bank VÖEN",
+    correspondentAccount: "Correspondent account",
     swift: "SWIFT",
     orderRef: "Order",
     clientRef: "Client reference",
@@ -74,10 +81,10 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     incoterms: "Incoterms",
     colNo: "#",
     colDescription: "Description",
-    colAmount: "Amount, USD",
+    colAmount: "Amount",
     total: "Total",
-    vatNote: "VAT: not subject to VAT",
-    currency: "USD",
+    vatNote: "VAT 0%",
+    amountInWordsLabel: "Amount in words",
     serviceForOrder: (n) => `Freight forwarding services for order ${n}`,
     additionalCharges: "Additional charges",
     signature: "Signature",
@@ -91,6 +98,9 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     bankDetails: "Банковские реквизиты",
     bank: "Банк",
     account: "Счёт / IBAN",
+    bankCode: "Код банка",
+    bankTaxId: "VÖEN банка",
+    correspondentAccount: "Корр. счёт",
     swift: "SWIFT",
     orderRef: "Заказ",
     clientRef: "Референс клиента",
@@ -102,10 +112,10 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     incoterms: "Инкотермс",
     colNo: "№",
     colDescription: "Наименование услуги",
-    colAmount: "Сумма, USD",
+    colAmount: "Сумма",
     total: "Итого",
-    vatNote: "НДС: не облагается",
-    currency: "USD",
+    vatNote: "НДС 0%",
+    amountInWordsLabel: "Сумма прописью",
     serviceForOrder: (n) => `Транспортно-экспедиторские услуги по заказу ${n}`,
     additionalCharges: "Дополнительные расходы",
     signature: "Подпись",
@@ -118,7 +128,10 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     email: "E-poçt",
     bankDetails: "Bank rekvizitləri",
     bank: "Bank",
-    account: "Hesab / IBAN",
+    account: "H/h",
+    bankCode: "Kod",
+    bankTaxId: "Bank VÖEN",
+    correspondentAccount: "M/h",
     swift: "SWIFT",
     orderRef: "Sifariş",
     clientRef: "Müştəri referansı",
@@ -129,12 +142,12 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     volumeM3: "Həcm, m³",
     incoterms: "İnkoterms",
     colNo: "№",
-    colDescription: "Xidmətin adı",
-    colAmount: "Məbləğ, USD",
-    total: "Cəmi",
-    vatNote: "ƏDV: ƏDV-yə cəlb olunmur",
-    currency: "USD",
-    serviceForOrder: (n) => `${n} nömrəli sifariş üzrə nəqliyyat-ekspedisiya xidmətləri`,
+    colDescription: "Xidmətin təsviri",
+    colAmount: "Məbləğ",
+    total: "Yekun",
+    vatNote: "ƏDV 0%",
+    amountInWordsLabel: "Cəm (yazı ilə)",
+    serviceForOrder: (n) => `${n} nömrəli sifariş üzrə beynəlxalq yükdaşıma xidməti`,
     additionalCharges: "Əlavə xərclər",
     signature: "İmza",
     stamp: "M.Y.",
@@ -160,10 +173,10 @@ export const INVOICE_STRINGS: Record<DocLanguage, InvoiceStrings> = {
   },
   az: {
     ...COMMON_STRINGS.az,
-    docTitle: "HESAB-FAKTURA",
-    numberDate: (number, date) => `№ ${number}, ${date}`,
+    docTitle: "Hesab Faktura",
+    numberDate: (number, date) => `${number}, ${date}`,
     seller: "İcraçı",
-    buyer: "Ödəyici (Sifarişçi)",
+    buyer: "Ödəyən (Sifarişçi)",
     paymentTerms: "Ödəniş hesab-faktura tarixindən etibarən 10 bank günü ərzində edilməlidir.",
   },
 };
@@ -191,12 +204,12 @@ export const ACT_STRINGS: Record<DocLanguage, ActStrings> = {
   },
   az: {
     ...COMMON_STRINGS.az,
-    docTitle: "GÖRÜLMÜŞ İŞLƏR (GÖSTƏRİLMİŞ XİDMƏTLƏR) AKTI",
-    numberDate: (number, date) => `№ ${number}, ${date}`,
+    docTitle: "Yükdaşıma xidmətinin göstərilməsi barədə AKT",
+    numberDate: (number, date) => `${number}, ${date}`,
     executor: "İcraçı",
     customer: "Sifarişçi",
     body: (n) =>
-      `İcraçı ${n} nömrəli sifariş üzrə nəqliyyat-ekspedisiya xidmətlərini göstərmiş, Sifarişçi isə həmin xidmətləri qəbul etmişdir. Xidmətlər tam həcmdə, vaxtında və lazımi keyfiyyətlə göstərilmişdir.`,
-    noClaims: "Tərəflərin bir-birinə qarşı iddiası yoxdur.",
+      `Biz, aşağıda imza edənlər — bir tərəfdən İcraçı, digər tərəfdən Sifarişçi — bu aktı ondan ötrü tərtib etdik ki, ${n} nömrəli sifariş üzrə aşağıda göstərilən beynəlxalq yükdaşıma xidmətləri həqiqətən tam həcmdə, vaxtında və lazımi keyfiyyətlə həyata keçirilmiş və təhvil verilmişdir:`,
+    noClaims: "Tərəflərin bir-birinə qarşı maddi və digər iddiası yoxdur.",
   },
 };

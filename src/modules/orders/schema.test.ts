@@ -52,7 +52,7 @@ describe("orderInputSchema", () => {
   it("accepts transport=new with mode type and number", () => {
     const r = orderInputSchema.safeParse({
       ...base,
-      transport: { mode: "new", modeType: "vehicle", number: "TRK-1", fromCountry: "", toCountry: "", route: "", loadingDate: "", plannedArrivalDate: "", totalWeightKg: "", totalVolumeM3: "" },
+      transport: { mode: "new", modeType: "truck", number: "TRK-1", fromCountry: "", toCountry: "", route: "", loadingDate: "", plannedArrivalDate: "", totalWeightKg: "", totalVolumeM3: "" },
     });
     expect(r.success).toBe(true);
   });

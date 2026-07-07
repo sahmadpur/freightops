@@ -31,7 +31,7 @@ export default async function TransportationPage() {
                   {m.derivedStatus && <StatusBadge status={m.derivedStatus} />}
                 </div>
                 <div className="mt-0.5 text-xs text-slate-500">
-                  {m.modeType}
+                  {t(`transportModes.${m.modeType}`)}
                   {m.route ? ` · ${m.route}` : ""}
                   {m.loadingDate ? ` · ${t("fields.loadingDate")}: ${m.loadingDate}` : ""}
                   {m.plannedArrivalDate ? ` · ${t("fields.plannedArrivalDate")}: ${m.plannedArrivalDate}` : ""}

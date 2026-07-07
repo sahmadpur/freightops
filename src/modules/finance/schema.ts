@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { paymentDirectionEnum } from "@/db/schema";
+import { financeLineSideEnum, paymentDirectionEnum } from "@/db/schema";
 import { numericString } from "@/modules/transport/schema";
 
 /** A money amount that must be present and strictly positive (for payments). */
@@ -25,3 +25,13 @@ export const financialsInputSchema = z.object({
 });
 
 export type FinancialsInput = z.infer<typeof financialsInputSchema>;
+
+/** A revenue/cost line item (description + positive amount + optional note). */
+export const financeLineInputSchema = z.object({
+  side: z.enum(financeLineSideEnum.enumValues),
+  description: z.string().trim().min(1).max(300),
+  amount: positiveAmount,
+  note: z.string().trim().max(500).optional().or(z.literal("")),
+});
+
+export type FinanceLineInput = z.infer<typeof financeLineInputSchema>;

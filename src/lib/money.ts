@@ -27,3 +27,25 @@ export function formatMoney(cents: number): string {
   });
   return `${sign}$${formatted}`;
 }
+
+/** Cents → a display string with the manat symbol, e.g. 714000 → "₼7,140.00". */
+export function formatMoneyAzn(cents: number): string {
+  const sign = cents < 0 ? "-" : "";
+  const abs = Math.abs(cents);
+  const formatted = (abs / 100).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return `${sign}₼${formatted}`;
+}
+
+/**
+ * Convert USD cents to AZN cents at `rate` (AZN per 1 USD). Returns null when no
+ * rate is set, so callers can fall back to USD-only display.
+ */
+export function convertUsdToAzn(usdCents: number, rate: string | number | null | undefined): number | null {
+  if (rate === null || rate === undefined || rate === "") return null;
+  const r = typeof rate === "string" ? Number(rate) : rate;
+  if (!Number.isFinite(r) || r <= 0) return null;
+  return Math.round(usdCents * r);
+}

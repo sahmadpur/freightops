@@ -11,8 +11,9 @@ function sampleData(overrides: Partial<DocData> = {}): DocData {
   return {
     issuer: ISSUER,
     client: { title: "Acme Trading LLC", taxId: "1234567890", address: "42 Client St, Baku" },
-    number: "INV-2026-007",
+    number: "RL-020726007",
     date: "2026-07-02",
+    currency: "AZN",
     order: {
       number: "ORD-2026-041",
       clientOrderId: "PO-991",
@@ -51,10 +52,15 @@ describe("formatDocDate", () => {
 describe.each(LANGS)("invoice template (%s)", (lang) => {
   const html = renderInvoiceHtml(sampleData(), lang);
   it("contains the number, client, order and total", () => {
-    expect(html).toContain("INV-2026-007");
+    expect(html).toContain("RL-020726007");
     expect(html).toContain("Acme Trading LLC");
     expect(html).toContain("ORD-2026-041");
     expect(html).toContain("4,350.50");
+  });
+  it("names the chosen currency and the amount in words", () => {
+    expect(html).toContain("4,350.50 AZN");
+    // 4350.50 → "четыре тысячи триста пятьдесят манатов 50 гяпиков" (ru) etc.
+    expect(html).toMatch(/manat|манат/);
   });
   it("escapes hostile order data", () => {
     const hostile = sampleData();
@@ -65,9 +71,9 @@ describe.each(LANGS)("invoice template (%s)", (lang) => {
 });
 
 describe.each(LANGS)("act template (%s)", (lang) => {
-  const html = renderActHtml(sampleData({ number: "ACT-2026-003" }), lang);
+  const html = renderActHtml(sampleData({ number: "AKT № 03" }), lang);
   it("contains the number, both parties and total", () => {
-    expect(html).toContain("ACT-2026-003");
+    expect(html).toContain("AKT № 03");
     expect(html).toContain("Acme Trading LLC");
     expect(html).toContain(ISSUER.name);
     expect(html).toContain("4,350.50");
@@ -83,7 +89,7 @@ describe("language-specific wording", () => {
   });
   it("uses Azerbaijani headings for az", () => {
     const html = renderActHtml(sampleData(), "az");
-    expect(html).toContain("GÖRÜLMÜŞ İŞLƏR");
+    expect(html).toContain("Yükdaşıma xidmətinin göstərilməsi barədə AKT");
     expect(html).toContain("Sifarişçi");
   });
 });

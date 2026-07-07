@@ -1,3 +1,4 @@
+import type { DocCurrency } from "@/lib/amount-in-words";
 import type { Issuer } from "../issuer";
 
 export type DocLanguage = "en" | "ru" | "az";
@@ -24,13 +25,15 @@ export type DocLine = {
   amountCents: number;
 };
 
-/** Shared payload for both document types; all amounts in integer cents (USD). */
+/** Shared payload for both document types; all amounts in integer minor units. */
 export type DocData = {
   issuer: Issuer;
   client: DocParty;
   number: string;
   /** ISO date (YYYY-MM-DD) as chosen in the generate form. */
   date: string;
+  /** Currency the amounts are denominated in, chosen per document. */
+  currency: DocCurrency;
   order: DocOrderInfo;
   lines: DocLine[];
   totalCents: number;

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { inputCls } from "@/components/ui/form";
+import { DOC_CURRENCIES } from "@/lib/amount-in-words";
+import { formatDocNumber } from "@/lib/doc-number-format";
 import { generateOrderDocument } from "./actions";
 
 const KINDS = ["invoice", "act"] as const;
@@ -14,21 +16,26 @@ type Kind = (typeof KINDS)[number];
 
 export function GenerateDocumentSection({
   orderId,
-  nextNumbers,
+  nextSeqs,
 }: {
   orderId: string;
-  nextNumbers: Record<Kind, string>;
+  nextSeqs: Record<Kind, number>;
 }) {
   const t = useTranslations("docgen");
   const router = useRouter();
   const [kind, setKind] = useState<Kind>("invoice");
-  const [language, setLanguage] = useState<string>("en");
+  const [language, setLanguage] = useState<string>("az");
+  const [currency, setCurrency] = useState<string>("AZN");
   const [auto, setAuto] = useState(true);
   const [number, setNumber] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [visible, setVisible] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // The invoice number embeds the document date, so re-derive the preview as
+  // the user edits the date. The server allocates the authoritative number.
+  const autoNumber = formatDocNumber(kind, date, nextSeqs[kind]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +46,7 @@ export function GenerateDocumentSection({
         orderId,
         kind,
         language,
+        currency,
         numberMode: auto ? "auto" : "manual",
         number: auto ? "" : number,
         date,
@@ -100,13 +108,30 @@ export function GenerateDocumentSection({
             </select>
           </div>
           <div>
+            <label className="mb-1 block text-xs text-slate-500" htmlFor="gen-currency">
+              {t("currencyLabel")}
+            </label>
+            <select
+              id="gen-currency"
+              className={`${inputCls} w-24`}
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            >
+              {DOC_CURRENCIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
             <label className="mb-1 block text-xs text-slate-500" htmlFor="gen-number">
               {t("numberLabel")}
             </label>
             <input
               id="gen-number"
               className={`${inputCls} w-40`}
-              value={auto ? nextNumbers[kind] : number}
+              value={auto ? autoNumber : number}
               onChange={(e) => setNumber(e.target.value)}
               disabled={auto}
               required={!auto}

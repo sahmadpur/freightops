@@ -1,9 +1,14 @@
+import { amountInWords, type DocCurrency } from "@/lib/amount-in-words";
 import { esc } from "./layout";
 import type { CommonStrings } from "./strings";
-import type { DocData, DocLine, DocOrderInfo, DocParty } from "./types";
+import type { DocData, DocLanguage, DocLine, DocOrderInfo, DocParty } from "./types";
 import type { Issuer } from "../issuer";
 
-/** Cents → "4,200.00" (no symbol; the column header names the currency). */
+/**
+ * Minor units → "4,200.00" (no symbol; the column header and total name the
+ * currency). Grouping is kept consistent across currencies — the explicit
+ * currency code and the amount-in-words line carry the legal meaning.
+ */
 export function formatDocMoney(cents: number): string {
   return (cents / 100).toLocaleString("en-US", {
     minimumFractionDigits: 2,
@@ -45,6 +50,9 @@ export function bankDetailsBlock(issuer: Issuer, t: CommonStrings): string {
     <div class="party-role">${esc(t.bankDetails)}</div>
     ${kv(t.bank, issuer.bankName)}
     ${kv(t.account, issuer.bankAccount)}
+    ${kv(t.bankCode, issuer.bankCode)}
+    ${kv(t.bankTaxId, issuer.bankTaxId)}
+    ${kv(t.correspondentAccount, issuer.correspondentAccount)}
     ${kv(t.swift, issuer.swift)}
   </div>`;
 }
@@ -62,7 +70,13 @@ export function orderMetaBlock(order: DocOrderInfo, t: CommonStrings): string {
   </div>`;
 }
 
-export function linesTable(lines: DocLine[], totalCents: number, t: CommonStrings): string {
+export function linesTable(
+  lines: DocLine[],
+  totalCents: number,
+  currency: DocCurrency,
+  lang: DocLanguage,
+  t: CommonStrings,
+): string {
   const rows = lines
     .map(
       (line, i) => `<tr>
@@ -77,15 +91,16 @@ export function linesTable(lines: DocLine[], totalCents: number, t: CommonString
       <tr>
         <th class="no">${esc(t.colNo)}</th>
         <th>${esc(t.colDescription)}</th>
-        <th class="num">${esc(t.colAmount)}</th>
+        <th class="num">${esc(`${t.colAmount}, ${currency}`)}</th>
       </tr>
     </thead>
     <tbody>
       ${rows}
     </tbody>
   </table>
-  <div class="totals"><span class="grand">${esc(t.total)}: ${formatDocMoney(totalCents)} ${esc(t.currency)}</span></div>
-  <div class="vat-note">${esc(t.vatNote)}</div>`;
+  <div class="totals"><span class="grand">${esc(t.total)}: ${formatDocMoney(totalCents)} ${esc(currency)}</span></div>
+  <div class="vat-note">${esc(t.vatNote)}</div>
+  <div class="amount-words">${esc(`${t.amountInWordsLabel}: ${amountInWords(totalCents, currency, lang)}`)}</div>`;
 }
 
 export function signaturesBlock(

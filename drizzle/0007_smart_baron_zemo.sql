@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "exchange_rate" numeric(12, 4);

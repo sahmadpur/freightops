@@ -4,6 +4,8 @@ import { getTranslations, getFormatter } from "next-intl/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { ArchiveButton } from "@/components/ui/archive-button";
+import { archiveCarrier, restoreCarrier } from "@/modules/carriers/actions";
 import { getCarrier } from "@/modules/carriers/queries";
 
 export default async function CarrierDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -19,12 +21,26 @@ export default async function CarrierDetailPage({ params }: { params: Promise<{ 
       <PageHeader
         title={carrier.title}
         action={
-          <Link
-            href={`/carriers/${carrier.id}/edit`}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
-          >
-            {t("actions.edit")}
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href={`/carriers/${carrier.id}/edit`}
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+            >
+              {t("actions.edit")}
+            </Link>
+            {carrier.deletedAt ? (
+              <ArchiveButton mode="restore" label={t("actions.restore")} action={restoreCarrier.bind(null, carrier.id)} />
+            ) : (
+              <ArchiveButton
+                mode="archive"
+                label={t("actions.archive")}
+                confirm={t("actions.confirmArchive")}
+                hasOrdersError={t("actions.hasOrders")}
+                redirectTo="/carriers"
+                action={archiveCarrier.bind(null, carrier.id)}
+              />
+            )}
+          </div>
         }
       />
       <div className="grid grid-cols-2 gap-4">

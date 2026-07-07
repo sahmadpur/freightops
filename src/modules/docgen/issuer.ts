@@ -1,20 +1,24 @@
 /**
  * The freight forwarder's own requisites, printed on generated invoices and
- * ACTs. Provisional placeholder values — replace with the real requisites when
- * the client supplies their branded templates (or promote to a settings table
- * if they ever need to be editable in the UI).
+ * ACTs. Transcribed from the client's real branded invoice template
+ * (RDL-AZL HF.xlsx). Promote to a settings table if these ever need to be
+ * editable in the UI (multi-currency / editable requisites are out of scope
+ * for v1 — see docs/2026-07-02-invoice-act-generation.md).
  */
 export const ISSUER = {
-  name: "FreightOps LLC",
-  address: "1 Logistics Way, Baku, Azerbaijan",
-  taxId: "0000000000",
-  bankName: "Example Bank OJSC",
-  bankAccount: "AZ00EXMP0000000000000000000000",
-  swift: "EXMPAZ22",
-  phone: "+994 00 000 00 00",
-  email: "billing@freightops.example",
-  signatoryName: "Full Name",
-  signatoryTitle: "Director",
+  name: "«Redline Supply» MMC",
+  address: "Bakı şəh., F.Bayramov küçəsi, ev 5, mən. 27",
+  taxId: "2007795241",
+  bankName: "Kapital Bank ASC, Port Baku filialı",
+  bankAccount: "AZ82AIIB400600E9445910682107",
+  bankCode: "201973",
+  bankTaxId: "9900003611",
+  correspondentAccount: "AZ37NABZ01350100000000001944",
+  swift: "AIIBAZ2XXXX",
+  phone: "+994 12 000 00 00",
+  email: "info@redline.az",
+  signatoryName: "Mehdi Orucov",
+  signatoryTitle: "Direktor",
 } as const;
 
 export type Issuer = typeof ISSUER;

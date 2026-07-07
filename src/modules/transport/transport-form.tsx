@@ -6,9 +6,8 @@ import { useTranslations } from "next-intl";
 import { Field, inputCls, SubmitRow } from "@/components/ui/form";
 import { Card, CardBody } from "@/components/ui/card";
 import { createTransportMode, updateTransportMode } from "./actions";
+import { TRANSPORT_MODES } from "./modes";
 import type { ActionResult } from "@/lib/forms";
-
-const MODE_TYPES = ["vehicle", "air", "postal", "rail", "sea"] as const;
 
 export type TransportFormInitial = {
   id?: string;
@@ -50,8 +49,8 @@ export function TransportForm({ initial }: { initial: TransportFormInitial }) {
       <div className="grid grid-cols-2 gap-x-4">
         <Field label={t("fields.modeType")} htmlFor="modeType" error={fe.modeType}>
           <select id="modeType" className={inputCls} value={v.modeType} onChange={(e) => set({ modeType: e.target.value })}>
-            {MODE_TYPES.map((m) => (
-              <option key={m} value={m}>{m}</option>
+            {TRANSPORT_MODES.map((m) => (
+              <option key={m} value={m}>{t(`transportModes.${m}`)}</option>
             ))}
           </select>
         </Field>

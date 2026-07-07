@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DOC_CURRENCIES } from "@/lib/amount-in-words";
 
 /** Checkbox/string → boolean ("true" or "on" → true, everything else → false). */
 const checkboxBool = z
@@ -11,6 +12,7 @@ export const generateDocInputSchema = z
     orderId: z.string().trim().min(1),
     kind: z.enum(["invoice", "act"]),
     language: z.enum(["en", "ru", "az"]),
+    currency: z.enum(DOC_CURRENCIES),
     numberMode: z.enum(["auto", "manual"]),
     number: z.string().trim().max(50).optional().or(z.literal("")),
     // Required (unlike the shared optional dateString): it becomes the document

@@ -2,13 +2,24 @@ import { toCents, sumCents } from "./money";
 
 export type PaymentStatus = "paid" | "partly_paid" | "not_paid";
 
-/** actual profit = client charge − carrier cost − additional costs, in cents. */
-export function actualProfitCents(
-  clientCharge: string | null,
-  carrierCost: string | null,
-  additionalCosts: string | null,
+/**
+ * Expected (planned) profit = client charge − carrier cost, in cents. Both are
+ * rollups of the order's revenue / cost line items. Previously mislabeled
+ * "actual profit"; see requirement #14.
+ */
+export function expectedProfitCents(clientCharge: string | null, carrierCost: string | null): number {
+  return toCents(clientCharge) - toCents(carrierCost);
+}
+
+/**
+ * Actual (settled) profit = amount receivable − amount payable, in cents — the
+ * agreed "Save amounts" figures, per requirement #14.
+ */
+export function settledProfitCents(
+  amountReceivable: string | null,
+  amountPayable: string | null,
 ): number {
-  return toCents(clientCharge) - toCents(carrierCost) - toCents(additionalCosts);
+  return toCents(amountReceivable) - toCents(amountPayable);
 }
 
 /** Invoiced vs paid for one side (receivable or payable). */

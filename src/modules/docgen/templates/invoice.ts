@@ -25,8 +25,8 @@ export function renderInvoiceHtml(data: InvoiceData, lang: DocLanguage): string 
   </tr></table>
   ${bankDetailsBlock(data.issuer, t)}
   ${orderMetaBlock(data.order, t)}
-  ${linesTable(data.lines, data.totalCents, t)}
+  ${linesTable(data.lines, data.totalCents, data.currency, lang, t)}
   <p class="terms">${esc(t.paymentTerms)}</p>
   ${signaturesBlock(t.seller, t.buyer, data, t)}`;
-  return docShell(`${t.docTitle} ${data.number}`, body);
+  return docShell(`${t.docTitle} ${data.number}`, body, lang);
 }

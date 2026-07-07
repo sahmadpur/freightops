@@ -1,13 +1,43 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { accounts, contacts } from "@/db/schema";
+import { accounts, contacts, orders } from "@/db/schema";
 import { auditDiff, recordAudit } from "@/lib/audit";
 import { requireArea } from "@/lib/session";
 import { accountInputSchema, type ActionResult } from "./schema";
 
 const AUDITED_FIELDS = ["title", "taxId", "address", "notes"];
+
+/** Soft-delete (archive) an account. Blocked while it has non-archived orders. */
+export async function archiveAccount(id: string): Promise<ActionResult> {
+  const { session } = await requireArea("staff");
+  const result = await db.transaction(async (tx) => {
+    const row = await tx.query.accounts.findFirst({ where: eq(accounts.id, id) });
+    if (!row) return "not_found" as const;
+    const [{ n }] = await tx
+      .select({ n: sql<number>`count(*)`.mapWith(Number) })
+      .from(orders)
+      .where(and(eq(orders.accountId, id), isNull(orders.deletedAt)));
+    if (n > 0) return "has_orders" as const;
+    await tx.update(accounts).set({ deletedAt: new Date() }).where(eq(accounts.id, id));
+    await recordAudit(tx, { userId: session.user.id, entityType: "account", entityId: id, action: "archived" });
+    return "ok" as const;
+  });
+  if (result === "not_found") return { ok: false, error: "not_found" };
+  if (result === "has_orders") return { ok: false, error: "has_orders" };
+  return { ok: true, id };
+}
+
+/** Restore a previously archived account. */
+export async function restoreAccount(id: string): Promise<ActionResult> {
+  const { session } = await requireArea("staff");
+  await db.transaction(async (tx) => {
+    await tx.update(accounts).set({ deletedAt: null }).where(eq(accounts.id, id));
+    await recordAudit(tx, { userId: session.user.id, entityType: "account", entityId: id, action: "restored" });
+  });
+  return { ok: true, id };
+}
 
 export async function createAccount(input: unknown): Promise<ActionResult> {
   const { session } = await requireArea("staff");

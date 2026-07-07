@@ -15,11 +15,11 @@ export type OrderFormInitial = {
   deliveryFormat: string;
   clientCharge: string;
   carrierCost: string;
-  additionalCosts: string;
-  additionalCostsNote: string;
-  expectedProfit: string;
+  exchangeRate: string;
   invoiceNumber: string;
   invoiceDate: string;
+  carrierInvoiceNumber: string;
+  carrierInvoiceDate: string;
   transportMode: TransportMode;
   transportModeId: string;
   newTransport: {
@@ -41,11 +41,12 @@ export function blankOrderInitial(): OrderFormInitial {
     title: "", clientOrderId: "", accountId: "", carrierId: "", route: "",
     cargoDescription: "", packages: "", weightKg: "", volumeM3: "",
     incoterms: "", deliveryFormat: "", clientCharge: "", carrierCost: "",
-    additionalCosts: "", additionalCostsNote: "", expectedProfit: "",
+    exchangeRate: "",
     invoiceNumber: "", invoiceDate: "",
+    carrierInvoiceNumber: "", carrierInvoiceDate: "",
     transportMode: "none", transportModeId: "",
     newTransport: {
-      modeType: "vehicle", number: "", fromCountry: "", toCountry: "",
+      modeType: "truck", number: "", fromCountry: "", toCountry: "",
       route: "", loadingDate: "", plannedArrivalDate: "", totalWeightKg: "", totalVolumeM3: "",
     },
   };

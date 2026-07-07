@@ -48,7 +48,6 @@ export default async function FinancePage() {
         <CardBody>
           {fin(t("totalRevenue"), totals.ytd.revenueCents, "pos")}
           {fin(t("totalCarrierCosts"), -totals.ytd.carrierCostsCents, "neg")}
-          {fin(t("additionalExpenses"), -totals.ytd.additionalCents, "neg")}
           {fin(t("expectedProfitOpen"), totals.ytd.expectedProfitCents, "pos")}
           {fin(t("actualProfitCompleted"), totals.ytd.actualProfitCents, "pos")}
         </CardBody>

@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { MoneyDual } from "@/components/ui/money";
+import { toCents } from "@/lib/money";
+import type { PaymentStatus } from "@/lib/finance";
 import type { OrderListRow } from "./queries";
 
 /** Day-Month-Year, zero-padded (DD/MM/YYYY) regardless of locale. */
@@ -14,8 +17,24 @@ function formatDMY(value: Date | string) {
   return `${dd}/${mm}/${d.getFullYear()}`;
 }
 
+const numOrDash = (v: string | null) => (v ? Number(v).toLocaleString("en-US") : "—");
+
 export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
   const t = useTranslations();
+  const tp = useTranslations("payStatus");
+
+  const payPill = (status: PaymentStatus | null) => {
+    if (!status) return <span className="text-ink-soft">—</span>;
+    const cls =
+      status === "paid"
+        ? "bg-[rgb(var(--approval-approved-bg))] text-[rgb(var(--approval-approved-fg))]"
+        : status === "partly_paid"
+          ? "bg-[rgb(var(--approval-pending-bg))] text-[rgb(var(--approval-pending-fg))]"
+          : "bg-[rgb(var(--approval-rejected-bg))] text-[rgb(var(--approval-rejected-fg))]";
+    return (
+      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${cls}`}>{tp(status)}</span>
+    );
+  };
 
   const columns: Column<OrderListRow>[] = [
     {
@@ -27,10 +46,33 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
     { key: "accountTitle", header: t("fields.client"), render: (r) => r.accountTitle },
     { key: "title", header: t("fields.orderTitle"), render: (r) => r.title },
     {
+      key: "clientOrderId",
+      header: t("fields.clientOrderId"),
+      width: "120px",
+      hiddenOnMobile: true,
+      render: (r) => r.clientOrderId ?? "—",
+    },
+    {
       key: "route",
       header: t("fields.route"),
       hiddenOnMobile: true,
       render: (r) => r.route ?? "—",
+    },
+    {
+      key: "weightKg",
+      header: t("fields.weightKg"),
+      width: "100px",
+      align: "right",
+      hiddenOnMobile: true,
+      render: (r) => numOrDash(r.weightKg),
+    },
+    {
+      key: "volumeM3",
+      header: t("fields.volumeM3"),
+      width: "100px",
+      align: "right",
+      hiddenOnMobile: true,
+      render: (r) => numOrDash(r.volumeM3),
     },
     {
       key: "transportNumber",
@@ -42,10 +84,54 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
     {
       key: "clientCharge",
       header: t("fields.clientCharge"),
-      width: "110px",
+      width: "120px",
       align: "right",
       render: (r) =>
-        r.clientCharge ? `$${Number(r.clientCharge).toLocaleString("en-US")}` : "—",
+        r.clientCharge ? (
+          <MoneyDual usdCents={toCents(r.clientCharge)} rate={r.exchangeRate} />
+        ) : (
+          "—"
+        ),
+    },
+    {
+      key: "carrierCost",
+      header: t("fields.carrierCost"),
+      width: "120px",
+      align: "right",
+      hiddenOnMobile: true,
+      render: (r) =>
+        r.carrierCost ? (
+          <MoneyDual usdCents={toCents(r.carrierCost)} rate={r.exchangeRate} />
+        ) : (
+          "—"
+        ),
+    },
+    {
+      key: "receivableStatus",
+      header: t("fields.paidByCustomer"),
+      width: "120px",
+      hiddenOnMobile: true,
+      render: (r) => payPill(r.receivableStatus),
+    },
+    {
+      key: "payableStatus",
+      header: t("fields.paidToCarrier"),
+      width: "120px",
+      hiddenOnMobile: true,
+      render: (r) => payPill(r.payableStatus),
+    },
+    {
+      key: "hasDocuments",
+      header: t("fields.documents"),
+      width: "60px",
+      align: "center",
+      hiddenOnMobile: true,
+      render: (r) =>
+        r.hasDocuments ? (
+          <PaperclipIcon />
+        ) : (
+          <span className="text-ink-soft">—</span>
+        ),
     },
     {
       key: "createdAt",
@@ -96,9 +182,26 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
       rows={rows}
       rowKey={(r) => r.id}
       storageKey="orders"
-      minWidth={1000}
+      minWidth={1600}
       empty={t("orders.empty")}
     />
+  );
+}
+
+function PaperclipIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="inline-block h-4 w-4 text-ink-soft"
+      aria-hidden="true"
+    >
+      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+    </svg>
   );
 }
 

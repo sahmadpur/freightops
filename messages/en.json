@@ -40,7 +40,13 @@
     "save": "Save",
     "cancel": "Cancel",
     "back": "Back",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "archive": "Archive",
+    "restore": "Restore",
+    "confirmArchive": "Archive this record? It will be hidden from lists but can be restored.",
+    "hasOrders": "Cannot archive — still has active orders.",
+    "showArchived": "Show archived",
+    "showActive": "Show active"
   },
   "fields": {
     "companyTitle": "Company title",
@@ -99,7 +105,13 @@
     "selectCarrier": "Select carrier…",
     "selectTransport": "Select transport…",
     "actNumber": "ACT number",
-    "actDate": "ACT date"
+    "actDate": "ACT date",
+    "paidByCustomer": "Paid by customer",
+    "paidToCarrier": "Paid to carrier",
+    "documents": "Docs",
+    "carrierInvoiceNumber": "Carrier invoice №",
+    "carrierInvoiceDate": "Carrier invoice date",
+    "exchangeRate": "Exchange rate (AZN/USD)"
   },
   "accounts": {
     "newAccount": "New account",
@@ -149,7 +161,7 @@
   "finance": {
     "title": "Finance",
     "tab": "Finance",
-    "actualProfit": "Actual profit",
+    "actualProfit": "Actual Profit",
     "receivable": "Receivable from client",
     "payable": "Payable to carrier",
     "amountReceivable": "Amount receivable",
@@ -176,7 +188,22 @@
     "additionalExpenses": "Additional expenses",
     "expectedProfitOpen": "Expected profit (open shipments)",
     "actualProfitCompleted": "Actual profit (completed)",
-    "remove": "Remove"
+    "remove": "Remove",
+    "expectedProfit": "Expected Profit",
+    "revenue": "Revenue",
+    "carrierCost": "Carrier cost",
+    "revenueLines": "Revenue",
+    "costLines": "Carrier cost",
+    "addLine": "Add line",
+    "lineDescription": "Description",
+    "lineAmount": "Amount (USD)",
+    "lineNote": "Note",
+    "noLines": "No lines yet",
+    "reportOfAccounts": "Report of accounts",
+    "filterByStatus": "Filter by status",
+    "clearFilter": "Clear",
+    "orderDetails": "Order details",
+    "noRows": "No matching rows"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -189,8 +216,8 @@
     "unfinishedOrders": "Unfinished orders",
     "revenue": "Revenue",
     "carrierCosts": "Carrier costs",
-    "expectedProfit": "Expected profit",
-    "actualProfit": "Actual profit",
+    "expectedProfit": "Expected Profit",
+    "actualProfit": "Actual Profit",
     "accountsReceivable": "Accounts receivable",
     "owedToCarriers": "Owed to carriers",
     "ordersByStatus": "Orders by status",
@@ -235,7 +262,8 @@
     "act": "ACT",
     "waybill": "Waybill",
     "cargo_photos": "Cargo photos",
-    "other": "Other"
+    "other": "Other",
+    "carrier_invoice": "Carrier invoice"
   },
   "docgen": {
     "title": "Generate document",
@@ -243,6 +271,7 @@
     "docInvoice": "Invoice",
     "docAct": "ACT (acceptance certificate)",
     "languageLabel": "Language",
+    "currencyLabel": "Currency",
     "lang_en": "English",
     "lang_ru": "Русский",
     "lang_az": "Azərbaycanca",
@@ -304,5 +333,13 @@
     "search": "Search",
     "filter": "Filter",
     "noAuditEntries": "No audit entries"
+  },
+  "transportModes": {
+    "truck": "Truck",
+    "container": "Container",
+    "air": "Air",
+    "postal": "Postal",
+    "rail": "Rail",
+    "sea": "Sea"
   }
 }

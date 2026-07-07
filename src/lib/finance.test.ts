@@ -1,14 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { actualProfitCents, balance, paymentStatus } from "./finance";
+import { balance, expectedProfitCents, paymentStatus, settledProfitCents } from "./finance";
 
-describe("actualProfitCents", () => {
-  it("is client charge minus carrier cost minus additional costs", () => {
-    expect(actualProfitCents("4200", "2800", "0")).toBe(140000);
-    expect(actualProfitCents("4200.00", "2800.00", "100.00")).toBe(130000);
+describe("expectedProfitCents", () => {
+  it("is client charge minus carrier cost", () => {
+    expect(expectedProfitCents("4200", "2800")).toBe(140000);
+    expect(expectedProfitCents("4200.00", "2900.00")).toBe(130000);
   });
   it("treats null fields as 0", () => {
-    expect(actualProfitCents("4200", null, null)).toBe(420000);
-    expect(actualProfitCents(null, null, null)).toBe(0);
+    expect(expectedProfitCents("4200", null)).toBe(420000);
+    expect(expectedProfitCents(null, null)).toBe(0);
+  });
+});
+
+describe("settledProfitCents", () => {
+  it("is amount receivable minus amount payable", () => {
+    expect(settledProfitCents("4200", "2800")).toBe(140000);
+    expect(settledProfitCents("4200", null)).toBe(420000);
+    expect(settledProfitCents(null, null)).toBe(0);
   });
 });
 

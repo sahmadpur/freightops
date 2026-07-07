@@ -9,14 +9,15 @@ import { orderStatusEnum } from "@/db/schema";
 export default async function OrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; page?: string; archived?: string }>;
 }) {
   const sp = await searchParams;
   const q = sp.q?.trim() || undefined;
   const status = sp.status || undefined;
   const page = Number(sp.page) || 1;
+  const archived = sp.archived === "1";
   const t = await getTranslations();
-  const { rows, total } = await listOrders({ q, status, page });
+  const { rows, total } = await listOrders({ q, status, page, archived });
 
   const pill = (label: string, value: string | undefined, active: boolean) => {
     const params = new URLSearchParams();
@@ -44,9 +45,15 @@ export default async function OrdersPage({
           </Link>
         }
       />
-      <div className="mb-3 flex flex-wrap gap-1.5">
+      <div className="mb-3 flex flex-wrap items-center gap-1.5">
         {pill(t("orders.allOrders"), undefined, !status)}
         {orderStatusEnum.enumValues.map((s) => pill(t(`status.${s}`), s, status === s))}
+        <Link
+          href={archived ? "/orders" : "/orders?archived=1"}
+          className={`ml-auto rounded-full border px-3 py-1 text-xs ${archived ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 text-slate-500 hover:bg-slate-50"}`}
+        >
+          {archived ? t("actions.showActive") : t("actions.showArchived")}
+        </Link>
       </div>
       <form className="mb-3" action="/orders">
         {status && <input type="hidden" name="status" value={status} />}

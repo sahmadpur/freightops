@@ -5,15 +5,23 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Field, inputCls } from "@/components/ui/form";
+import { MoneyDual } from "@/components/ui/money";
 import { formatMoney, toCents } from "@/lib/money";
-import type { OrderFinance, OrderPayment } from "./queries";
-import { addPayment, deletePayment, updateOrderFinancials } from "./actions";
+import type { FinanceLine, OrderFinance, OrderPayment } from "./queries";
+import {
+  addFinanceLine,
+  addPayment,
+  deleteFinanceLine,
+  deletePayment,
+  updateOrderFinancials,
+} from "./actions";
 
 type Side = "incoming" | "outgoing";
 
 export function FinanceTab({ orderId, finance }: { orderId: string; finance: OrderFinance }) {
   const t = useTranslations("finance");
   const router = useRouter();
+  const rate = finance.exchangeRate;
 
   const [amountReceivable, setAmountReceivable] = useState(finance.amountReceivable ?? "");
   const [amountPayable, setAmountPayable] = useState(finance.amountPayable ?? "");
@@ -29,18 +37,25 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("actualProfit")}</span></CardHeader>
+        <CardHeader><span className="text-sm font-semibold">{t("expectedProfit")}</span></CardHeader>
         <CardBody>
           <div className="grid grid-cols-3 gap-3 text-sm">
-            <Stat label={t("amountReceivable")} value={formatMoney(finance.clientChargeCents)} />
-            <Stat label="−" value={formatMoney(finance.carrierCostCents + finance.additionalCostsCents)} />
-            <Stat label={t("actualProfit")} value={formatMoney(finance.actualProfitCents)} positive={finance.actualProfitCents >= 0} />
+            <Stat label={t("revenue")} value={<MoneyDual usdCents={finance.clientChargeCents} rate={rate} />} />
+            <Stat label={t("carrierCost")} value={<MoneyDual usdCents={finance.carrierCostCents} rate={rate} />} />
+            <Stat
+              label={t("expectedProfit")}
+              value={<MoneyDual usdCents={finance.expectedProfitCents} rate={rate} />}
+              positive={finance.expectedProfitCents >= 0}
+            />
           </div>
         </CardBody>
       </Card>
 
+      <FinanceLines orderId={orderId} side="revenue" title={t("revenueLines")} lines={finance.revenueLines} totalCents={finance.clientChargeCents} rate={rate} />
+      <FinanceLines orderId={orderId} side="cost" title={t("costLines")} lines={finance.costLines} totalCents={finance.carrierCostCents} rate={rate} />
+
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("saveFinancials")}</span></CardHeader>
+        <CardHeader><span className="text-sm font-semibold">{t("actualProfit")}</span></CardHeader>
         <CardBody>
           <div className="grid grid-cols-2 gap-4">
             <Field label={t("amountReceivable")} htmlFor="ar">
@@ -50,14 +65,16 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
               <input id="ap" className={inputCls} value={amountPayable} onChange={(e) => setAmountPayable(e.target.value)} />
             </Field>
           </div>
-          <button
-            type="button"
-            onClick={saveAmounts}
-            disabled={savingAmounts}
-            className="btn-primary"
-          >
-            {t("saveFinancials")}
-          </button>
+          <div className="mt-3 flex items-end justify-between gap-4">
+            <button type="button" onClick={saveAmounts} disabled={savingAmounts} className="btn-primary">
+              {t("saveFinancials")}
+            </button>
+            <Stat
+              label={t("actualProfit")}
+              value={<MoneyDual usdCents={finance.settledProfitCents} rate={rate} />}
+              positive={finance.settledProfitCents >= 0}
+            />
+          </div>
         </CardBody>
       </Card>
 
@@ -85,12 +102,99 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
   );
 }
 
-function Stat({ label, value, positive }: { label: string; value: string; positive?: boolean }) {
+function Stat({ label, value, positive }: { label: string; value: React.ReactNode; positive?: boolean }) {
   return (
     <div className="rounded-[6px] bg-surface-hover px-3 py-2">
       <div className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-ink-soft">{label}</div>
       <div className={`text-sm font-semibold tabular-nums ${positive ? "text-emerald-600" : "text-ink"}`}>{value}</div>
     </div>
+  );
+}
+
+/** Editable itemized list of revenue or cost lines for the order (#13). */
+function FinanceLines({
+  orderId,
+  side,
+  title,
+  lines,
+  totalCents,
+  rate,
+}: {
+  orderId: string;
+  side: "revenue" | "cost";
+  title: string;
+  lines: FinanceLine[];
+  totalCents: number;
+  rate: string | null;
+}) {
+  const t = useTranslations("finance");
+  const router = useRouter();
+  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function add() {
+    setPending(true);
+    setError(null);
+    const r = await addFinanceLine(orderId, { side, description, amount, note });
+    setPending(false);
+    if (r.ok) {
+      setDescription(""); setAmount(""); setNote("");
+      router.refresh();
+    } else {
+      setError(r.fieldErrors?.description?.[0] ?? r.fieldErrors?.amount?.[0] ?? r.error ?? "Error");
+    }
+  }
+
+  async function remove(id: string) {
+    const r = await deleteFinanceLine(id);
+    if (r.ok) router.refresh();
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <span className="text-sm font-semibold">{title}</span>
+        <span className="text-sm font-semibold tabular-nums"><MoneyDual usdCents={totalCents} rate={rate} /></span>
+      </CardHeader>
+      <CardBody>
+        {lines.length === 0 ? (
+          <p className="mb-3 text-sm text-ink-soft">{t("noLines")}</p>
+        ) : (
+          <ul className="mb-3 divide-y divide-edge-soft text-sm">
+            {lines.map((l) => (
+              <li key={l.id} className="flex items-center justify-between gap-3 py-2">
+                <span className="flex-1 truncate">
+                  {l.description}
+                  {l.note ? <span className="ml-2 text-xs text-ink-soft">· {l.note}</span> : null}
+                </span>
+                <span className="tabular-nums"><MoneyDual usdCents={toCents(l.amount)} rate={rate} /></span>
+                <button type="button" onClick={() => remove(l.id)} className="text-xs text-[rgb(var(--danger-fg))] hover:underline">
+                  {t("remove")}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="flex flex-wrap items-end gap-2">
+          <Field label={t("lineDescription")} htmlFor={`desc-${side}`}>
+            <input id={`desc-${side}`} className={`${inputCls} w-56`} value={description} onChange={(e) => setDescription(e.target.value)} />
+          </Field>
+          <Field label={t("lineAmount")} htmlFor={`amt-${side}`}>
+            <input id={`amt-${side}`} className={`${inputCls} w-32`} value={amount} onChange={(e) => setAmount(e.target.value)} />
+          </Field>
+          <Field label={t("lineNote")} htmlFor={`note-${side}`}>
+            <input id={`note-${side}`} className={`${inputCls} w-40`} value={note} onChange={(e) => setNote(e.target.value)} />
+          </Field>
+          <button type="button" onClick={add} disabled={pending} className="mb-3.5 btn-primary">
+            + {t("addLine")}
+          </button>
+        </div>
+        {error && <p className="text-sm text-[rgb(var(--danger-fg))]">{error}</p>}
+      </CardBody>
+    </Card>
   );
 }
 

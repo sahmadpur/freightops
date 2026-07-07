@@ -1,3 +1,4 @@
+import { LOGO_DATA_URI } from "./logo";
 import type { DocLanguage } from "./types";
 
 /** Escape a value for interpolation into HTML text/attribute content. */
@@ -29,9 +30,11 @@ export function formatDocDate(iso: string, lang: DocLanguage): string {
  * Shared A4 shell for generated documents. DejaVu Sans covers Latin, Cyrillic
  * and Azerbaijani ə (installed in the runtime image via ttf-dejavu).
  */
-export function docShell(title: string, bodyHtml: string): string {
+export function docShell(title: string, bodyHtml: string, lang: DocLanguage): string {
+  // The lang attribute makes CSS text-transform locale-aware, so Azerbaijani
+  // headings uppercase "i" → "İ" (dotted) rather than the Latin "I".
   return `<!doctype html>
-<html>
+<html lang="${esc(lang)}">
 <head>
 <meta charset="utf-8">
 <title>${esc(title)}</title>
@@ -51,7 +54,10 @@ export function docShell(title: string, bodyHtml: string): string {
     margin: 0 0 2mm;
     letter-spacing: 0.02em;
   }
+  .doc-header { text-align: center; margin: 0 0 6mm; padding-bottom: 4mm; border-bottom: 0.4mm solid #b91c1c; }
+  .doc-logo { height: 14mm; }
   .doc-subtitle { text-align: center; font-size: 11pt; margin: 0 0 8mm; }
+  .amount-words { margin-bottom: 8mm; }
   .parties { width: 100%; border-collapse: collapse; margin-bottom: 6mm; }
   .parties td { vertical-align: top; width: 50%; padding: 0 4mm 0 0; }
   .party-role { font-weight: bold; text-transform: uppercase; font-size: 9pt; letter-spacing: 0.06em; margin-bottom: 1mm; }
@@ -78,6 +84,7 @@ export function docShell(title: string, bodyHtml: string): string {
 </style>
 </head>
 <body>
+<div class="doc-header"><img class="doc-logo" src="${LOGO_DATA_URI}" alt="RedLine Sourcing Logistics"></div>
 ${bodyHtml}
 </body>
 </html>`;

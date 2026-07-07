@@ -5,12 +5,14 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionRule, DefRow } from "@/components/ui/record";
 import { OrderDetailTabs } from "@/modules/orders/order-detail-tabs";
 import { StatusControl } from "@/modules/orders/status-control";
+import { ArchiveButton } from "@/components/ui/archive-button";
+import { archiveOrder, restoreOrder } from "@/modules/orders/actions";
 import { getOrder } from "@/modules/orders/queries";
 import { orderFinance } from "@/modules/finance/queries";
 import { FinanceTab } from "@/modules/finance/finance-tab";
 import { listOrderDocuments } from "@/modules/documents/queries";
 import { DocumentsTab } from "@/modules/documents/documents-tab";
-import { peekNextDocNumber } from "@/modules/docgen/queries";
+import { peekNextDocSeq } from "@/modules/docgen/queries";
 import { GenerateDocumentSection } from "@/modules/docgen/generate-document-section";
 import { listOrderComments } from "@/modules/comments/queries";
 import { CommentsTab } from "@/modules/comments/comments-tab";
@@ -27,13 +29,13 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   if (!data) notFound();
   // Independent of each other — fetch in parallel.
   const currentYear = new Date().getFullYear();
-  const [finance, orderDocuments, orderComments, nextInvoiceNumber, nextActNumber] =
+  const [finance, orderDocuments, orderComments, nextInvoiceSeq, nextActSeq] =
     await Promise.all([
       orderFinance(id),
       listOrderDocuments(id),
       listOrderComments(id),
-      peekNextDocNumber("invoice", currentYear),
-      peekNextDocNumber("act", currentYear),
+      peekNextDocSeq("invoice", currentYear),
+      peekNextDocSeq("act", currentYear),
     ]);
   const { order, accountTitle, carrierTitle, transportNumber, transportModeType, history } = data;
 
@@ -48,7 +50,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <DefRow label={t("fields.route")} value={order.route} />
           <DefRow
             label={t("fields.transport")}
-            value={transportNumber ? `${transportNumber} (${transportModeType})` : null}
+            value={
+              transportNumber
+                ? `${transportNumber}${transportModeType ? ` (${t(`transportModes.${transportModeType}`)})` : ""}`
+                : null
+            }
           />
           <DefRow label={t("fields.incoterms")} value={order.incoterms} />
         </dl>
@@ -71,6 +77,9 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
           <DefRow label={t("fields.invoiceNumber")} value={order.invoiceNumber} />
           <DefRow label={t("fields.invoiceDate")} value={order.invoiceDate} />
+          <DefRow label={t("fields.carrierInvoiceNumber")} value={order.carrierInvoiceNumber} />
+          <DefRow label={t("fields.carrierInvoiceDate")} value={order.carrierInvoiceDate} />
+          <DefRow label={t("fields.exchangeRate")} value={order.exchangeRate} />
           <DefRow label={t("fields.deliveryFormat")} value={order.deliveryFormat} />
           <DefRow label={t("fields.actNumber")} value={order.actNumber} />
           <DefRow label={t("fields.actDate")} value={order.actDate} />
@@ -184,7 +193,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 <DocumentsTab orderId={order.id} documents={orderDocuments} />
                 <GenerateDocumentSection
                   orderId={order.id}
-                  nextNumbers={{ invoice: nextInvoiceNumber, act: nextActNumber }}
+                  nextSeqs={{ invoice: nextInvoiceSeq, act: nextActSeq }}
                 />
               </div>
             }
@@ -204,16 +213,33 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <div>
             <SectionRule>{t("orders.updateStatus")}</SectionRule>
             <StatusControl orderId={order.id} current={order.status} />
+            <div className="mt-3">
+              {order.deletedAt ? (
+                <ArchiveButton
+                  mode="restore"
+                  label={t("actions.restore")}
+                  action={restoreOrder.bind(null, order.id)}
+                />
+              ) : (
+                <ArchiveButton
+                  mode="archive"
+                  label={t("actions.archive")}
+                  confirm={t("actions.confirmArchive")}
+                  redirectTo="/orders"
+                  action={archiveOrder.bind(null, order.id)}
+                />
+              )}
+            </div>
           </div>
           {finance && (
             <div>
               <SectionRule>{t("finance.tab")}</SectionRule>
               <dl className="text-[13px]">
-                {snap(t("fields.clientCharge"), formatMoney(finance.clientChargeCents))}
-                {snap(t("fields.carrierCost"), `− ${formatMoney(finance.carrierCostCents)}`, "neg")}
-                {snap(t("fields.additionalCosts"), `− ${formatMoney(finance.additionalCostsCents)}`, "neg")}
+                {snap(t("finance.revenue"), formatMoney(finance.clientChargeCents))}
+                {snap(t("finance.carrierCost"), `− ${formatMoney(finance.carrierCostCents)}`, "neg")}
                 <div className="my-1.5 border-t border-edge-soft" />
-                {snap(t("finance.actualProfit"), formatMoney(finance.actualProfitCents), "strong")}
+                {snap(t("finance.expectedProfit"), formatMoney(finance.expectedProfitCents), "strong")}
+                {snap(t("finance.actualProfit"), formatMoney(finance.settledProfitCents), "strong")}
               </dl>
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between">

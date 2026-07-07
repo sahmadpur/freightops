@@ -2,12 +2,13 @@ import { getTranslations } from "next-intl/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBar } from "@/components/dashboard/status-bar";
-import { dashboardData } from "@/modules/finance/queries";
+import { dashboardData, reconciliationRows } from "@/modules/finance/queries";
+import { ReconciliationReport } from "@/modules/finance/reconciliation-report";
 import { formatMoney } from "@/lib/money";
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
-  const d = await dashboardData();
+  const [d, reconRows] = await Promise.all([dashboardData(), reconciliationRows()]);
   const year = new Date().getFullYear();
 
   const metric = (
@@ -88,6 +89,10 @@ export default async function DashboardPage() {
         <CardHeader><span className="text-sm font-semibold">{t("ordersByStatus")}</span></CardHeader>
         <CardBody><StatusBar counts={d.statusCounts} /></CardBody>
       </Card>
+
+      <div className="mb-4">
+        <ReconciliationReport rows={reconRows} />
+      </div>
 
       <Card>
         <CardHeader><span className="text-sm font-semibold">{t("monthlyResults", { year })}</span></CardHeader>
