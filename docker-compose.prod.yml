@@ -11,13 +11,17 @@
 #   docker compose -f docker-compose.prod.yml up -d --build
 #
 # Migrations run automatically on app start (drizzle-kit migrate, see Dockerfile).
+#
+# Parallel instances: the stack is parameterized by STACK (default `freightops`).
+# A second checkout with STACK=<other> + its own APP_HOST in .env runs a fully
+# independent copy (own network, volumes, db) on the same server — see DEPLOY.md.
 
-name: freightops
+name: ${STACK:-freightops}
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: freightops-db
+    container_name: ${STACK:-freightops}-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -36,7 +40,7 @@ services:
   # Object storage for documents (used from Phase 4 on). Internal-only.
   minio:
     image: minio/minio:latest
-    container_name: freightops-minio
+    container_name: ${STACK:-freightops}-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
@@ -51,7 +55,7 @@ services:
   # and alerts don't error. Point SMTP_* at a real MTA in .env to deliver mail.
   mailpit:
     image: axllent/mailpit:latest
-    container_name: freightops-mailpit
+    container_name: ${STACK:-freightops}-mailpit
     restart: unless-stopped
     environment:
       MP_MAX_MESSAGES: "500"
@@ -62,8 +66,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: freightops-app:latest
-    container_name: freightops-app
+    image: ${STACK:-freightops}-app:latest
+    container_name: ${STACK:-freightops}-app
     restart: unless-stopped
     depends_on:
       postgres:
@@ -75,11 +79,12 @@ services:
       # secure cookies (app runs behind Cloudflare->Traefik; browser is on https).
       BETTER_AUTH_URL: https://${APP_HOST}
       APP_BASE_URL: https://${APP_HOST}
-      S3_ENDPOINT: http://freightops-minio:9000
+      # Service-name DNS (not container_name) so the same file works for any STACK.
+      S3_ENDPOINT: http://minio:9000
       S3_ACCESS_KEY: ${S3_ACCESS_KEY}
       S3_SECRET_KEY: ${S3_SECRET_KEY}
       S3_BUCKET: ${S3_BUCKET:-freightops-documents}
-      SMTP_HOST: ${SMTP_HOST:-freightops-mailpit}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
       SMTP_PORT: ${SMTP_PORT:-1025}
       SMTP_SECURE: ${SMTP_SECURE:-false}
       SMTP_FROM: ${SMTP_FROM:-FreightOps <no-reply@freightops.local>}
@@ -97,9 +102,11 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=proxy
-      - traefik.http.routers.freightops.entrypoints=web
-      - traefik.http.routers.freightops.rule=Host(`${APP_HOST}`)
-      - traefik.http.services.freightops.loadbalancer.server.port=3000
+      # Router/service names must be unique across everything Traefik sees —
+      # STACK keeps parallel instances from clashing.
+      - traefik.http.routers.${STACK:-freightops}.entrypoints=web
+      - traefik.http.routers.${STACK:-freightops}.rule=Host(`${APP_HOST}`)
+      - traefik.http.services.${STACK:-freightops}.loadbalancer.server.port=3000
 
 volumes:
   pgdata:

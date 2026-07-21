@@ -34,6 +34,8 @@ Migrations run automatically on app start (`drizzle-kit migrate`, see Dockerfile
   public hostname / Traefik route.
 - `POSTGRES_PASSWORD` and the password inside `DATABASE_URL` must be identical.
 - `BETTER_AUTH_SECRET` — `openssl rand -base64 32`.
+- `STACK` — leave unset for the primary instance; set for parallel instances
+  (see below).
 
 ## First admin (run once, after the stack is up)
 
@@ -54,6 +56,40 @@ Sign in at `https://freightops.cybercraft.az` with `SEED_ADMIN_EMAIL` /
 Zero Trust → Networks → Tunnels → *tunnel* → Public Hostname → **Add**:
 - Subdomain/domain: same as `APP_HOST`
 - Service: `HTTP` → `localhost:80` (Traefik)
+
+## Parallel instance (second subdomain, same server)
+
+The whole stack is namespaced by `STACK` (compose project, containers, volumes,
+image tag, Traefik router — default `freightops`). A second checkout with a
+different `STACK` runs a fully independent copy: own network, own Postgres/MinIO
+volumes, empty database.
+
+```bash
+git clone <repo> /home/freightops2          # separate checkout, any dir name
+cd /home/freightops2
+cp .env.prod.example .env
+```
+
+In the new `.env`, set at minimum:
+- `STACK=freightops2` — unique per instance; **never change it later** (volumes
+  are named after it — changing it orphans the instance's data).
+- `APP_HOST=freightops2.cybercraft.az` — the new subdomain.
+- Fresh `POSTGRES_PASSWORD` / `DATABASE_URL` password, `BETTER_AUTH_SECRET`,
+  `S3_SECRET_KEY`, seed admin credentials.
+
+Then bring it up and route it:
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+- Cloudflare: add a Public Hostname for the new subdomain → `HTTP` →
+  `localhost:80` (same tunnel; Traefik routes by `Host()`).
+- Seed the first admin with the same command as above, substituting the
+  checkout dir and the network name `freightops2_default`.
+
+The instances share nothing — deploying/stopping one never touches the other.
+Traefik picks the new router up from container labels automatically.
 
 ## Email
 
