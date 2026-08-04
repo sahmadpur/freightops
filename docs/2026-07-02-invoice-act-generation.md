@@ -88,8 +88,10 @@ logo, glyphs, requisites, currency, numbering and amount-in-words all correct.
 ## Environment / ops notes
 
 - Dockerfile runner stage and the `app-dev` compose command install
-  `chromium` + `ttf-dejavu`, with a fallback to the kernel.org Alpine mirror —
-  `dl-cdn.alpinelinux.org` proved unreachable from the dev machine's network.
+  `chromium` + `ttf-dejavu` + `font-noto`, with a fallback to the kernel.org
+  Alpine mirror — `dl-cdn.alpinelinux.org` proved unreachable from the dev
+  machine's network. `ttf-dejavu` alone renders the manat sign ₼ (U+20BC, on
+  every AZN amount via `formatMoneyAzn`) as a tofu box; `font-noto` covers it.
 - Host `npm run dev` needs `PUPPETEER_EXECUTABLE_PATH` pointing at a local
   Chrome (documented in `.env.example`).
 - Dev-machine gotcha: Docker builds hanging at "0/0 steps" or failing with

@@ -46,9 +46,10 @@ services:
   app-dev:
     image: node:24-alpine
     working_dir: /app
-    # chromium + ttf-dejavu: HTML→PDF document generation (src/lib/pdf.ts).
+    # chromium + fonts: HTML→PDF document generation (src/lib/pdf.ts). font-noto
+    # supplies the manat sign ₼ (U+20BC), which ttf-dejavu lacks.
     # Falls back to the kernel.org mirror when dl-cdn is unreachable.
-    command: sh -c "{ apk add --no-cache chromium ttf-dejavu || { sed -i 's#https://dl-cdn.alpinelinux.org#https://mirrors.edge.kernel.org#' /etc/apk/repositories && apk add --no-cache chromium ttf-dejavu; }; } && npm install && npm run db:migrate && npm run dev"
+    command: sh -c "{ apk add --no-cache chromium ttf-dejavu font-noto || { sed -i 's#https://dl-cdn.alpinelinux.org#https://mirrors.edge.kernel.org#' /etc/apk/repositories && apk add --no-cache chromium ttf-dejavu font-noto; }; } && npm install && npm run db:migrate && npm run dev"
     ports:
       - "3000:3000"
     environment:

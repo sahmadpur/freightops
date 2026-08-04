@@ -33,12 +33,14 @@ FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 # Chromium for HTML→PDF document generation (puppeteer-core drives the distro
-# build; see src/lib/pdf.ts). ttf-dejavu covers Latin + Cyrillic + Azerbaijani ə.
+# build; see src/lib/pdf.ts). ttf-dejavu covers Latin + Cyrillic + Azerbaijani ə,
+# but has no glyph for the manat sign ₼ (U+20BC) that formatMoneyAzn puts on
+# every AZN amount — font-noto supplies it, otherwise invoices/ACTs render tofu.
 # dl-cdn.alpinelinux.org is unreliable from some networks — fall back to the
 # kernel.org mirror if the default CDN fails.
-RUN apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-dejavu || \
+RUN apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-dejavu font-noto || \
     { sed -i 's#https://dl-cdn.alpinelinux.org#https://mirrors.edge.kernel.org#' /etc/apk/repositories && \
-      apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-dejavu; }
+      apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-dejavu font-noto; }
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 # Next.js standalone server.js binds to $HOSTNAME; Docker otherwise sets it to the
 # container id, binding a single interface. Bind all interfaces so a reverse proxy
