@@ -2,26 +2,31 @@
 
 import { useTranslations } from "next-intl";
 
+/**
+ * Hue-coded shipment stages: cool blues while the load is being arranged,
+ * amber in motion, rose at the border/customs, green once it lands. The hue
+ * is information — it lets a table be scanned without reading the labels.
+ */
 const STATUS_COLORS: Record<string, string> = {
-  created: "bg-[#ddeaf9] text-[#0c447c]",
-  waiting_pickup: "bg-[#efe6d4] text-[#5c4413]",
-  received: "bg-[#e3e0f7] text-[#3b2f7e]",
-  internal_transit: "bg-[#d8eef7] text-[#0b4a63]",
-  loaded: "bg-[#d4f2e7] text-[#085041]",
-  transit: "bg-[#fdefd1] text-[#633806]",
-  at_border: "bg-[#fde8df] text-[#712b13]",
-  at_customs: "bg-[#fae0ea] text-[#72243e]",
-  arrived: "bg-[#e0f0d0] text-[#27500a]",
-  delivered: "bg-[#c8e8d8] text-[#085041]",
-  closed: "bg-[#e8e8e8] text-[#444444]",
+  created: "bg-[#eef3ff] text-[#2049c4]",
+  waiting_pickup: "bg-[#f1f3f7] text-[#4d5566]",
+  received: "bg-[#eceaff] text-[#4436b8]",
+  internal_transit: "bg-[#e7f4fb] text-[#0f5f80]",
+  loaded: "bg-[#e6f6ef] text-[#12775a]",
+  transit: "bg-[#fff6df] text-[#8a5a06]",
+  at_border: "bg-[#feeee6] text-[#9a4419]",
+  at_customs: "bg-[#fdeaf1] text-[#96305a]",
+  arrived: "bg-[#edf7e3] text-[#3d6b16]",
+  delivered: "bg-[#dff3e9] text-[#12775a]",
+  closed: "bg-[#f1f1f1] text-[#5c5c5c]",
 };
 
 export function StatusBadge({ status }: { status: string }) {
   const t = useTranslations("status");
   return (
     <span
-      className={`inline-block whitespace-nowrap rounded-[10px] px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.08em] ${
-        STATUS_COLORS[status] ?? "bg-[#e8e8e8] text-[#444444]"
+      className={`inline-block whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
+        STATUS_COLORS[status] ?? "bg-[#f1f1f1] text-[#5c5c5c]"
       }`}
     >
       {t(status)}

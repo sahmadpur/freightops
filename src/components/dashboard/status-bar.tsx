@@ -1,15 +1,17 @@
 import { StatusBadge } from "@/components/ui/status-badge";
 
+/** Same hue coding as `StatusBadge`, one step more saturated for the bar. */
 const SEGMENT_COLORS: Record<string, string> = {
-  created: "#b5d4f4",
-  received: "#c5bdf0",
-  internal_transit: "#a8d8ed",
-  loaded: "#9fe1cb",
-  transit: "#fac775",
-  at_border: "#f5c4b3",
-  at_customs: "#f4c0d1",
-  arrived: "#c0dd97",
-  delivered: "#5dcaa5",
+  created: "#91afff",
+  waiting_pickup: "#c3cad6",
+  received: "#a99cf0",
+  internal_transit: "#7dc4e3",
+  loaded: "#6cc9a5",
+  transit: "#f5c344",
+  at_border: "#f0a37a",
+  at_customs: "#e78fb1",
+  arrived: "#a8cf72",
+  delivered: "#22a06b",
   closed: "#c4c4c4",
 };
 
@@ -17,7 +19,7 @@ export function StatusBar({ counts }: { counts: { status: string; count: number 
   const total = counts.reduce((s, c) => s + c.count, 0);
   return (
     <div>
-      <div className="flex h-2.5 overflow-hidden rounded">
+      <div className="flex h-2.5 overflow-hidden rounded-full">
         {total === 0 ? (
           <div className="h-full w-full bg-slate-100" />
         ) : (

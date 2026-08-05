@@ -11,7 +11,7 @@ export function MonthPicker({ month, label }: { month: string; label: string }) 
   const router = useRouter();
   return (
     <label className="flex items-center gap-2">
-      <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">
+      <span className="text-[11.5px] font-medium text-ink-soft">
         {label}
       </span>
       <input

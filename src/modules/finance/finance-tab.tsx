@@ -177,7 +177,7 @@ function CashLedger({
               <li key={r.id} className="flex items-baseline justify-between gap-3 py-2">
                 <span className="min-w-0">
                   <span
-                    className={`mr-2 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.06em] ${
+                    className={`mr-2 rounded-full px-2 py-0.5 text-[11px] font-medium ${
                       r.direction === "incoming"
                         ? "bg-[rgb(var(--approval-approved-bg))] text-[rgb(var(--approval-approved-fg))]"
                         : "bg-[rgb(var(--approval-rejected-bg))] text-[rgb(var(--approval-rejected-fg))]"
@@ -209,8 +209,8 @@ function CashLedger({
 
 function Stat({ label, value, positive }: { label: string; value: React.ReactNode; positive?: boolean }) {
   return (
-    <div className="rounded-[6px] bg-surface-hover px-3 py-2">
-      <div className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-ink-soft">{label}</div>
+    <div className="rounded-[12px] bg-surface-hover px-3 py-2">
+      <div className="text-[11.5px] font-medium text-ink-soft">{label}</div>
       <div className={`text-sm font-semibold tabular-nums ${positive ? "text-emerald-600" : "text-ink"}`}>{value}</div>
     </div>
   );
@@ -277,7 +277,7 @@ function FinanceLines({
               <li key={l.id} className="flex items-center justify-between gap-3 py-2">
                 <span className="flex-1 truncate">
                   {side === "cost" && (
-                    <span className="mr-2 rounded-full bg-surface-chip-active px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.06em] text-ink-soft">
+                    <span className="mr-2 rounded-full bg-surface-chip-active px-2 py-0.5 text-[11px] text-ink-soft">
                       {tc(l.category)}
                     </span>
                   )}

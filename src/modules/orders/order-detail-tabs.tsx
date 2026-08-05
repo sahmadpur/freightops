@@ -32,7 +32,7 @@ export function OrderDetailTabs({
   );
 
   const tabCls = (active: boolean) =>
-    `border-b-2 -mb-px px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edge-focus ${
+    `border-b-2 -mb-px px-3.5 py-2 text-[12.5px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edge-focus ${
       active ? "border-brand text-brand" : "border-transparent text-ink-soft hover:text-ink"
     }`;
 

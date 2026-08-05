@@ -28,7 +28,7 @@ export function LanguageSwitcher() {
           onClick={() => choose(l)}
           aria-pressed={l === current}
           aria-label={`Switch to ${LOCALE_NAMES[l]}`}
-          className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors ${
+          className={`rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.04em] transition-colors ${
             l === current
               ? "bg-brand text-brand-pale"
               : "text-ink-soft hover:text-brand"

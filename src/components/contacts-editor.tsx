@@ -32,9 +32,9 @@ export function ContactsEditor({
       {/* Index keys are fine here: rows are only user-edited, inputs are controlled,
           and state lives in the parent form. Not suitable for sorted/filtered lists. */}
       {contacts.map((c, i) => (
-        <div key={i} className="rounded-[6px] border border-edge-soft bg-surface-hover p-3">
+        <div key={i} className="rounded-[12px] border border-edge-soft bg-surface-hover p-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">
+            <span className="text-[11.5px] font-medium text-ink-soft">
               {t("contacts")} {i + 1}
             </span>
             <button
@@ -53,7 +53,7 @@ export function ContactsEditor({
           />
           <div className="mt-2 grid grid-cols-2 gap-3">
             <div>
-              <div className="mb-1 font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">{t("phones")}</div>
+              <div className="mb-1 text-[11.5px] font-medium text-ink-soft">{t("phones")}</div>
               {c.phones.map((p, j) => (
                 <input
                   key={j}
@@ -67,7 +67,7 @@ export function ContactsEditor({
               </button>
             </div>
             <div>
-              <div className="mb-1 font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">{t("emails")}</div>
+              <div className="mb-1 text-[11.5px] font-medium text-ink-soft">{t("emails")}</div>
               {c.emails.map((m, j) => (
                 <input
                   key={j}
@@ -87,7 +87,7 @@ export function ContactsEditor({
       <button
         type="button"
         onClick={() => onChange([...contacts, emptyContact()])}
-        className="rounded-[6px] border border-dashed border-edge-chip px-3 py-2 text-sm text-ink-soft hover:bg-surface-hover"
+        className="rounded-[12px] border border-dashed border-edge-chip px-3 py-2 text-sm text-ink-soft hover:bg-surface-hover"
       >
         + {t("addContact")}
       </button>

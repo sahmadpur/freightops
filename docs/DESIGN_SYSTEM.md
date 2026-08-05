@@ -1,5 +1,11 @@
 # DocAI — Design System Spec (Portable)
 
+> **Not the FreightOps system.** FreightOps moved to the light "Signal Desk"
+> language (near-white canvas, signal blue #2f69ff, Geist + Inter, pill
+> controls). Its tokens and component recipes live in `src/app/globals.css` —
+> that file is the source of truth. Keep this spec only as the archival
+> reference for the older editorial/ledger aesthetic.
+
 > **Purpose of this file.** Hand this to a frontend-design skill in another codebase. It captures the complete visual language of **DocAI** (a multilingual document-archive platform) so the target platform can be re-skinned to look *identical in design DNA* — same palette, typography, spacing, component shapes, motion, and the distinctive "archival / ledger / catalog-card" editorial aesthetic. Adapt the *content* to the target app, but keep the *design language* exact.
 
 The reference stack is **Next.js 14 (App Router) + Tailwind CSS + next-intl + lucide-react + Radix primitives**. If the target uses a different stack, translate the tokens and recipes faithfully (the CSS variables and class recipes below are framework-agnostic).

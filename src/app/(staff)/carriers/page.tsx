@@ -33,7 +33,7 @@ export default async function CarriersPage({
             name="q"
             defaultValue={q}
             placeholder={t("carriers.searchPlaceholder")}
-            className="w-72 rounded-[5px] border border-edge-chip bg-surface-card px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-soft/55 focus:border-edge-focus"
+            className="w-72 rounded-[10px] border border-edge-chip bg-surface-card px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-soft/55 focus:border-edge-focus"
           />
         </form>
         <Link

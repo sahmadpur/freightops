@@ -30,10 +30,10 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
         key={href}
         href={href}
         aria-current={active ? "page" : undefined}
-        className={`flex items-center gap-2.5 border-l-[3px] py-2.5 pl-[15px] pr-[18px] text-[13px] transition-colors ${
+        className={`mx-2 flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] transition-colors ${
           active
-            ? "border-brand-accent bg-white/[0.13] text-sidebar-fg"
-            : "border-transparent text-sidebar-fg-soft hover:bg-white/[0.07]"
+            ? "bg-sidebar-chip font-medium text-white shadow-[inset_0_0_18px_rgba(142,174,255,0.5)]"
+            : "text-sidebar-fg-soft hover:bg-surface-chip-active hover:text-brand"
         }`}
       >
         {label}
@@ -41,53 +41,76 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
     );
   };
 
-  const eyebrow = (label: string) => (
-    <div className="px-[18px] pb-1 pt-3.5 font-mono text-[10px] uppercase tracking-[0.18em] text-brand-accent">
+  const sectionLabel = (label: string) => (
+    <div className="px-[18px] pb-1.5 pt-4 text-[10.5px] font-medium uppercase tracking-[0.12em] text-ink-soft/70">
       {label}
     </div>
   );
 
   return (
-    <aside className="flex w-[210px] shrink-0 flex-col bg-sidebar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {/* Wordmark — split-color superscript treatment */}
+    <aside className="hidden w-[210px] shrink-0 flex-col border-r border-edge-soft bg-sidebar md:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Wordmark */}
       <div className="flex items-center gap-2.5 px-[18px] pb-4 pt-4">
         <BrandMark />
-        <span className="text-[16px] font-semibold tracking-tight text-sidebar-fg">
-          Freight
-          <sup className="ml-0.5 align-super font-mono text-[10px] text-brand-accent">
-            Ops
-          </sup>
+        <span className="font-display text-[17px] font-medium tracking-[-0.03em] text-sidebar-fg">
+          Freight<span className="text-brand">Ops</span>
         </span>
       </div>
 
-      <nav className="flex-1 overflow-y-auto pb-2">
-        {eyebrow(t("sectionLibrary"))}
+      <nav className="flex-1 space-y-0.5 overflow-y-auto pb-2">
+        {sectionLabel(t("sectionLibrary"))}
         {LIBRARY_NAV.map((n) => item(n.href, t(n.key)))}
         {isAdmin && (
           <>
-            {eyebrow(t("sectionManage"))}
+            {sectionLabel(t("sectionManage"))}
             {ADMIN_NAV.map((n) => item(n.href, t(n.key)))}
           </>
         )}
       </nav>
 
-      {/* Ledger footer rule */}
-      <div className="border-t border-white/10 px-[18px] py-3">
-        <div className="font-mono text-[9.5px] uppercase tracking-[0.22em] text-sidebar-fg-soft/70">
-          Freight Forwarding
-        </div>
-        <div className="mt-0.5 font-mono text-[9.5px] uppercase tracking-[0.22em] text-brand-accent">
-          Manifest · 2026
-        </div>
+      <div className="border-t border-edge-soft px-[18px] py-3 text-[10.5px] leading-relaxed text-ink-soft/70">
+        Freight forwarding operations
       </div>
     </aside>
   );
 }
 
-/** Stamped freight-box mark on a lime square — the desk's seal. */
+/**
+ * Below `md` the rail is hidden and the same routes ride in a scrollable strip
+ * under the top bar, so a phone gets the full width for the record itself.
+ */
+export function MobileNav({ isAdmin }: { isAdmin: boolean }) {
+  const t = useTranslations("nav");
+  const pathname = usePathname();
+  const links = isAdmin ? [...LIBRARY_NAV, ...ADMIN_NAV] : LIBRARY_NAV;
+
+  return (
+    <nav className="flex gap-1.5 overflow-x-auto border-b border-edge-soft bg-sidebar px-3 py-2 md:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {links.map(({ href, key }) => {
+        const active = pathname === href || pathname.startsWith(href + "/");
+        return (
+          <Link
+            key={href}
+            href={href}
+            aria-current={active ? "page" : undefined}
+            className={`shrink-0 rounded-full px-3 py-1.5 text-[12.5px] transition-colors ${
+              active
+                ? "bg-sidebar-chip font-medium text-white"
+                : "text-sidebar-fg-soft hover:bg-surface-chip-active hover:text-brand"
+            }`}
+          >
+            {t(key)}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+/** Freight-box mark on a blue tile. */
 function BrandMark() {
   return (
-    <span className="flex h-7 w-7 items-center justify-center rounded-[5px] bg-brand-accent text-brand-deep">
+    <span className="flex h-7 w-7 items-center justify-center rounded-[9px] bg-brand text-white shadow-[inset_0_0_18px_rgba(142,174,255,0.55)]">
       <svg
         viewBox="0 0 24 24"
         fill="none"

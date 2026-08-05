@@ -20,7 +20,7 @@ function matches(option: ComboOption, query: string): boolean {
 }
 
 const listCls =
-  "absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-[5px] border border-edge-chip bg-surface-card py-1 shadow-lg";
+  "absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-[10px] border border-edge-chip bg-surface-card py-1 shadow-lg";
 
 const optionCls = (active: boolean, selected: boolean) =>
   `flex cursor-pointer items-center gap-2 px-3 py-1.5 text-[13px] ${

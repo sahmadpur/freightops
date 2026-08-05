@@ -62,7 +62,7 @@ export function OrderFilters({
     [countries, locale],
   );
 
-  const label = "mb-1 block font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft";
+  const label = "mb-1 block text-[11.5px] font-medium text-ink-soft";
 
   return (
     <div className="mb-3">
@@ -94,7 +94,7 @@ export function OrderFilters({
       {open && (
         <form
           action="/orders"
-          className="mt-3 rounded-[8px] border border-edge-soft bg-surface-card p-4"
+          className="mt-3 rounded-[10px] border border-edge-soft bg-surface-card p-4"
         >
           {q && <input type="hidden" name="q" value={q} />}
           {status && <input type="hidden" name="status" value={status} />}

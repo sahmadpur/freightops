@@ -252,7 +252,7 @@ export function OrderForm({
               value={v.exchangeRate}
               onChange={(e) => set({ exchangeRate: e.target.value })}
             />
-            <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.06em] text-ink-soft">
+            <p className="mt-1 text-[11px] text-ink-soft">
               {t("fields.rateSource")}
             </p>
           </Field>
@@ -260,7 +260,7 @@ export function OrderForm({
             <Field label={t("fields.clientCharge")} htmlFor="clientCharge" error={fe.clientCharge}>
               <input id="clientCharge" className={inputCls} value={v.clientCharge} onChange={(e) => set({ clientCharge: e.target.value })} />
               {chargeAzn !== null && v.currency !== "AZN" && (
-                <p className="mt-1 font-mono text-[10px] tracking-[0.06em] text-ink-soft">
+                <p className="mt-1 font-mono text-[11px] text-ink-soft">
                   = {formatMoneyAzn(chargeAzn)}
                 </p>
               )}
@@ -271,7 +271,7 @@ export function OrderForm({
         {!v.id && (
           <div className="mt-2">
             <div className="mb-2 flex items-center justify-between">
-              <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">
+              <span className="text-[11.5px] font-medium text-ink-soft">
                 {t("fields.agentExpenses")}
               </span>
               <button

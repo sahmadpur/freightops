@@ -54,17 +54,11 @@ function ResetForm() {
 
   return (
     <div>
-      <div className="mb-7">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="h-px w-4 bg-brand-accent" aria-hidden="true" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-ink-soft">
-            Reset password
-          </span>
-        </div>
-        <h1 className="font-display text-[34px] font-light leading-[1.05] tracking-[-0.01em] text-brand-deep">
+      <div className="mb-6">
+        <h2 className="font-display text-[21px] font-medium tracking-[-0.02em] text-brand-deep">
           Choose a new password
-        </h1>
-        <p className="mt-2 text-[13.5px] text-ink-soft">
+        </h2>
+        <p className="mt-1.5 text-[13px] text-ink-soft">
           Set a new password for your account.
         </p>
       </div>

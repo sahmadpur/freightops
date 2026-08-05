@@ -146,7 +146,7 @@ function InlineStatus({ orderId, current, status }: { orderId: string; current: 
         value={current}
         disabled={pending}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-[5px] border border-edge-chip bg-surface-card px-1.5 py-0.5 text-xs text-ink outline-none focus:border-edge-focus"
+        className="rounded-[10px] border border-edge-chip bg-surface-card px-1.5 py-0.5 text-xs text-ink outline-none focus:border-edge-focus"
       >
         {STATUSES.map((s) => (<option key={s} value={s}>{t(`status.${s}`)}</option>))}
       </select>

@@ -38,11 +38,11 @@ export function InviteUserForm({ accounts }: { accounts: { id: string; title: st
   return (
     <div className="flex flex-wrap items-end gap-2">
       <div>
-        <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">{t("email")}</label>
+        <label className="mb-1 block text-[11.5px] font-medium text-ink-soft">{t("email")}</label>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} />
       </div>
       <div>
-        <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">{t("role")}</label>
+        <label className="mb-1 block text-[11.5px] font-medium text-ink-soft">{t("role")}</label>
         <select value={role} onChange={(e) => setRole(e.target.value)} className={`${inputCls} w-auto`}>
           <option value="admin">{t("roleAdmin")}</option>
           <option value="operator">{t("roleOperator")}</option>
@@ -51,7 +51,7 @@ export function InviteUserForm({ accounts }: { accounts: { id: string; title: st
       </div>
       {role === "client" && (
         <div>
-          <label className="mb-1 block font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">{t("account")}</label>
+          <label className="mb-1 block text-[11.5px] font-medium text-ink-soft">{t("account")}</label>
           <select value={accountId} onChange={(e) => setAccountId(e.target.value)} className={`${inputCls} w-auto`}>
             <option value="">{t("selectAccount")}</option>
             {accounts.map((a) => (<option key={a.id} value={a.id}>{a.title}</option>))}

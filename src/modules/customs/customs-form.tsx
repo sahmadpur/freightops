@@ -226,7 +226,7 @@ export function CustomsForm({
           <p className="text-[12px] text-ink-soft">{t("customs.noItems")}</p>
         ) : (
           <div className="space-y-2">
-            <div className="hidden grid-cols-[minmax(0,1.4fr)_130px_130px_minmax(0,1fr)_auto] gap-2 font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft sm:grid">
+            <div className="hidden grid-cols-[minmax(0,1.4fr)_130px_130px_minmax(0,1fr)_auto] gap-2 text-[11.5px] font-medium text-ink-soft sm:grid">
               <span>{t("customs.category")}</span>
               <span>{t("customs.buy")}</span>
               <span>{t("customs.sell")}</span>

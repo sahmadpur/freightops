@@ -24,7 +24,7 @@ export default async function CustomsDetailPage({ params }: { params: Promise<{ 
           <div>
             <div className="mb-1.5 flex items-center gap-2">
               <span className="h-px w-4 bg-brand-accent" aria-hidden="true" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft">
+              <span className="font-display text-[13px] font-medium tracking-[-0.01em] text-brand-deep">
                 {t("nav.customs")} · {c.number}
               </span>
             </div>
@@ -72,7 +72,7 @@ export default async function CustomsDetailPage({ params }: { params: Promise<{ 
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[520px] text-[13px]">
                   <thead>
-                    <tr className="border-b border-edge-chip text-left font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">
+                    <tr className="border-b border-edge-chip text-left text-[11.5px] font-medium text-ink-soft">
                       <th className="py-1.5 pr-3">{t("customs.category")}</th>
                       <th className="py-1.5 pr-3 text-right">{t("customs.buy")}</th>
                       <th className="py-1.5 pr-3 text-right">{t("customs.sell")}</th>

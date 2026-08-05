@@ -18,12 +18,16 @@ export function Topbar({ userName }: { userName: string }) {
     .toUpperCase();
 
   return (
-    <header className="flex items-center gap-3 border-b border-edge-soft bg-surface-card px-[22px] py-2">
+    <header className="flex items-center gap-3 border-b border-edge-soft bg-surface-card px-4 py-2 md:px-[22px]">
+      {/* The rail carries the wordmark from md up; on a phone it lives here. */}
+      <span className="font-display text-[16px] font-medium tracking-[-0.03em] text-brand-deep md:hidden">
+        Freight<span className="text-brand">Ops</span>
+      </span>
       <div className="flex-1" />
       <LanguageSwitcher />
       <div className="flex items-center gap-2">
         <span
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-chip text-[11px] font-semibold text-brand-pale"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-chip-active text-[11px] font-semibold text-brand"
           aria-hidden="true"
         >
           {initials}

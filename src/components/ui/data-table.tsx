@@ -134,7 +134,7 @@ export function DataTable<T>({
                   thRefs.current[c.key] = el;
                 }}
                 style={{ width: widthFor(c) }}
-                className={`group relative border-b border-edge-chip px-3 py-2.5 text-[11px] font-semibold leading-tight text-brand-deep ${ALIGN[c.align ?? "left"]}`}
+                className={`group relative border-b border-edge-soft px-3 py-2.5 text-[11.5px] font-medium leading-tight text-ink-soft ${ALIGN[c.align ?? "left"]}`}
               >
                 {c.header}
                 {resizable && (

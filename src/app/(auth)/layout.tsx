@@ -1,216 +1,115 @@
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-screen bg-paper font-sans text-ink md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-      <HeroPanel />
-
-      {/* Form panel — paper with a faint grain */}
-      <div className="relative flex items-center justify-center bg-paper bg-grain-light bg-blend-multiply px-6 py-12">
-        <div className="w-full max-w-sm">
-          {/* Compact lockup (carries the brand on mobile, where the hero is hidden) */}
-          <div className="mb-8 flex items-center gap-2.5">
-            <BrandMark />
-            <span className="text-[17px] font-semibold tracking-tight text-brand-deep">
-              Freight
-              <sup className="ml-0.5 align-super font-mono text-[10px] text-brand-chip">
-                Ops
-              </sup>
-            </span>
-          </div>
-          {children}
-          <p className="mt-8 font-mono text-[9.5px] uppercase tracking-[0.22em] text-ink-soft/70">
-            Freight forwarding operations
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** Deep-green editorial column with floating waybill cards. Hidden on mobile. */
-function HeroPanel() {
-  return (
-    <div className="relative hidden overflow-hidden bg-brand-deep px-12 py-14 text-paper md:flex md:flex-col md:justify-between">
-      {/* warm glow from upper-left */}
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-paper-dim bg-grid px-5 py-14 font-sans text-ink">
+      {/* Soft blue wash behind the card, top-centre */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -left-24 -top-24 h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,#0e3e6e_0%,transparent_65%)] opacity-55"
+        className="pointer-events-none absolute -top-40 left-1/2 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(47,105,255,0.16)_0%,transparent_65%)]"
       />
-      {/* grain */}
+      {/* The grid fades out toward the bottom of the page */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-grain opacity-[0.16] mix-blend-screen"
-      />
-      {/* ledger margin rule down the right edge */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-10 w-px bg-brand-accent/20"
-      />
-      {/* thin horizontal rule near the top */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-12 top-[88px] h-px bg-paper/10"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-paper-dim"
       />
 
-      {/* brand strip */}
-      <div className="relative flex items-center gap-2.5">
-        <BrandMark accent />
-        <span className="text-[17px] font-semibold tracking-tight text-paper">
-          Freight
-          <sup className="ml-0.5 align-super font-mono text-[10px] text-brand-accent">
-            Ops
-          </sup>
-        </span>
-      </div>
-
-      {/* headline + footer, anchored to the bottom of the panel */}
-      <div className="relative mt-auto">
-        <div className="max-w-md">
-          <h2 className="font-display text-[44px] font-light leading-[0.98] tracking-[-0.01em] lg:text-[56px]">
-            Every shipment,
-            <br />
-            <span className="italic text-brand-light">filed and</span>
-            <br />
-            accounted for.
-          </h2>
-          <p className="mt-5 max-w-sm text-[14px] leading-relaxed text-brand-light/90">
-            The operations desk for freight forwarders — waybills, customs
-            clearances and carrier ledgers, kept in one orderly record.
-          </p>
-        </div>
-
-        {/* footer meta row */}
-        <div className="mt-10 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em]">
-          <span className="text-brand-accent">Consignment Ledger</span>
-          <span className="text-paper/40">N° 01</span>
-        </div>
-      </div>
-
-      {/* floating waybill cards — stacked in the upper zone, clear of the headline */}
-      <WaybillCard
-        className="absolute right-10 top-14 w-[224px] animate-float1"
+      <ShipmentCard
+        className="absolute left-[6%] top-[18%] hidden w-[210px] animate-float1 xl:block"
         id="FRT-002847"
-        origin="Baku, AZ"
-        dest="Istanbul, TR"
+        route="Baku, AZ → Istanbul, TR"
         mode="Road · FTL"
         incoterm="DAP"
-        stamped
+        status="In transit"
+        dot="bg-dot-progress"
       />
-      <WaybillCard
-        className="absolute right-24 top-[232px] hidden w-[206px] animate-float2 lg:block"
+      <ShipmentCard
+        className="absolute bottom-[16%] right-[6%] hidden w-[210px] animate-float2 xl:block"
         id="FRT-002851"
-        origin="Poti, GE"
-        dest="Tbilisi, GE"
+        route="Poti, GE → Tbilisi, GE"
         mode="Rail"
         incoterm="CIP"
+        status="Delivered"
+        dot="bg-dot-done"
       />
+
+      <div className="relative w-full max-w-[26rem]">
+        {/* Lockup */}
+        <div className="mb-7 flex items-center justify-center gap-2.5">
+          <BrandMark />
+          <span className="font-display text-[19px] font-medium tracking-[-0.03em] text-brand-deep">
+            Freight<span className="text-brand">Ops</span>
+          </span>
+        </div>
+
+        <div className="mb-6 text-center">
+          <span className="eyebrow mb-3">Operations desk</span>
+          <h1 className="font-display text-[32px] font-medium leading-[1.08] tracking-[-0.035em] text-brand-deep">
+            Every shipment,
+            <br />
+            accounted for
+          </h1>
+          <p className="mx-auto mt-3 max-w-[22rem] text-[14px] leading-relaxed text-ink-soft">
+            Waybills, customs clearances and carrier ledgers, kept in one
+            record.
+          </p>
+        </div>
+
+        {/* Form card */}
+        <div className="rounded-[20px] border border-edge-soft bg-surface-card p-7 shadow-[0_1px_1px_rgba(0,0,0,0.04),0_18px_44px_-24px_rgba(0,0,0,0.18)]">
+          {children}
+        </div>
+
+        <p className="mt-6 text-center text-[11.5px] text-ink-soft/80">
+          Freight forwarding operations
+        </p>
+      </div>
     </div>
   );
 }
 
-/** A tilted "library card" reimagined as a freight waybill. */
-function WaybillCard({
+/** A shipment record, floated behind the form as ambient product detail. */
+function ShipmentCard({
   className = "",
   id,
-  origin,
-  dest,
+  route,
   mode,
   incoterm,
-  stamped = false,
+  status,
+  dot,
 }: {
   className?: string;
   id: string;
-  origin: string;
-  dest: string;
+  route: string;
   mode: string;
   incoterm: string;
-  stamped?: boolean;
+  status: string;
+  dot: string;
 }) {
   return (
     <div
       aria-hidden="true"
-      className={`bg-paper p-4 text-ink shadow-[0_22px_44px_-18px_rgba(0,0,0,0.45)] ring-1 ring-paper-edge ${className}`}
+      className={`rounded-[16px] border border-edge-soft bg-surface-card p-4 shadow-[0_1px_1px_rgba(0,0,0,0.04),0_18px_44px_-26px_rgba(0,0,0,0.22)] ${className}`}
     >
-      {/* tick-mark corners */}
-      <Ticks />
-      {/* perforation row */}
-      <div className="mb-3 flex justify-between">
-        {Array.from({ length: 18 }).map((_, i) => (
-          <span
-            key={i}
-            className="h-[3px] w-[3px] rounded-full bg-ink opacity-40"
-          />
-        ))}
-      </div>
-
-      {/* header */}
-      <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-ink-soft">
-        <span>Waybill · 2026</span>
-        <span className="rounded-[2px] border border-ink/20 px-1 py-px text-[8px]">
+      <div className="flex items-center justify-between">
+        <span className="font-mono text-[12.5px] text-brand">{id}</span>
+        <span className="rounded-full bg-surface-chip-active px-2 py-0.5 text-[10px] font-medium text-brand">
           {incoterm}
         </span>
       </div>
-      <div className="mt-1 font-mono text-[15px] tracking-[0.02em] text-brand-deep">
-        {id}
+      <div className="mt-2.5 text-[12.5px] font-medium text-brand-deep">
+        {route}
       </div>
-
-      {/* metadata */}
-      <dl className="mt-3 space-y-1.5 font-mono text-[10.5px]">
-        <Row k="Origin" v={origin} />
-        <Row k="Destination" v={dest} />
-        <Row k="Mode" v={mode} />
-      </dl>
-
-      {/* footer status */}
-      <div className="mt-3 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-ink-soft">
-        <span className="h-[6px] w-[6px] rounded-full bg-dot-done" />
-        Manifested
+      <div className="mt-0.5 text-[11.5px] text-ink-soft">{mode}</div>
+      <div className="mt-3 flex items-center gap-1.5 border-t border-edge-soft pt-2.5 text-[11px] text-ink-soft">
+        <span className={`h-[6px] w-[6px] rounded-full ${dot}`} />
+        {status}
       </div>
-
-      {stamped && (
-        <span className="absolute -right-2 bottom-6 rotate-[14deg] animate-stamp rounded-[2px] border-[1.5px] border-red-700/80 bg-paper/60 px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-red-700/85 backdrop-blur-[1px]">
-          Cleared ’26
-        </span>
-      )}
     </div>
   );
 }
 
-function Row({ k, v }: { k: string; v: string }) {
+function BrandMark() {
   return (
-    <div className="flex items-baseline justify-between border-b border-dashed border-ink/15 pb-1">
-      <dt className="uppercase tracking-[0.1em] text-ink-soft">{k}</dt>
-      <dd className="text-ink">{v}</dd>
-    </div>
-  );
-}
-
-function Ticks() {
-  const marks = [
-    "left-0 top-0 w-3 h-px",
-    "left-0 top-0 w-px h-3",
-    "right-0 top-0 w-3 h-px",
-    "right-0 top-0 w-px h-3",
-    "left-0 bottom-0 w-3 h-px",
-    "left-0 bottom-0 w-px h-3",
-    "right-0 bottom-0 w-3 h-px",
-    "right-0 bottom-0 w-px h-3",
-  ];
-  return (
-    <>
-      {marks.map((m) => (
-        <span key={m} className={`absolute bg-ink/40 ${m}`} />
-      ))}
-    </>
-  );
-}
-
-function BrandMark({ accent = false }: { accent?: boolean }) {
-  return (
-    <span
-      className={`flex h-7 w-7 items-center justify-center rounded-[5px] ${
-        accent ? "bg-brand-accent text-brand-deep" : "bg-brand text-brand-pale"
-      }`}
-    >
+    <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-brand text-white shadow-[inset_0_0_20px_rgba(142,174,255,0.55),0_1px_2px_rgba(0,46,164,0.2)]">
       <svg
         viewBox="0 0 24 24"
         fill="none"
@@ -218,7 +117,7 @@ function BrandMark({ accent = false }: { accent?: boolean }) {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="h-4 w-4"
+        className="h-[18px] w-[18px]"
         aria-hidden="true"
       >
         <path d="M3 7.5 12 3l9 4.5v9L12 21 3 16.5z" />

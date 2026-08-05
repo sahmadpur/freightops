@@ -85,7 +85,7 @@ export default async function DashboardPage({
         action={<MonthPicker month={d.month} label={t("period")} />}
       />
 
-      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t("operationalOverview")}</div>
+      <div className="mb-2.5"><span className="eyebrow">{t("operationalOverview")}</span></div>
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
         {metric(t("activeShipments"), d.operational.activeShipments, <IconTruck />, "indigo")}
         {metric(t("awaitingPickup"), d.operational.awaitingPickup, <IconClipboard />, "violet")}

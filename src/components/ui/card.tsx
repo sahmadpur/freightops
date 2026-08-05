@@ -5,14 +5,14 @@ export function Card({
 }: {
   children: React.ReactNode;
   className?: string;
-  /** Warm the border + lift the surface on hover. Use for clickable cards. */
+  /** Tint the border blue + lift the surface on hover. Use for clickable cards. */
   interactive?: boolean;
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-[10px] border border-edge-soft bg-surface-card ${
+      className={`overflow-hidden rounded-[14px] border border-edge-soft bg-surface-card shadow-[0_1px_1px_rgba(0,0,0,0.04)] ${
         interactive
-          ? "transition-colors hover:border-edge-chip hover:bg-surface-hover"
+          ? "transition-colors hover:border-brand-light hover:bg-surface-hover"
           : ""
       } ${className}`}
     >

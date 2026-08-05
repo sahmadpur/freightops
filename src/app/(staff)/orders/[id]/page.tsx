@@ -101,8 +101,8 @@ export default async function OrderDetailPage({
 
   const meta = (label: string, value: React.ReactNode) => (
     <span className="inline-flex items-baseline gap-1.5">
-      <span className="uppercase tracking-[0.14em] text-ink-soft">{label}</span>
-      <span className="text-ink">{value || "—"}</span>
+      <span className="text-ink-soft">{label}</span>
+      <span className="font-medium text-ink">{value || "—"}</span>
     </span>
   );
   const metaDot = <span className="text-edge-chip" aria-hidden="true">·</span>;
@@ -116,7 +116,7 @@ export default async function OrderDetailPage({
           ? "bg-[rgb(var(--approval-pending-bg))] text-[rgb(var(--approval-pending-fg))]"
           : "bg-[rgb(var(--approval-rejected-bg))] text-[rgb(var(--approval-rejected-fg))]";
     return (
-      <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] ${cls}`}>
+      <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${cls}`}>
         {t(`payStatus.${status}`)}
       </span>
     );
@@ -141,14 +141,13 @@ export default async function OrderDetailPage({
       <div className="mb-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="mb-1.5 flex items-center gap-2">
-              <span className="h-px w-4 bg-brand-accent" aria-hidden="true" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft">
+            <div className="mb-2">
+              <span className="eyebrow">
                 {t("nav.orders")} · {order.number}
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <h1 className="font-display text-[26px] font-medium leading-[1.05] tracking-[-0.01em] text-brand-deep">
+              <h1 className="font-display text-[27px] font-medium leading-[1.1] tracking-[-0.03em] text-brand-deep">
                 {order.title}
               </h1>
               <StatusBadge status={order.status} />
@@ -158,7 +157,7 @@ export default async function OrderDetailPage({
             {t("actions.edit")}
           </Link>
         </div>
-        <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1.5 border-t border-edge-soft pt-3 font-mono text-[11px]">
+        <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1.5 border-t border-edge-soft pt-3 text-[12px]">
           {meta(t("fields.client"), accountTitle)}
           {metaDot}
           {meta(t("fields.route"), route)}
@@ -171,7 +170,7 @@ export default async function OrderDetailPage({
       </div>
 
       {invoiceDue && (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[6px] border border-[rgb(var(--approval-pending-edge))] bg-[rgb(var(--approval-pending-bg))] px-4 py-3">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-[rgb(var(--approval-pending-edge))] bg-[rgb(var(--approval-pending-bg))] px-4 py-3">
           <p className="text-[13px] text-[rgb(var(--approval-pending-fg))]">
             {t("orders.invoiceRequired")}
           </p>

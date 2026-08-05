@@ -1,93 +1,96 @@
 @import "tailwindcss";
 
 /*
- * FreightOps — "The Forwarder's Desk" design system
- * --------------------------------------------------
- * An editorial, archival language for a paperwork-heavy trade: international
- * freight forwarding lives on waybills, CMR consignment notes, customs
- * declarations and ledgers. The surface reads like a well-kept forwarder's
- * desk — warm paper, a serious deep-forest-green ink, a lime accent used
- * sparingly, and three typographic voices (serif display / humanist sans /
- * monospace metadata).
+ * FreightOps — "Signal Desk" design system
+ * ----------------------------------------
+ * A light, product-grade SaaS language: near-white #f5f5f5 canvas, white
+ * cards on hairline borders, soft charcoal ink, and one signal blue that
+ * carries every primary action, active state and accent. Two typographic
+ * voices — Geist for display, Inter for UI/body — plus Geist Mono reserved
+ * for record numbers and other machine-readable data.
+ *
+ * Shape language: pill controls (radius 999px), 14px cards, whisper shadows.
+ * Signature: a dashed graph-paper grid (.bg-grid) behind chrome and auth
+ * surfaces, with white record cards floating over it.
  *
  * Colors are space-separated RGB channels consumed via rgb(var(--token)),
  * so every token supports opacity. The semantic tokens below are also mapped
  * onto Tailwind's indigo/violet/slate/emerald/rose scales so the wider app
  * inherits the palette without rewriting every utility string.
  *
- * Light mode only — layouts paint their own paper/surface backgrounds and the
- * product has no theme toggle. (A dark token-flip is a clean future addition.)
+ * Light mode only — layouts paint their own surfaces and the product has no
+ * theme toggle. (A dark token-flip is a clean future addition.)
  */
 
 :root {
-  /* Brand — navy primary, signal-cyan accent */
-  --brand: 0 29 61; /* #001d3d deep navy (PRIMARY) */
-  --brand-hover: 12 47 84; /* #0c2f54 */
-  --brand-deep: 0 18 38; /* #001226 darkest — headings */
-  --brand-accent: 56 189 248; /* #38bdf8 signal cyan accent */
-  --brand-light: 186 225 251; /* #bae1fb light sky */
-  --brand-pale: 230 244 251; /* #e6f4fb — text/icon ON a navy button */
-  --brand-chip: 30 70 110; /* #1e466e */
+  /* Brand — signal blue primary */
+  --brand: 47 105 255; /* #2f69ff signal blue (PRIMARY) */
+  --brand-hover: 31 84 224; /* #1f54e0 */
+  --brand-deep: 45 45 45; /* #2d2d2d heading ink */
+  --brand-accent: 47 105 255; /* #2f69ff accent = primary, used sparingly */
+  --brand-light: 145 175 255; /* #91afff gradient tail */
+  --brand-pale: 255 255 255; /* text/icon ON a blue button */
+  --brand-chip: 74 124 255; /* #4a7cff mid blue */
 
-  /* Paper — cool ivory chrome for auth / editorial surfaces */
-  --paper: 238 241 246; /* #eef1f6 */
-  --paper-dim: 226 232 240; /* #e2e8f0 */
-  --paper-edge: 203 214 227; /* #cbd6e3 */
+  /* Paper — the off-white chrome for auth / marketing surfaces */
+  --paper: 250 250 250; /* #fafafa */
+  --paper-dim: 245 245 245; /* #f5f5f5 */
+  --paper-edge: 232 232 232; /* #e8e8e8 */
 
   /* Ink — body text */
-  --ink: 17 28 39; /* #111c27 near-black cool */
-  --ink-soft: 90 107 123; /* #5a6b7b secondary text */
+  --ink: 61 61 61; /* #3d3d3d soft charcoal */
+  --ink-soft: 124 124 124; /* #7c7c7c secondary text */
 
-  /* Surface scale — the app workspace (cool blue-grey) */
-  --surface: 243 245 248; /* #f3f5f8 page background */
+  /* Surface scale — the app workspace */
+  --surface: 245 245 245; /* #f5f5f5 page background */
   --surface-card: 255 255 255; /* cards, tables, inputs */
-  --surface-hover: 240 246 252; /* #f0f6fc row hover */
-  --surface-thead: 238 243 249; /* #eef3f9 table header */
-  --surface-chip-active: 226 236 247; /* #e2ecf7 active filter chip */
+  --surface-hover: 250 250 250; /* #fafafa row hover */
+  --surface-thead: 250 250 250; /* #fafafa table header */
+  --surface-chip-active: 238 243 255; /* #eef3ff active filter chip */
 
   /* Edges / borders */
-  --edge-soft: 226 232 240; /* #e2e8f0 subtle dividers */
-  --edge-chip: 203 214 227; /* #cbd6e3 visible input/btn borders */
-  --edge-focus: 56 189 248; /* #38bdf8 cyan focus ring */
+  --edge-soft: 235 235 235; /* #ebebeb subtle dividers */
+  --edge-chip: 224 224 224; /* #e0e0e0 visible input/btn borders */
+  --edge-focus: 47 105 255; /* #2f69ff blue focus ring */
 
   /* Status dots */
-  --dot-done: 99 153 34;
-  --dot-progress: 239 159 39;
-  --dot-pending: 148 163 184; /* #94a3b8 cool grey */
-  --dot-failed: 201 73 73;
+  --dot-done: 34 160 107; /* #22a06b */
+  --dot-progress: 245 184 0; /* #f5b800 */
+  --dot-pending: 180 180 180; /* #b4b4b4 */
+  --dot-failed: 229 72 77; /* #e5484d */
 
   /* Approval / workflow states (bg / fg / edge) */
-  --approval-pending-bg: 255 251 235;
-  --approval-pending-fg: 180 83 9;
-  --approval-pending-edge: 253 230 138;
-  --approval-approved-bg: 236 253 245;
-  --approval-approved-fg: 4 120 87;
-  --approval-approved-edge: 167 243 208;
-  --approval-rejected-bg: 255 241 242;
-  --approval-rejected-fg: 159 18 57;
-  --approval-rejected-edge: 254 205 211;
+  --approval-pending-bg: 255 250 235;
+  --approval-pending-fg: 158 100 8;
+  --approval-pending-edge: 250 224 160;
+  --approval-approved-bg: 236 250 244;
+  --approval-approved-fg: 20 122 82;
+  --approval-approved-edge: 176 232 210;
+  --approval-rejected-bg: 254 242 242;
+  --approval-rejected-fg: 185 42 47;
+  --approval-rejected-edge: 246 200 200;
 
   /* Destructive chrome */
-  --danger-bg: 253 241 241;
-  --danger-fg: 201 73 73;
-  --danger-edge: 224 180 180;
+  --danger-bg: 254 242 242;
+  --danger-fg: 229 72 77;
+  --danger-edge: 246 200 200;
 
-  /* Sidebar — decoupled from brand on purpose */
-  --sidebar-bg: 0 24 47; /* #00182f deep navy */
-  --sidebar-fg: 230 244 251; /* #e6f4fb — active nav text */
-  --sidebar-fg-soft: 159 180 201; /* #9fb4c9 — inactive nav text */
-  --sidebar-chip: 30 70 110; /* #1e466e avatar bg */
+  /* Sidebar — white rail, blue pill for the active route */
+  --sidebar-bg: 255 255 255;
+  --sidebar-fg: 45 45 45; /* #2d2d2d active nav text */
+  --sidebar-fg-soft: 124 124 124; /* #7c7c7c inactive nav text */
+  --sidebar-chip: 47 105 255; /* #2f69ff active pill */
 }
 
 @theme inline {
-  /* Typefaces — display (serif) + mono wired in layout.tsx via next/font.
-     Body is a humanist system stack (Calibri family) per the design DNA. */
-  --font-sans: Calibri, Aptos, "Segoe UI", Arial, sans-serif;
-  --font-display: var(--font-fraunces), Georgia, "Iowan Old Style", serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo,
+  /* Typefaces — Geist (display) + Inter (UI/body) + Geist Mono (record data),
+     all wired in layout.tsx via next/font. */
+  --font-sans: var(--font-inter), "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-display: var(--font-geist), var(--font-inter), sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
     monospace;
 
-  /* Cool-paper base */
+  /* Near-white base */
   --color-background: rgb(var(--surface));
   --color-surface: rgb(var(--surface-card));
 
@@ -126,30 +129,30 @@
   --color-sidebar-fg-soft: rgb(var(--sidebar-fg-soft));
   --color-sidebar-chip: rgb(var(--sidebar-chip));
 
-  /* ----- Remap Tailwind's default scales onto the forwarder palette so the
+  /* ----- Remap Tailwind's default scales onto the signal palette so the
      long tail of indigo/violet/slate/emerald/rose utilities re-skins for free. */
 
-  /* indigo + violet → forest green (primary brand family) */
+  /* indigo + violet → signal blue (primary brand family) */
   --color-indigo-50: rgb(var(--surface-chip-active));
-  --color-indigo-100: rgb(var(--brand-pale));
+  --color-indigo-100: rgb(235 241 255);
   --color-indigo-200: rgb(var(--brand-light));
-  --color-indigo-300: rgb(var(--edge-chip));
+  --color-indigo-300: rgb(var(--brand-light));
   --color-indigo-400: rgb(var(--brand-chip));
   --color-indigo-500: rgb(var(--brand-chip));
   --color-indigo-600: rgb(var(--brand));
   --color-indigo-700: rgb(var(--brand-hover));
-  --color-indigo-800: rgb(var(--brand-deep));
+  --color-indigo-800: rgb(23 62 168);
   --color-indigo-900: rgb(var(--brand-deep));
 
-  --color-violet-50: rgb(var(--surface-chip-active));
-  --color-violet-100: rgb(var(--brand-pale));
+  --color-violet-50: rgb(245 248 255);
+  --color-violet-100: rgb(235 241 255);
   --color-violet-200: rgb(var(--brand-light));
-  --color-violet-300: rgb(var(--edge-chip));
+  --color-violet-300: rgb(var(--brand-light));
   --color-violet-400: rgb(var(--brand-chip));
   --color-violet-500: rgb(var(--brand-chip));
-  --color-violet-600: rgb(var(--brand-chip));
+  --color-violet-600: rgb(var(--brand));
   --color-violet-700: rgb(var(--brand-hover));
-  --color-violet-800: rgb(var(--brand-deep));
+  --color-violet-800: rgb(23 62 168);
   --color-violet-900: rgb(var(--brand-deep));
 
   /* slate → ink / paper / edge (chrome, text, borders) */
@@ -162,13 +165,13 @@
   --color-slate-600: rgb(var(--ink-soft));
   --color-slate-700: rgb(var(--ink));
   --color-slate-800: rgb(var(--ink));
-  --color-slate-900: rgb(var(--ink));
+  --color-slate-900: rgb(var(--brand-deep));
 
-  /* emerald → "indexed/positive" green */
+  /* emerald → positive green */
   --color-emerald-50: rgb(var(--approval-approved-bg));
   --color-emerald-500: rgb(var(--dot-done));
   --color-emerald-600: rgb(var(--dot-done));
-  --color-emerald-700: rgb(var(--brand-hover));
+  --color-emerald-700: rgb(var(--approval-approved-fg));
 
   /* rose + red → the danger red */
   --color-rose-50: rgb(var(--danger-bg));
@@ -181,11 +184,10 @@
   --color-red-700: rgb(var(--danger-fg));
   --color-red-800: rgb(var(--approval-rejected-fg));
 
-  /* Motion — gentle archival drift, never bouncy */
-  --animate-rise: riseFade 0.8s cubic-bezier(0.2, 0.65, 0.2, 1) both;
+  /* Motion — calm product motion, never bouncy */
+  --animate-rise: riseFade 0.7s cubic-bezier(0.2, 0.65, 0.2, 1) both;
   --animate-float1: cardFloat1 9s ease-in-out infinite;
   --animate-float2: cardFloat2 11s ease-in-out infinite;
-  --animate-stamp: stampPulse 4s ease-in-out infinite;
 }
 
 @keyframes riseFade {
@@ -202,30 +204,20 @@
 @keyframes cardFloat1 {
   0%,
   100% {
-    transform: rotate(-5.5deg) translateY(0);
+    transform: translateY(0);
   }
   50% {
-    transform: rotate(-5deg) translateY(-7px);
+    transform: translateY(-8px);
   }
 }
 
 @keyframes cardFloat2 {
   0%,
   100% {
-    transform: rotate(4deg) translateY(0);
+    transform: translateY(0);
   }
   50% {
-    transform: rotate(3.5deg) translateY(-5px);
-  }
-}
-
-@keyframes stampPulse {
-  0%,
-  100% {
-    opacity: 0.78;
-  }
-  50% {
-    opacity: 1;
+    transform: translateY(-5px);
   }
 }
 
@@ -236,43 +228,51 @@ body {
 }
 
 /*
- * Reusable surface + control classes — keep the brand's button and editorial
- * recipes in one place. The working UI is flat and border-defined; drama is
- * reserved for chrome and editorial surfaces.
+ * Reusable surface + control classes — the brand's button, badge and card
+ * recipes in one place. Controls are pills; the working UI stays dense.
  */
 @layer components {
-  /* Primary action — solid deep-green "stamp" button */
+  /* Primary action — signal-blue pill with a soft inner highlight */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-[6px]
-      border border-brand bg-brand px-3.5 py-1.5 text-[12px] font-medium
-      text-brand-pale transition-colors hover:bg-brand-hover
-      focus-visible:outline-none focus-visible:ring-2
-      focus-visible:ring-edge-focus focus-visible:ring-offset-1
-      disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full
+      bg-brand px-4 py-1.5 text-[12.5px] font-semibold text-brand-pale
+      shadow-[inset_0_0_20px_rgba(142,174,255,0.55),0_1px_2px_rgba(0,46,164,0.16)]
+      transition-colors hover:bg-brand-hover focus-visible:outline-none
+      focus-visible:ring-2 focus-visible:ring-edge-focus
+      focus-visible:ring-offset-1 disabled:pointer-events-none
+      disabled:opacity-50;
   }
 
-  /* Secondary — quiet paper surface that warms toward green on hover */
+  /* Secondary — white pill on a hairline border */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-[6px]
-      border border-edge-chip bg-surface-card px-3.5 py-1.5 text-[12px]
-      font-medium text-brand transition-colors hover:bg-surface-chip-active
+    @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full
+      border border-edge-chip bg-surface-card px-4 py-1.5 text-[12.5px]
+      font-medium text-ink shadow-[0_1px_1px_rgba(0,0,0,0.06)]
+      transition-colors hover:bg-surface-chip-active hover:text-brand
       focus-visible:outline-none focus-visible:ring-2
       focus-visible:ring-edge-focus focus-visible:ring-offset-1
       disabled:pointer-events-none disabled:opacity-50;
   }
 
-  /* The signature label treatment: mono · uppercase · wide-tracked. */
+  /* The signature label treatment: white pill, blue dot, blue label. */
   .eyebrow {
-    @apply font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft;
+    @apply inline-flex items-center gap-1.5 rounded-full border
+      border-edge-soft bg-surface-card px-2.5 py-1 text-[11px] font-medium
+      text-brand shadow-[0_1px_1px_rgba(0,0,0,0.04)];
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-[5px] w-[5px] shrink-0 rounded-full bg-brand;
   }
 
-  /* Kept for back-compat with the old gradient wordmark — now flat brand. */
+  /* Blue-gradient display text, for hero headlines only. */
   .text-gradient {
-    @apply text-brand;
+    @apply bg-gradient-to-b from-brand to-brand-light bg-clip-text
+      text-transparent;
   }
 }
 
-/* Staggered editorial entrance — children rise-fade in sequence. */
+/* Staggered entrance — children rise-fade in sequence. */
 .stagger > * {
   animation: var(--animate-rise);
 }
@@ -298,21 +298,16 @@ body {
   animation-delay: 0.3s;
 }
 
-/* Paper grain — low-opacity turbulence under hero/auth panels. */
-.bg-grain {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 320px;
-}
-.bg-grain-light {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  background-size: 320px;
+/* Graph-paper grid — dashed 120px guides behind hero/auth surfaces. */
+.bg-grid {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg stroke='%233d3d3d' stroke-opacity='0.14' stroke-dasharray='5 6'%3E%3Cpath d='M0 0.5H120'/%3E%3Cpath d='M0.5 0V120'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 120px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .stagger > *,
   .animate-float1,
   .animate-float2,
-  .animate-stamp,
   .animate-rise {
     animation: none !important;
   }

@@ -1,14 +1,14 @@
 /**
- * Editorial record primitives — flat, border-defined sections for detail and
- * form pages (no boxed cards). Mono-uppercase eyebrow with a cyan accent rule,
- * and definition rows that fall back to an em-dash.
+ * Record primitives — flat, border-defined sections for detail and form pages
+ * (no boxed cards). A section rule carries a blue dot and a Geist label; the
+ * definition rows fall back to an em-dash.
  */
 
 export function SectionRule({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-4 flex items-center gap-2 border-b border-edge-soft pb-2">
-      <span className="h-px w-4 bg-brand-accent" aria-hidden="true" />
-      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-ink-soft">
+      <span className="h-[5px] w-[5px] rounded-full bg-brand" aria-hidden="true" />
+      <span className="font-display text-[13px] font-medium tracking-[-0.01em] text-brand-deep">
         {children}
       </span>
     </div>
@@ -26,7 +26,7 @@ export function DefRow({
 }) {
   return (
     <div className={className}>
-      <dt className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-ink-soft">
+      <dt className="text-[11.5px] font-medium text-ink-soft">
         {label}
       </dt>
       <dd className="mt-1 text-[13px] text-ink">

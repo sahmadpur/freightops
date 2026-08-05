@@ -84,7 +84,7 @@ export function FilePicker({
       >
         {addLabel}
       </button>
-      <span className="ml-3 font-mono text-[10px] uppercase tracking-[0.08em] text-ink-soft">
+      <span className="ml-3 text-[11px] font-medium text-ink-soft">
         {formatSize(MAX_FILE_BYTES)} max
       </span>
       {files.length === 0 ? (
