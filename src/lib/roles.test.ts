@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canAccess, homeFor } from "./roles";
+import { canAccess, homeFor, isRole } from "./roles";
 
 describe("canAccess", () => {
   it("staff area allows admin and operator", () => {
@@ -26,5 +26,20 @@ describe("homeFor", () => {
     expect(homeFor("admin")).toBe("/orders");
     expect(homeFor("operator")).toBe("/orders");
     expect(homeFor("client")).toBe("/portal");
+  });
+});
+
+describe("isRole", () => {
+  it("accepts the three roles", () => {
+    expect(isRole("admin")).toBe(true);
+    expect(isRole("operator")).toBe(true);
+    expect(isRole("client")).toBe(true);
+  });
+  it("rejects anything else the auth response might carry", () => {
+    expect(isRole("Admin")).toBe(false);
+    expect(isRole("")).toBe(false);
+    expect(isRole(undefined)).toBe(false);
+    expect(isRole(null)).toBe(false);
+    expect(isRole(3)).toBe(false);
   });
 });
