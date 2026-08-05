@@ -6,6 +6,8 @@
  * `Intl.DisplayNames`, so country names never enter `messages/*.json` and are
  * localized for free in EN/RU/AZ.
  */
+import { AZ_REGION_NAMES } from "./country-names-az";
+
 const CODES =
   "AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ " +
   "BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ " +
@@ -44,8 +46,16 @@ export function countryFlag(code: string): string {
 /**
  * Localized country name. Falls back to the raw code where `Intl.DisplayNames`
  * has no entry (or isn't available, e.g. a stripped-down runtime).
+ *
+ * Azerbaijani comes from our own table: Chromium has no `az` region data and
+ * falls back to English, while Node's ICU returns real Azerbaijani — computing
+ * it at runtime would make server and client HTML disagree. See
+ * `country-names-az.ts`.
  */
 export function countryName(code: string, locale: string): string {
+  if (locale === "az" || locale.startsWith("az-")) {
+    return AZ_REGION_NAMES[code] ?? code;
+  }
   try {
     return new Intl.DisplayNames([locale], { type: "region" }).of(code) ?? code;
   } catch {

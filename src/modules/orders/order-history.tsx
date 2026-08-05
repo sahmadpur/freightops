@@ -1,14 +1,14 @@
 "use client";
 
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { SectionRule } from "@/components/ui/record";
 import { countryLabel } from "@/lib/countries";
+import { formatDateTime } from "@/lib/datetime";
 import { AUDIT_COUNTRY_FIELDS, AUDIT_FIELD_LABELS } from "@/lib/audit-labels";
 import type { OrderHistoryEntry } from "./queries";
 
 export function OrderHistory({ entries }: { entries: OrderHistoryEntry[] }) {
   const t = useTranslations();
-  const format = useFormatter();
   const locale = useLocale();
 
   const fieldLabel = (field: string) => {
@@ -54,7 +54,7 @@ export function OrderHistory({ entries }: { entries: OrderHistoryEntry[] }) {
                 )}
               </span>
               <span className="whitespace-nowrap font-mono text-[11px] text-ink-soft">
-                {format.dateTime(h.createdAt, { dateStyle: "medium", timeStyle: "short" })}
+                {formatDateTime(h.createdAt, locale)}
               </span>
             </li>
           ))}

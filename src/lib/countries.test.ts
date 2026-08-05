@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { countryFlag, countryLabel, isCountryCode, routeLabel } from "./countries";
+import {
+  COUNTRY_CODES,
+  countryFlag,
+  countryLabel,
+  countryName,
+  isCountryCode,
+  routeLabel,
+} from "./countries";
 
 describe("isCountryCode", () => {
   it("knows real alpha-2 codes", () => {
@@ -35,6 +42,25 @@ describe("countryLabel", () => {
   it("is null when there is no code", () => {
     expect(countryLabel(null, "en")).toBeNull();
     expect(countryLabel("", "en")).toBeNull();
+  });
+});
+
+describe("countryName in Azerbaijani", () => {
+  // Chromium's Intl has no az region data and answers in English, so these
+  // names must come from our own table — otherwise server and client HTML
+  // disagree and hydration fails.
+  it("uses the Azerbaijani table, not the English fallback", () => {
+    expect(countryName("AZ", "az")).toBe("Azərbaycan");
+    expect(countryName("TR", "az")).toBe("Türkiyə");
+    expect(countryName("GE", "az")).toBe("Gürcüstan");
+  });
+  it("covers every code the app offers", () => {
+    const missing = COUNTRY_CODES.filter((c) => countryName(c, "az") === c);
+    expect(missing).toEqual([]);
+  });
+  it("still uses Intl for the other locales", () => {
+    expect(countryName("DE", "en")).toBe("Germany");
+    expect(countryName("DE", "ru")).toContain("Герман");
   });
 });
 

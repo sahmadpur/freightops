@@ -1,15 +1,15 @@
 "use client";
 
-import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { AUDIT_COUNTRY_FIELDS, AUDIT_FIELD_LABELS } from "@/lib/audit-labels";
 import { countryLabel } from "@/lib/countries";
+import { formatDateTime } from "@/lib/datetime";
 import type { AuditRow } from "./queries";
 
 export function AuditTable({ rows }: { rows: AuditRow[] }) {
   const t = useTranslations("admin");
   const tg = useTranslations();
-  const format = useFormatter();
   const locale = useLocale();
 
   // Same labelling as the order History tab — see src/lib/audit-labels.ts.
@@ -41,7 +41,7 @@ export function AuditTable({ rows }: { rows: AuditRow[] }) {
       width: "150px",
       render: (r) => (
         <span className="whitespace-nowrap text-ink-soft">
-          {format.dateTime(r.createdAt, { dateStyle: "short", timeStyle: "short" })}
+          {formatDateTime(r.createdAt, locale, "short")}
         </span>
       ),
     },

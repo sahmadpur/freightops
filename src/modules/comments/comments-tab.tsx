@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { formatDateTime } from "@/lib/datetime";
 import type { CommentRow } from "./queries";
 import type { ActionResult } from "@/lib/forms";
 
@@ -18,6 +19,7 @@ export function CommentsTab({
   sendAction: (orderId: string, input: { body: string }) => Promise<ActionResult>;
 }) {
   const t = useTranslations("comments");
+  const locale = useLocale();
   const router = useRouter();
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
@@ -70,7 +72,7 @@ export function CommentsTab({
                   {/* Timestamp renders in the viewer's locale/timezone, so the SSR (UTC) and
                       client strings differ by design — suppress the expected hydration mismatch. */}
                   <time suppressHydrationWarning dateTime={new Date(c.createdAt).toISOString()}>
-                    {new Date(c.createdAt).toLocaleString()}
+                    {formatDateTime(c.createdAt, locale)}
                   </time>
                 </span>
               </li>
