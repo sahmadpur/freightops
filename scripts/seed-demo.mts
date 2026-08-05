@@ -306,7 +306,8 @@ async function main() {
     userId: by,
     entityType: "order",
     entityId: o.id,
-    action: i % 2 === 0 ? "create" : "status_change",
+    // Must match what recordAudit() writes, so the History tab can label them.
+    action: i % 2 === 0 ? "created" : "status_changed",
     field: i % 2 === 0 ? null : "status",
     oldValue: i % 2 === 0 ? null : "created",
     newValue: i % 2 === 0 ? null : o.status,
