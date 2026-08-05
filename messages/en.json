@@ -5,21 +5,22 @@
     "signOut": "Sign out",
     "save": "Save",
     "cancel": "Cancel",
-    "search": "Search"
+    "search": "Search",
+    "noResults": "No matches"
   },
   "nav": {
     "orders": "Orders",
     "dashboard": "Dashboard",
     "accounts": "Accounts",
     "carriers": "Carriers",
-    "transportation": "Transportation",
     "finance": "Finance",
     "documents": "Documents",
     "users": "Users & Roles",
     "audit": "Audit Log",
     "myOrders": "My orders",
     "sectionLibrary": "Library",
-    "sectionManage": "Manage"
+    "sectionManage": "Manage",
+    "customs": "Customs"
   },
   "status": {
     "created": "Created",
@@ -31,7 +32,8 @@
     "at_customs": "At customs",
     "arrived": "Arrived",
     "delivered": "Delivered",
-    "closed": "Closed"
+    "closed": "Closed",
+    "waiting_pickup": "Waiting for cargo pickup"
   },
   "actions": {
     "new": "New",
@@ -67,8 +69,7 @@
     "noOrdersYet": "No orders yet",
     "actionsCol": "Actions",
     "orderId": "Order ID",
-    "orderTitle": "Order title",
-    "clientOrderId": "Client order ID",
+    "orderTitle": "Order subject",
     "client": "Client",
     "carrier": "Carrier",
     "route": "Route",
@@ -79,31 +80,16 @@
     "incoterms": "Delivery terms (Incoterms 2020)",
     "deliveryFormat": "Cargo delivery format",
     "status": "Status",
-    "clientCharge": "Charge",
-    "carrierCost": "Carrier cost",
-    "additionalCosts": "Additional costs",
-    "expectedProfit": "Expected profit",
+    "clientCharge": "Transportation cost",
+    "carrierCost": "Agent expenses",
     "actualProfit": "Actual profit",
     "invoiceNumber": "Invoice number",
     "invoiceDate": "Invoice date",
-    "transport": "Transport",
-    "transportMode": "Transportation mode",
-    "modeType": "Mode type",
-    "transportNumber": "Transport mode number",
     "fromCountry": "From",
     "toCountry": "To",
-    "loadingDate": "Loading date",
-    "plannedArrivalDate": "Planned arrival date",
-    "totalWeightKg": "Total capacity weight (kg)",
-    "totalVolumeM3": "Total capacity volume (m³)",
-    "addTransport": "Add transport",
-    "noTransport": "No transport",
-    "attachExisting": "Attach to existing transport",
-    "createNew": "Create new transport",
     "lastModified": "Last modified",
     "selectAccount": "Select account…",
     "selectCarrier": "Select carrier…",
-    "selectTransport": "Select transport…",
     "actNumber": "ACT number",
     "actDate": "ACT date",
     "paidByCustomer": "Paid by customer",
@@ -111,7 +97,28 @@
     "documents": "Docs",
     "carrierInvoiceNumber": "Carrier invoice №",
     "carrierInvoiceDate": "Carrier invoice date",
-    "exchangeRate": "Exchange rate (AZN/USD)"
+    "exchangeRate": "Exchange rate (AZN)",
+    "transportType": "Transport type",
+    "rollbackNumber": "Rollback number",
+    "currency": "Currency",
+    "selectTransportType": "Select transport type",
+    "selectCountry": "Select country",
+    "selectCargo": "Select or type cargo",
+    "loadingRate": "Fetching rate…",
+    "rateSource": "Auto-filled from CBAR — editable",
+    "agentExpenses": "Agent expenses",
+    "addExpense": "Add expense",
+    "noExpenses": "No expenses added.",
+    "expenseCategory": "Category",
+    "amount": "Amount",
+    "note": "Note",
+    "total": "Total",
+    "amountReceivable": "Amount receivable",
+    "amountPayable": "Amount payable",
+    "received": "Received",
+    "paid": "Paid",
+    "revenue": "Revenue",
+    "cost": "Cost"
   },
   "accounts": {
     "newAccount": "New account",
@@ -142,21 +149,9 @@
     "noHistory": "No history yet",
     "sectionConsignment": "Consignment",
     "sectionCargo": "Cargo",
-    "sectionBilling": "Billing"
-  },
-  "transport": {
-    "title": "Transportation",
-    "newTransport": "New transport",
-    "editTransport": "Edit transport",
-    "notFound": "Transport not found",
-    "empty": "No transport modes yet — create the first one.",
-    "ourOrdersTotal": "Our orders",
-    "weight": "Weight (ours)",
-    "volume": "Volume (ours)",
-    "revenue": "Revenue (our cargo)",
-    "carrierCostShare": "Carrier cost (our share)",
-    "profit": "Profit (our cargo)",
-    "ordersOnThisTransport": "Orders on this transport"
+    "sectionBilling": "Billing",
+    "invoiceRequired": "This order has arrived and has no invoice yet.",
+    "systemActor": "System"
   },
   "finance": {
     "title": "Finance",
@@ -203,7 +198,13 @@
     "filterByStatus": "Filter by status",
     "clearFilter": "Clear",
     "orderDetails": "Order details",
-    "noRows": "No matching rows"
+    "noRows": "No matching rows",
+    "agentExpenses": "Agent expenses",
+    "expenseCategory": "Category",
+    "ledger": "Received / paid log",
+    "recordedBy": "by {name}",
+    "carrierInvoiceNumber": "Carrier invoice no.",
+    "carrierInvoiceDate": "Carrier invoice date"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -224,7 +225,15 @@
     "monthlyResults": "Financial results per month — {year}",
     "month": "Month",
     "noData": "No data for this period",
-    "balancesOverview": "Outstanding balances"
+    "balancesOverview": "Outstanding balances",
+    "period": "Period",
+    "periodResults": "Results for {month}",
+    "ordersCount": "{count} orders",
+    "unratedNote": "{count} orders have no FX rate and are counted at face value.",
+    "topRoutes": "Top routes",
+    "topClients": "Top clients",
+    "clearances": "Clearances",
+    "awaitingPickup": "Awaiting pickup"
   },
   "payStatus": {
     "paid": "Paid",
@@ -250,7 +259,10 @@
     "tooLarge": "File is too large (max 20 MB)",
     "badType": "That file type is not allowed",
     "emptyFile": "The file is empty",
-    "uploadFailed": "Upload failed"
+    "uploadFailed": "Upload failed",
+    "addFiles": "Choose files",
+    "noFilesSelected": "No files selected.",
+    "uploadFailedAfterCreate": "The order was created, but these files failed to upload: {files}"
   },
   "docType": {
     "cmr": "CMR",
@@ -283,7 +295,8 @@
     "generating": "Generating…",
     "failed": "Generation failed",
     "notFound": "Order not found",
-    "hint": "The PDF is saved to this order's documents. The previewed number is reserved only when you generate."
+    "hint": "The PDF is saved to this order's documents. The previewed number is reserved only when you generate.",
+    "createInvoice": "Create invoice"
   },
   "comments": {
     "tab": "Comments",
@@ -334,12 +347,103 @@
     "filter": "Filter",
     "noAuditEntries": "No audit entries"
   },
-  "transportModes": {
+  "transportTypes": {
     "truck": "Truck",
     "container": "Container",
     "air": "Air",
     "postal": "Postal",
     "rail": "Rail",
     "sea": "Sea"
+  },
+  "filters": {
+    "toggle": "Filters",
+    "any": "Any",
+    "apply": "Apply",
+    "clear": "Clear",
+    "createdBetween": "Created between"
+  },
+  "customs": {
+    "title": "Customs clearance",
+    "newClearance": "New clearance",
+    "editClearance": "Edit clearance",
+    "empty": "No clearances yet — create the first one.",
+    "searchPlaceholder": "Search clearances, declarations, orders...",
+    "number": "Clearance no.",
+    "order": "Order",
+    "selectOrder": "Select order",
+    "standalone": "No order",
+    "forOrder": "For an order",
+    "sectionSubject": "Subject",
+    "declarationNumber": "Declaration no.",
+    "description": "Description",
+    "clearedAt": "Cleared on",
+    "costs": "Costs",
+    "addItem": "Add cost",
+    "noItems": "No costs added.",
+    "category": "Category",
+    "buy": "Buy",
+    "sell": "Sell",
+    "totalBuy": "Total buy",
+    "totalSell": "Total sell",
+    "margin": "Margin",
+    "totals": "Totals",
+    "untitled": "Customs clearance"
+  },
+  "customsCategory": {
+    "documentation_fee": "Documentation fee",
+    "declaration_main_page": "Declaration — main page",
+    "declaration_additional_page": "Declaration — additional page",
+    "short_declaration": "Short declaration",
+    "broker_fee": "Broker fee",
+    "inspector_fee": "Inspector fee",
+    "handling": "Handling",
+    "terminal": "Terminal",
+    "delivery": "Delivery"
+  },
+  "financeCategory": {
+    "customs": "Customs",
+    "broker": "Broker",
+    "terminal": "Terminal",
+    "warehouse": "Warehouse",
+    "loading": "Loading",
+    "transport": "Transport",
+    "insurance": "Insurance",
+    "certification": "Certification",
+    "demurrage": "Demurrage",
+    "bank_fee": "Bank fee",
+    "other": "Other"
+  },
+  "cargoTypes": {
+    "generalCargo": "General cargo",
+    "machinery": "Machinery & equipment",
+    "spareParts": "Spare parts",
+    "constructionMaterials": "Construction materials",
+    "chemicals": "Chemicals",
+    "foodstuffs": "Foodstuffs",
+    "textiles": "Textiles & apparel",
+    "electronics": "Electronics",
+    "furniture": "Furniture",
+    "pharmaceuticals": "Pharmaceuticals",
+    "automotive": "Automotive",
+    "packagingMaterials": "Packaging materials",
+    "frozenGoods": "Frozen / chilled goods",
+    "dangerousGoods": "Dangerous goods (ADR)",
+    "personalEffects": "Personal effects"
+  },
+  "auditAction": {
+    "created": "created the order",
+    "updated": "updated",
+    "status_changed": "changed the status",
+    "archived": "archived it",
+    "restored": "restored it",
+    "payment_added": "recorded a payment",
+    "payment_removed": "removed a payment",
+    "financials_updated": "updated the amounts",
+    "finance_line_added": "added a line",
+    "finance_line_removed": "removed a line",
+    "document_uploaded": "uploaded a document",
+    "document_removed": "removed a document",
+    "document_visibility_changed": "changed document visibility",
+    "document_generated": "generated a document"
   }
 }

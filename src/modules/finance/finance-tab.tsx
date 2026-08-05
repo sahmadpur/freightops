@@ -7,6 +7,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Field, inputCls } from "@/components/ui/form";
 import { MoneyDual } from "@/components/ui/money";
 import { formatMoney, toCents } from "@/lib/money";
+import { FINANCE_CATEGORIES } from "@/lib/finance-categories";
 import type { FinanceLine, OrderFinance, OrderPayment } from "./queries";
 import {
   addFinanceLine,
@@ -18,18 +19,33 @@ import {
 
 type Side = "incoming" | "outgoing";
 
-export function FinanceTab({ orderId, finance }: { orderId: string; finance: OrderFinance }) {
+export function FinanceTab({
+  orderId,
+  currency,
+  finance,
+}: {
+  orderId: string;
+  currency: string;
+  finance: OrderFinance;
+}) {
   const t = useTranslations("finance");
   const router = useRouter();
   const rate = finance.exchangeRate;
 
   const [amountReceivable, setAmountReceivable] = useState(finance.amountReceivable ?? "");
   const [amountPayable, setAmountPayable] = useState(finance.amountPayable ?? "");
+  const [carrierInvoiceNumber, setCarrierInvoiceNumber] = useState(finance.carrierInvoiceNumber ?? "");
+  const [carrierInvoiceDate, setCarrierInvoiceDate] = useState(finance.carrierInvoiceDate ?? "");
   const [savingAmounts, setSavingAmounts] = useState(false);
 
   async function saveAmounts() {
     setSavingAmounts(true);
-    const r = await updateOrderFinancials(orderId, { amountReceivable, amountPayable });
+    const r = await updateOrderFinancials(orderId, {
+      amountReceivable,
+      amountPayable,
+      carrierInvoiceNumber,
+      carrierInvoiceDate,
+    });
     setSavingAmounts(false);
     if (r.ok) router.refresh();
   }
@@ -40,19 +56,19 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
         <CardHeader><span className="text-sm font-semibold">{t("expectedProfit")}</span></CardHeader>
         <CardBody>
           <div className="grid grid-cols-3 gap-3 text-sm">
-            <Stat label={t("revenue")} value={<MoneyDual usdCents={finance.clientChargeCents} rate={rate} />} />
-            <Stat label={t("carrierCost")} value={<MoneyDual usdCents={finance.carrierCostCents} rate={rate} />} />
+            <Stat label={t("revenue")} value={<MoneyDual cents={finance.clientChargeCents} currency={currency} rate={rate} />} />
+            <Stat label={t("carrierCost")} value={<MoneyDual cents={finance.carrierCostCents} currency={currency} rate={rate} />} />
             <Stat
               label={t("expectedProfit")}
-              value={<MoneyDual usdCents={finance.expectedProfitCents} rate={rate} />}
+              value={<MoneyDual cents={finance.expectedProfitCents} currency={currency} rate={rate} />}
               positive={finance.expectedProfitCents >= 0}
             />
           </div>
         </CardBody>
       </Card>
 
-      <FinanceLines orderId={orderId} side="revenue" title={t("revenueLines")} lines={finance.revenueLines} totalCents={finance.clientChargeCents} rate={rate} />
-      <FinanceLines orderId={orderId} side="cost" title={t("costLines")} lines={finance.costLines} totalCents={finance.carrierCostCents} rate={rate} />
+      <FinanceLines orderId={orderId} side="revenue" title={t("revenueLines")} lines={finance.revenueLines} totalCents={finance.clientChargeCents} rate={rate} currency={currency} />
+      <FinanceLines orderId={orderId} side="cost" title={t("agentExpenses")} lines={finance.costLines} totalCents={finance.carrierCostCents} rate={rate} currency={currency} />
 
       <Card>
         <CardHeader><span className="text-sm font-semibold">{t("actualProfit")}</span></CardHeader>
@@ -64,6 +80,12 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
             <Field label={t("amountPayable")} htmlFor="ap">
               <input id="ap" className={inputCls} value={amountPayable} onChange={(e) => setAmountPayable(e.target.value)} />
             </Field>
+            <Field label={t("carrierInvoiceNumber")} htmlFor="cin">
+              <input id="cin" className={inputCls} value={carrierInvoiceNumber} onChange={(e) => setCarrierInvoiceNumber(e.target.value)} />
+            </Field>
+            <Field label={t("carrierInvoiceDate")} htmlFor="cid">
+              <input id="cid" type="date" className={inputCls} value={carrierInvoiceDate} onChange={(e) => setCarrierInvoiceDate(e.target.value)} />
+            </Field>
           </div>
           <div className="mt-3 flex items-end justify-between gap-4">
             <button type="button" onClick={saveAmounts} disabled={savingAmounts} className="btn-primary">
@@ -71,7 +93,7 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
             </button>
             <Stat
               label={t("actualProfit")}
-              value={<MoneyDual usdCents={finance.settledProfitCents} rate={rate} />}
+              value={<MoneyDual cents={finance.settledProfitCents} currency={currency} rate={rate} />}
               positive={finance.settledProfitCents >= 0}
             />
           </div>
@@ -87,6 +109,7 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
         deltaCents={finance.receivable.deltaCents}
         status={finance.receivable.status}
         payments={finance.incoming}
+        currency={currency}
       />
       <PaymentSection
         orderId={orderId}
@@ -97,8 +120,90 @@ export function FinanceTab({ orderId, finance }: { orderId: string; finance: Ord
         deltaCents={finance.payable.deltaCents}
         status={finance.payable.status}
         payments={finance.outgoing}
+        currency={currency}
       />
+
+      <CashLedger incoming={finance.incoming} outgoing={finance.outgoing} currency={currency} />
     </div>
+  );
+}
+
+/**
+ * Merge both payment directions into one date-ordered list, signing each amount
+ * and carrying the running net position. Pure, so the component stays free of
+ * mid-render mutation.
+ */
+function withRunningBalance(incoming: OrderPayment[], outgoing: OrderPayment[]) {
+  const entries = [...incoming, ...outgoing].sort(
+    (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime(),
+  );
+  return entries.reduce<(OrderPayment & { signed: number; running: number })[]>((acc, p) => {
+    const signed = p.direction === "incoming" ? toCents(p.amount) : -toCents(p.amount);
+    const running = (acc.length > 0 ? acc[acc.length - 1].running : 0) + signed;
+    acc.push({ ...p, signed, running });
+    return acc;
+  }, []);
+}
+
+/**
+ * One chronological log of money in and money out (requirement #14), with who
+ * recorded each entry and the running net position after it.
+ */
+function CashLedger({
+  incoming,
+  outgoing,
+  currency,
+}: {
+  incoming: OrderPayment[];
+  outgoing: OrderPayment[];
+  currency: string;
+}) {
+  const t = useTranslations("finance");
+  const rows = withRunningBalance(incoming, outgoing);
+  const net = rows.length > 0 ? rows[rows.length - 1].running : 0;
+
+  return (
+    <Card>
+      <CardHeader>
+        <span className="text-sm font-semibold">{t("ledger")}</span>
+        <span className="text-sm font-semibold tabular-nums">{formatMoney(net, currency)}</span>
+      </CardHeader>
+      <CardBody>
+        {rows.length === 0 ? (
+          <p className="text-sm text-ink-soft">{t("noPayments")}</p>
+        ) : (
+          <ul className="divide-y divide-edge-soft text-sm">
+            {rows.map((r) => (
+              <li key={r.id} className="flex items-baseline justify-between gap-3 py-2">
+                <span className="min-w-0">
+                  <span
+                    className={`mr-2 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.06em] ${
+                      r.direction === "incoming"
+                        ? "bg-[rgb(var(--approval-approved-bg))] text-[rgb(var(--approval-approved-fg))]"
+                        : "bg-[rgb(var(--approval-rejected-bg))] text-[rgb(var(--approval-rejected-fg))]"
+                    }`}
+                  >
+                    {r.direction === "incoming" ? t("received") : t("paid")}
+                  </span>
+                  <span className="font-mono text-[11px] text-ink-soft">
+                    {new Date(r.paidAt).toISOString().slice(0, 10)}
+                    {r.recordedBy ? ` · ${t("recordedBy", { name: r.recordedBy })}` : ""}
+                    {r.note ? ` · ${r.note}` : ""}
+                  </span>
+                </span>
+                <span className="whitespace-nowrap tabular-nums">
+                  <span className={r.signed >= 0 ? "text-emerald-600" : "text-rose-600"}>
+                    {r.signed >= 0 ? "+" : "−"}
+                    {formatMoney(Math.abs(r.signed), currency)}
+                  </span>
+                  <span className="ml-3 text-ink-soft">{formatMoney(r.running, currency)}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardBody>
+    </Card>
   );
 }
 
@@ -119,6 +224,7 @@ function FinanceLines({
   lines,
   totalCents,
   rate,
+  currency,
 }: {
   orderId: string;
   side: "revenue" | "cost";
@@ -126,22 +232,25 @@ function FinanceLines({
   lines: FinanceLine[];
   totalCents: number;
   rate: string | null;
+  currency: string;
 }) {
   const t = useTranslations("finance");
+  const tc = useTranslations("financeCategory");
   const router = useRouter();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
+  const [category, setCategory] = useState("other");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function add() {
     setPending(true);
     setError(null);
-    const r = await addFinanceLine(orderId, { side, description, amount, note });
+    const r = await addFinanceLine(orderId, { side, category, description, amount, note });
     setPending(false);
     if (r.ok) {
-      setDescription(""); setAmount(""); setNote("");
+      setDescription(""); setAmount(""); setNote(""); setCategory("other");
       router.refresh();
     } else {
       setError(r.fieldErrors?.description?.[0] ?? r.fieldErrors?.amount?.[0] ?? r.error ?? "Error");
@@ -157,7 +266,7 @@ function FinanceLines({
     <Card>
       <CardHeader>
         <span className="text-sm font-semibold">{title}</span>
-        <span className="text-sm font-semibold tabular-nums"><MoneyDual usdCents={totalCents} rate={rate} /></span>
+        <span className="text-sm font-semibold tabular-nums"><MoneyDual cents={totalCents} currency={currency} rate={rate} /></span>
       </CardHeader>
       <CardBody>
         {lines.length === 0 ? (
@@ -167,10 +276,17 @@ function FinanceLines({
             {lines.map((l) => (
               <li key={l.id} className="flex items-center justify-between gap-3 py-2">
                 <span className="flex-1 truncate">
-                  {l.description}
+                  {side === "cost" && (
+                    <span className="mr-2 rounded-full bg-surface-chip-active px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.06em] text-ink-soft">
+                      {tc(l.category)}
+                    </span>
+                  )}
+                  {/* A note-less create-form expense stores its category as the
+                      description; the chip already says that, so don't repeat it. */}
+                  {l.description === l.category ? null : l.description}
                   {l.note ? <span className="ml-2 text-xs text-ink-soft">· {l.note}</span> : null}
                 </span>
-                <span className="tabular-nums"><MoneyDual usdCents={toCents(l.amount)} rate={rate} /></span>
+                <span className="tabular-nums"><MoneyDual cents={toCents(l.amount)} currency={currency} rate={rate} /></span>
                 <button type="button" onClick={() => remove(l.id)} className="text-xs text-[rgb(var(--danger-fg))] hover:underline">
                   {t("remove")}
                 </button>
@@ -179,6 +295,20 @@ function FinanceLines({
           </ul>
         )}
         <div className="flex flex-wrap items-end gap-2">
+          {side === "cost" && (
+            <Field label={t("expenseCategory")} htmlFor={`cat-${side}`}>
+              <select
+                id={`cat-${side}`}
+                className={`${inputCls} w-44`}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                {FINANCE_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{tc(c)}</option>
+                ))}
+              </select>
+            </Field>
+          )}
           <Field label={t("lineDescription")} htmlFor={`desc-${side}`}>
             <input id={`desc-${side}`} className={`${inputCls} w-56`} value={description} onChange={(e) => setDescription(e.target.value)} />
           </Field>
@@ -207,6 +337,7 @@ function PaymentSection({
   deltaCents,
   status,
   payments,
+  currency,
 }: {
   orderId: string;
   side: Side;
@@ -216,6 +347,7 @@ function PaymentSection({
   deltaCents: number;
   status: "paid" | "partly_paid" | "not_paid" | null;
   payments: OrderPayment[];
+  currency: string;
 }) {
   const t = useTranslations("finance");
   const tp = useTranslations("payStatus");
@@ -261,9 +393,9 @@ function PaymentSection({
       </CardHeader>
       <CardBody>
         <div className="mb-3 grid grid-cols-3 gap-3 text-sm">
-          <Stat label={side === "incoming" ? t("amountReceivable") : t("amountPayable")} value={formatMoney(invoicedCents)} />
-          <Stat label={side === "incoming" ? t("received") : t("paid")} value={formatMoney(paidCents)} />
-          <Stat label={t("delta")} value={formatMoney(deltaCents)} positive={deltaCents <= 0} />
+          <Stat label={side === "incoming" ? t("amountReceivable") : t("amountPayable")} value={formatMoney(invoicedCents, currency)} />
+          <Stat label={side === "incoming" ? t("received") : t("paid")} value={formatMoney(paidCents, currency)} />
+          <Stat label={t("delta")} value={formatMoney(deltaCents, currency)} positive={deltaCents <= 0} />
         </div>
 
         {payments.length === 0 ? (
@@ -272,7 +404,7 @@ function PaymentSection({
           <ul className="mb-3 divide-y divide-edge-soft text-sm">
             {payments.map((p) => (
               <li key={p.id} className="flex items-center justify-between py-2">
-                <span className="font-medium tabular-nums">{formatMoney(toCents(p.amount))}</span>
+                <span className="font-medium tabular-nums">{formatMoney(toCents(p.amount), currency)}</span>
                 <span className="font-mono text-[11px] text-ink-soft">
                   {new Date(p.paidAt).toISOString().slice(0, 10)}{p.note ? ` · ${p.note}` : ""}
                 </span>

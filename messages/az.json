@@ -5,21 +5,22 @@
     "signOut": "Çıxış",
     "save": "Yadda saxla",
     "cancel": "Ləğv et",
-    "search": "Axtarış"
+    "search": "Axtarış",
+    "noResults": "Nəticə yoxdur"
   },
   "nav": {
     "orders": "Sifarişlər",
     "dashboard": "İdarə paneli",
     "accounts": "Müştərilər",
     "carriers": "Daşıyıcılar",
-    "transportation": "Nəqliyyat",
     "finance": "Maliyyə",
     "documents": "Sənədlər",
     "users": "İstifadəçilər və rollar",
     "audit": "Audit jurnalı",
     "myOrders": "Sifarişlərim",
     "sectionLibrary": "Kitabxana",
-    "sectionManage": "İdarəetmə"
+    "sectionManage": "İdarəetmə",
+    "customs": "Gömrük"
   },
   "status": {
     "created": "Yaradılıb",
@@ -31,7 +32,8 @@
     "at_customs": "Gömrükdə",
     "arrived": "Çatıb",
     "delivered": "Təhvil verilib",
-    "closed": "Bağlanıb"
+    "closed": "Bağlanıb",
+    "waiting_pickup": "Yükün götürülməsi gözlənilir"
   },
   "actions": {
     "new": "Yarat",
@@ -67,8 +69,7 @@
     "noOrdersYet": "Hələ sifariş yoxdur",
     "actionsCol": "Əməliyyatlar",
     "orderId": "Sifariş nömrəsi",
-    "orderTitle": "Sifarişin adı",
-    "clientOrderId": "Müştəri sifariş nömrəsi",
+    "orderTitle": "Sifariş mövzusu",
     "client": "Müştəri",
     "carrier": "Daşıyıcı",
     "route": "Marşrut",
@@ -79,31 +80,16 @@
     "incoterms": "Çatdırılma şərtləri (Incoterms 2020)",
     "deliveryFormat": "Yük çatdırılma formatı",
     "status": "Status",
-    "clientCharge": "Məbləğ",
-    "carrierCost": "Daşıyıcı xərci",
-    "additionalCosts": "Əlavə xərclər",
-    "expectedProfit": "Gözlənilən mənfəət",
+    "clientCharge": "Daşınma dəyəri",
+    "carrierCost": "Agent xərcləri",
     "actualProfit": "Faktiki mənfəət",
     "invoiceNumber": "Qaimə nömrəsi",
     "invoiceDate": "Qaimə tarixi",
-    "transport": "Nəqliyyat",
-    "transportMode": "Nəqliyyat növü",
-    "modeType": "Nəqliyyat tipi",
-    "transportNumber": "Nəqliyyat nömrəsi",
     "fromCountry": "Haradan",
     "toCountry": "Haraya",
-    "loadingDate": "Yükləmə tarixi",
-    "plannedArrivalDate": "Planlaşdırılan çatma tarixi",
-    "totalWeightKg": "Ümumi tutum çəki (kq)",
-    "totalVolumeM3": "Ümumi tutum həcm (m³)",
-    "addTransport": "Nəqliyyat əlavə et",
-    "noTransport": "Nəqliyyatsız",
-    "attachExisting": "Mövcud nəqliyyata bağla",
-    "createNew": "Yeni nəqliyyat yarat",
     "lastModified": "Dəyişdirilib",
     "selectAccount": "Müştəri seçin…",
     "selectCarrier": "Daşıyıcı seçin…",
-    "selectTransport": "Nəqliyyat seçin…",
     "actNumber": "Akt nömrəsi",
     "actDate": "Akt tarixi",
     "paidByCustomer": "Müştəri ödənişi",
@@ -111,7 +97,28 @@
     "documents": "Sənəd",
     "carrierInvoiceNumber": "Daşıyıcı hesab №",
     "carrierInvoiceDate": "Daşıyıcı hesab tarixi",
-    "exchangeRate": "Məzənnə (AZN/USD)"
+    "exchangeRate": "Məzənnə (AZN)",
+    "transportType": "Nəqliyyat növü",
+    "rollbackNumber": "Rollback nömrəsi",
+    "currency": "Valyuta",
+    "selectTransportType": "Nəqliyyat növünü seçin",
+    "selectCountry": "Ölkəni seçin",
+    "selectCargo": "Yükü seçin və ya yazın",
+    "loadingRate": "Məzənnə yüklənir…",
+    "rateSource": "CBAR-dan avtomatik — dəyişdirilə bilər",
+    "agentExpenses": "Agent xərcləri",
+    "addExpense": "Xərc əlavə et",
+    "noExpenses": "Xərc əlavə edilməyib.",
+    "expenseCategory": "Kateqoriya",
+    "amount": "Məbləğ",
+    "note": "Qeyd",
+    "total": "Cəmi",
+    "amountReceivable": "Alınacaq məbləğ",
+    "amountPayable": "Ödəniləcək məbləğ",
+    "received": "Alınıb",
+    "paid": "Ödənilib",
+    "revenue": "Gəlir",
+    "cost": "Xərc"
   },
   "accounts": {
     "newAccount": "Yeni müştəri",
@@ -142,21 +149,9 @@
     "noHistory": "Hələ tarixçə yoxdur",
     "sectionConsignment": "Göndəriş",
     "sectionCargo": "Yük",
-    "sectionBilling": "Faktura"
-  },
-  "transport": {
-    "title": "Nəqliyyat",
-    "newTransport": "Yeni nəqliyyat",
-    "editTransport": "Nəqliyyatı redaktə et",
-    "notFound": "Nəqliyyat tapılmadı",
-    "empty": "Hələ nəqliyyat yoxdur — birincisini yaradın.",
-    "ourOrdersTotal": "Bizim sifarişlər",
-    "weight": "Çəki (bizim)",
-    "volume": "Həcm (bizim)",
-    "revenue": "Gəlir (bizim yük)",
-    "carrierCostShare": "Daşıyıcı xərci (bizim pay)",
-    "profit": "Mənfəət (bizim yük)",
-    "ordersOnThisTransport": "Bu nəqliyyatdakı sifarişlər"
+    "sectionBilling": "Faktura",
+    "invoiceRequired": "Sifariş çatıb, lakin hesab-faktura yaradılmayıb.",
+    "systemActor": "Sistem"
   },
   "finance": {
     "title": "Maliyyə",
@@ -203,7 +198,13 @@
     "filterByStatus": "Statusa görə filtr",
     "clearFilter": "Təmizlə",
     "orderDetails": "Sifariş təfərrüatları",
-    "noRows": "Uyğun sətir yoxdur"
+    "noRows": "Uyğun sətir yoxdur",
+    "agentExpenses": "Agent xərcləri",
+    "expenseCategory": "Kateqoriya",
+    "ledger": "Alınan / ödənilən jurnalı",
+    "recordedBy": "{name} tərəfindən",
+    "carrierInvoiceNumber": "Daşıyıcının hesab №-si",
+    "carrierInvoiceDate": "Daşıyıcının hesab tarixi"
   },
   "dashboard": {
     "title": "İdarə paneli",
@@ -224,7 +225,15 @@
     "monthlyResults": "Aylıq maliyyə nəticələri — {year}",
     "month": "Ay",
     "noData": "Bu dövr üçün məlumat yoxdur",
-    "balancesOverview": "Qalıq balanslar"
+    "balancesOverview": "Qalıq balanslar",
+    "period": "Dövr",
+    "periodResults": "{month} nəticələri",
+    "ordersCount": "{count} sifariş",
+    "unratedNote": "{count} sifarişin məzənnəsi yoxdur — nominal dəyərlə sayılıb.",
+    "topRoutes": "Əsas marşrutlar",
+    "topClients": "Əsas müştərilər",
+    "clearances": "Rəsmiləşdirmə",
+    "awaitingPickup": "Götürülməsi gözlənilir"
   },
   "payStatus": {
     "paid": "Ödənilib",
@@ -250,7 +259,10 @@
     "tooLarge": "Fayl çox böyükdür (maks. 20 MB)",
     "badType": "Bu fayl növünə icazə verilmir",
     "emptyFile": "Fayl boşdur",
-    "uploadFailed": "Yükləmə alınmadı"
+    "uploadFailed": "Yükləmə alınmadı",
+    "addFiles": "Fayl seçin",
+    "noFilesSelected": "Fayl seçilməyib.",
+    "uploadFailedAfterCreate": "Sifariş yaradıldı, lakin bu fayllar yüklənmədi: {files}"
   },
   "docType": {
     "cmr": "CMR",
@@ -283,7 +295,8 @@
     "generating": "Yaradılır…",
     "failed": "Sənədi yaratmaq mümkün olmadı",
     "notFound": "Sifariş tapılmadı",
-    "hint": "PDF sifarişin sənədlərinə yazılır. Göstərilən nömrə yalnız yaratma zamanı rezerv olunur."
+    "hint": "PDF sifarişin sənədlərinə yazılır. Göstərilən nömrə yalnız yaratma zamanı rezerv olunur.",
+    "createInvoice": "Hesab-faktura yarat"
   },
   "comments": {
     "tab": "Şərhlər",
@@ -334,12 +347,103 @@
     "filter": "Filtr",
     "noAuditEntries": "Audit qeydi yoxdur"
   },
-  "transportModes": {
+  "transportTypes": {
     "truck": "Yük maşını",
     "container": "Konteyner",
     "air": "Hava",
     "postal": "Poçt",
     "rail": "Dəmir yolu",
     "sea": "Dəniz"
+  },
+  "filters": {
+    "toggle": "Filtrlər",
+    "any": "İstənilən",
+    "apply": "Tətbiq et",
+    "clear": "Təmizlə",
+    "createdBetween": "Yaradılma tarixi"
+  },
+  "customs": {
+    "title": "Gömrük rəsmiləşdirilməsi",
+    "newClearance": "Yeni rəsmiləşdirmə",
+    "editClearance": "Rəsmiləşdirməni redaktə et",
+    "empty": "Hələ rəsmiləşdirmə yoxdur — birincisini yaradın.",
+    "searchPlaceholder": "Rəsmiləşdirmə, bəyannamə, sifariş axtar...",
+    "number": "Rəsmiləşdirmə №",
+    "order": "Sifariş",
+    "selectOrder": "Sifarişi seçin",
+    "standalone": "Sifarişsiz",
+    "forOrder": "Sifariş üzrə",
+    "sectionSubject": "Obyekt",
+    "declarationNumber": "Bəyannamə №",
+    "description": "Təsvir",
+    "clearedAt": "Rəsmiləşdirmə tarixi",
+    "costs": "Xərclər",
+    "addItem": "Xərc əlavə et",
+    "noItems": "Xərc əlavə edilməyib.",
+    "category": "Kateqoriya",
+    "buy": "Alış",
+    "sell": "Satış",
+    "totalBuy": "Cəmi alış",
+    "totalSell": "Cəmi satış",
+    "margin": "Marja",
+    "totals": "Yekun",
+    "untitled": "Gömrük rəsmiləşdirilməsi"
+  },
+  "customsCategory": {
+    "documentation_fee": "Sənədləşmə haqqı",
+    "declaration_main_page": "Bəyannamə — əsas vərəq",
+    "declaration_additional_page": "Bəyannamə — əlavə vərəq",
+    "short_declaration": "Qısa bəyannamə",
+    "broker_fee": "Broker haqqı",
+    "inspector_fee": "İnspektor haqqı",
+    "handling": "Yükləmə-boşaltma",
+    "terminal": "Terminal",
+    "delivery": "Çatdırılma"
+  },
+  "financeCategory": {
+    "customs": "Gömrük",
+    "broker": "Broker",
+    "terminal": "Terminal",
+    "warehouse": "Anbar",
+    "loading": "Yükləmə",
+    "transport": "Daşınma",
+    "insurance": "Sığorta",
+    "certification": "Sertifikatlaşdırma",
+    "demurrage": "Demeraj",
+    "bank_fee": "Bank komissiyası",
+    "other": "Digər"
+  },
+  "cargoTypes": {
+    "generalCargo": "Ümumi yük",
+    "machinery": "Maşın və avadanlıq",
+    "spareParts": "Ehtiyat hissələri",
+    "constructionMaterials": "Tikinti materialları",
+    "chemicals": "Kimyəvi mallar",
+    "foodstuffs": "Ərzaq məhsulları",
+    "textiles": "Tekstil və geyim",
+    "electronics": "Elektronika",
+    "furniture": "Mebel",
+    "pharmaceuticals": "Farmasevtika",
+    "automotive": "Avtomobil malları",
+    "packagingMaterials": "Qablaşdırma materialları",
+    "frozenGoods": "Dondurulmuş / soyudulmuş mallar",
+    "dangerousGoods": "Təhlükəli yüklər (ADR)",
+    "personalEffects": "Şəxsi əşyalar"
+  },
+  "auditAction": {
+    "created": "sifarişi yaratdı",
+    "updated": "dəyişdirdi",
+    "status_changed": "statusu dəyişdi",
+    "archived": "arxivə göndərdi",
+    "restored": "bərpa etdi",
+    "payment_added": "ödəniş qeyd etdi",
+    "payment_removed": "ödənişi sildi",
+    "financials_updated": "məbləğləri dəyişdi",
+    "finance_line_added": "sətir əlavə etdi",
+    "finance_line_removed": "sətri sildi",
+    "document_uploaded": "sənəd yüklədi",
+    "document_removed": "sənədi sildi",
+    "document_visibility_changed": "sənədin görünüşünü dəyişdi",
+    "document_generated": "sənəd formalaşdırdı"
   }
 }

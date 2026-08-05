@@ -5,21 +5,22 @@
     "signOut": "Выйти",
     "save": "Сохранить",
     "cancel": "Отмена",
-    "search": "Поиск"
+    "search": "Поиск",
+    "noResults": "Ничего не найдено"
   },
   "nav": {
     "orders": "Заказы",
     "dashboard": "Дашборд",
     "accounts": "Клиенты",
     "carriers": "Перевозчики",
-    "transportation": "Транспорт",
     "finance": "Финансы",
     "documents": "Документы",
     "users": "Пользователи и роли",
     "audit": "Журнал аудита",
     "myOrders": "Мои заказы",
     "sectionLibrary": "Библиотека",
-    "sectionManage": "Управление"
+    "sectionManage": "Управление",
+    "customs": "Таможня"
   },
   "status": {
     "created": "Создан",
@@ -31,7 +32,8 @@
     "at_customs": "На таможне",
     "arrived": "Прибыл",
     "delivered": "Доставлен",
-    "closed": "Закрыт"
+    "closed": "Закрыт",
+    "waiting_pickup": "Ожидает забора груза"
   },
   "actions": {
     "new": "Создать",
@@ -67,8 +69,7 @@
     "noOrdersYet": "Заказов пока нет",
     "actionsCol": "Действия",
     "orderId": "Номер заказа",
-    "orderTitle": "Название заказа",
-    "clientOrderId": "Номер заказа клиента",
+    "orderTitle": "Тема заказа",
     "client": "Клиент",
     "carrier": "Перевозчик",
     "route": "Маршрут",
@@ -79,31 +80,16 @@
     "incoterms": "Условия поставки (Инкотермс 2020)",
     "deliveryFormat": "Формат доставки груза",
     "status": "Статус",
-    "clientCharge": "Сумма",
-    "carrierCost": "Расходы перевозчика",
-    "additionalCosts": "Дополнительные расходы",
-    "expectedProfit": "Ожидаемая прибыль",
+    "clientCharge": "Стоимость транспортировки",
+    "carrierCost": "Расходы агента",
     "actualProfit": "Фактическая прибыль",
     "invoiceNumber": "Номер счёта",
     "invoiceDate": "Дата счёта",
-    "transport": "Транспорт",
-    "transportMode": "Вид транспорта",
-    "modeType": "Тип транспорта",
-    "transportNumber": "Номер транспорта",
     "fromCountry": "Откуда",
     "toCountry": "Куда",
-    "loadingDate": "Дата погрузки",
-    "plannedArrivalDate": "Планируемая дата прибытия",
-    "totalWeightKg": "Общая вместимость по весу (кг)",
-    "totalVolumeM3": "Общая вместимость по объёму (м³)",
-    "addTransport": "Добавить транспорт",
-    "noTransport": "Без транспорта",
-    "attachExisting": "Привязать к существующему транспорту",
-    "createNew": "Создать новый транспорт",
     "lastModified": "Изменено",
     "selectAccount": "Выберите клиента…",
     "selectCarrier": "Выберите перевозчика…",
-    "selectTransport": "Выберите транспорт…",
     "actNumber": "Номер акта",
     "actDate": "Дата акта",
     "paidByCustomer": "Оплата клиента",
@@ -111,7 +97,28 @@
     "documents": "Док.",
     "carrierInvoiceNumber": "№ счёта перевозчика",
     "carrierInvoiceDate": "Дата счёта перевозчика",
-    "exchangeRate": "Курс (AZN/USD)"
+    "exchangeRate": "Курс (AZN)",
+    "transportType": "Тип транспорта",
+    "rollbackNumber": "Номер отката",
+    "currency": "Валюта",
+    "selectTransportType": "Выберите тип транспорта",
+    "selectCountry": "Выберите страну",
+    "selectCargo": "Выберите или введите груз",
+    "loadingRate": "Загрузка курса…",
+    "rateSource": "Автоматически из ЦБА — можно изменить",
+    "agentExpenses": "Расходы агента",
+    "addExpense": "Добавить расход",
+    "noExpenses": "Расходы не добавлены.",
+    "expenseCategory": "Категория",
+    "amount": "Сумма",
+    "note": "Примечание",
+    "total": "Итого",
+    "amountReceivable": "Сумма к получению",
+    "amountPayable": "Сумма к оплате",
+    "received": "Получено",
+    "paid": "Оплачено",
+    "revenue": "Доход",
+    "cost": "Расход"
   },
   "accounts": {
     "newAccount": "Новый клиент",
@@ -142,21 +149,9 @@
     "noHistory": "Истории пока нет",
     "sectionConsignment": "Отправление",
     "sectionCargo": "Груз",
-    "sectionBilling": "Счёт"
-  },
-  "transport": {
-    "title": "Транспорт",
-    "newTransport": "Новый транспорт",
-    "editTransport": "Изменить транспорт",
-    "notFound": "Транспорт не найден",
-    "empty": "Транспорта пока нет — создайте первый.",
-    "ourOrdersTotal": "Наши заказы",
-    "weight": "Вес (наш)",
-    "volume": "Объём (наш)",
-    "revenue": "Выручка (наш груз)",
-    "carrierCostShare": "Расходы перевозчика (наша доля)",
-    "profit": "Прибыль (наш груз)",
-    "ordersOnThisTransport": "Заказы на этом транспорте"
+    "sectionBilling": "Счёт",
+    "invoiceRequired": "Заказ прибыл, но счёт ещё не создан.",
+    "systemActor": "Система"
   },
   "finance": {
     "title": "Финансы",
@@ -203,7 +198,13 @@
     "filterByStatus": "Фильтр по статусу",
     "clearFilter": "Сбросить",
     "orderDetails": "Детали заказа",
-    "noRows": "Нет подходящих строк"
+    "noRows": "Нет подходящих строк",
+    "agentExpenses": "Расходы агента",
+    "expenseCategory": "Категория",
+    "ledger": "Журнал поступлений и оплат",
+    "recordedBy": "внёс {name}",
+    "carrierInvoiceNumber": "№ счёта перевозчика",
+    "carrierInvoiceDate": "Дата счёта перевозчика"
   },
   "dashboard": {
     "title": "Дашборд",
@@ -224,7 +225,15 @@
     "monthlyResults": "Финансовые результаты по месяцам — {year}",
     "month": "Месяц",
     "noData": "Нет данных за период",
-    "balancesOverview": "Непогашенные балансы"
+    "balancesOverview": "Непогашенные балансы",
+    "period": "Период",
+    "periodResults": "Результаты за {month}",
+    "ordersCount": "заказов: {count}",
+    "unratedNote": "У {count} заказов нет курса — суммы учтены по номиналу.",
+    "topRoutes": "Основные маршруты",
+    "topClients": "Основные клиенты",
+    "clearances": "Оформлений",
+    "awaitingPickup": "Ожидают забора"
   },
   "payStatus": {
     "paid": "Оплачено",
@@ -250,7 +259,10 @@
     "tooLarge": "Файл слишком большой (макс. 20 МБ)",
     "badType": "Этот тип файла не разрешён",
     "emptyFile": "Файл пустой",
-    "uploadFailed": "Не удалось загрузить"
+    "uploadFailed": "Не удалось загрузить",
+    "addFiles": "Выбрать файлы",
+    "noFilesSelected": "Файлы не выбраны.",
+    "uploadFailedAfterCreate": "Заказ создан, но не удалось загрузить файлы: {files}"
   },
   "docType": {
     "cmr": "CMR",
@@ -283,7 +295,8 @@
     "generating": "Формирование…",
     "failed": "Не удалось сформировать документ",
     "notFound": "Заказ не найден",
-    "hint": "PDF сохраняется в документы заказа. Показанный номер резервируется только при формировании."
+    "hint": "PDF сохраняется в документы заказа. Показанный номер резервируется только при формировании.",
+    "createInvoice": "Создать счёт"
   },
   "comments": {
     "tab": "Комментарии",
@@ -334,12 +347,103 @@
     "filter": "Фильтр",
     "noAuditEntries": "Нет записей аудита"
   },
-  "transportModes": {
+  "transportTypes": {
     "truck": "Грузовик",
     "container": "Контейнер",
     "air": "Авиа",
     "postal": "Почта",
     "rail": "Ж/Д",
     "sea": "Море"
+  },
+  "filters": {
+    "toggle": "Фильтры",
+    "any": "Любой",
+    "apply": "Применить",
+    "clear": "Сбросить",
+    "createdBetween": "Создан в период"
+  },
+  "customs": {
+    "title": "Таможенное оформление",
+    "newClearance": "Новое оформление",
+    "editClearance": "Изменить оформление",
+    "empty": "Оформлений пока нет — создайте первое.",
+    "searchPlaceholder": "Поиск оформлений, деклараций, заказов...",
+    "number": "№ оформления",
+    "order": "Заказ",
+    "selectOrder": "Выберите заказ",
+    "standalone": "Без заказа",
+    "forOrder": "По заказу",
+    "sectionSubject": "Объект",
+    "declarationNumber": "№ декларации",
+    "description": "Описание",
+    "clearedAt": "Дата оформления",
+    "costs": "Расходы",
+    "addItem": "Добавить статью",
+    "noItems": "Статьи не добавлены.",
+    "category": "Категория",
+    "buy": "Закупка",
+    "sell": "Продажа",
+    "totalBuy": "Итого закупка",
+    "totalSell": "Итого продажа",
+    "margin": "Маржа",
+    "totals": "Итоги",
+    "untitled": "Таможенное оформление"
+  },
+  "customsCategory": {
+    "documentation_fee": "Оформление документов",
+    "declaration_main_page": "Декларация — основной лист",
+    "declaration_additional_page": "Декларация — доп. лист",
+    "short_declaration": "Краткая декларация",
+    "broker_fee": "Услуги брокера",
+    "inspector_fee": "Услуги инспектора",
+    "handling": "Погрузо-разгрузочные работы",
+    "terminal": "Терминал",
+    "delivery": "Доставка"
+  },
+  "financeCategory": {
+    "customs": "Таможня",
+    "broker": "Брокер",
+    "terminal": "Терминал",
+    "warehouse": "Склад",
+    "loading": "Погрузка",
+    "transport": "Перевозка",
+    "insurance": "Страхование",
+    "certification": "Сертификация",
+    "demurrage": "Демередж",
+    "bank_fee": "Банковская комиссия",
+    "other": "Прочее"
+  },
+  "cargoTypes": {
+    "generalCargo": "Генеральный груз",
+    "machinery": "Машины и оборудование",
+    "spareParts": "Запасные части",
+    "constructionMaterials": "Строительные материалы",
+    "chemicals": "Химические товары",
+    "foodstuffs": "Продукты питания",
+    "textiles": "Текстиль и одежда",
+    "electronics": "Электроника",
+    "furniture": "Мебель",
+    "pharmaceuticals": "Фармацевтика",
+    "automotive": "Автотовары",
+    "packagingMaterials": "Упаковочные материалы",
+    "frozenGoods": "Замороженные / охлаждённые товары",
+    "dangerousGoods": "Опасные грузы (ADR)",
+    "personalEffects": "Личные вещи"
+  },
+  "auditAction": {
+    "created": "создал заказ",
+    "updated": "изменил",
+    "status_changed": "изменил статус",
+    "archived": "отправил в архив",
+    "restored": "восстановил",
+    "payment_added": "внёс платёж",
+    "payment_removed": "удалил платёж",
+    "financials_updated": "изменил суммы",
+    "finance_line_added": "добавил строку",
+    "finance_line_removed": "удалил строку",
+    "document_uploaded": "загрузил документ",
+    "document_removed": "удалил документ",
+    "document_visibility_changed": "изменил видимость документа",
+    "document_generated": "сформировал документ"
   }
 }

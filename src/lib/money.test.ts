@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toCents, sumCents, centsToString, formatMoney, formatMoneyAzn, convertUsdToAzn } from "./money";
+import { toCents, sumCents, centsToString, formatMoney, formatMoneyAzn, convertToAzn } from "./money";
 
 describe("toCents", () => {
   it("parses numeric strings to integer cents", () => {
@@ -34,10 +34,19 @@ describe("centsToString", () => {
 });
 
 describe("formatMoney", () => {
-  it("renders a $ amount with thousands separators and 2 decimals", () => {
+  it("defaults to USD with thousands separators and 2 decimals", () => {
     expect(formatMoney(420000)).toBe("$4,200.00");
     expect(formatMoney(0)).toBe("$0.00");
     expect(formatMoney(-220000)).toBe("-$2,200.00");
+  });
+  it("uses the symbol of the given currency", () => {
+    expect(formatMoney(420000, "EUR")).toBe("€4,200.00");
+    expect(formatMoney(420000, "AZN")).toBe("₼4,200.00");
+    expect(formatMoney(420000, "RUB")).toBe("₽4,200.00");
+    expect(formatMoney(-5000, "TRY")).toBe("-₺50.00");
+  });
+  it("falls back to the code for a currency with no symbol", () => {
+    expect(formatMoney(420000, "GBP")).toBe("GBP 4,200.00");
   });
 });
 
@@ -48,16 +57,16 @@ describe("formatMoneyAzn", () => {
   });
 });
 
-describe("convertUsdToAzn", () => {
-  it("converts USD cents to AZN cents at the rate (string or number)", () => {
-    expect(convertUsdToAzn(420000, 1.7)).toBe(714000);
-    expect(convertUsdToAzn(420000, "1.7000")).toBe(714000);
-    expect(convertUsdToAzn(100, 1.705)).toBe(171);
+describe("convertToAzn", () => {
+  it("converts cents to AZN cents at the rate (string or number)", () => {
+    expect(convertToAzn(420000, 1.7)).toBe(714000);
+    expect(convertToAzn(420000, "1.7000")).toBe(714000);
+    expect(convertToAzn(100, 1.705)).toBe(171);
   });
   it("returns null for missing, zero, or invalid rates", () => {
-    expect(convertUsdToAzn(420000, null)).toBeNull();
-    expect(convertUsdToAzn(420000, "")).toBeNull();
-    expect(convertUsdToAzn(420000, 0)).toBeNull();
-    expect(convertUsdToAzn(420000, "abc")).toBeNull();
+    expect(convertToAzn(420000, null)).toBeNull();
+    expect(convertToAzn(420000, "")).toBeNull();
+    expect(convertToAzn(420000, 0)).toBeNull();
+    expect(convertToAzn(420000, "abc")).toBeNull();
   });
 });

@@ -20,6 +20,16 @@ export function orderStatusChangedEmail(d: { orderNumber: string; status: string
   };
 }
 
+/** Sent to staff when an order reaches "Arrived" without an invoice yet. */
+export function invoiceRequiredEmail(d: { orderNumber: string; orderTitle: string; url: string }): EmailContent {
+  return {
+    subject: `Invoice required — order ${d.orderNumber} has arrived`,
+    body:
+      `Order ${d.orderNumber} ("${d.orderTitle}") has arrived and has no invoice yet.\n\n` +
+      `Create the invoice from the order's Documents tab: ${d.url}\n`,
+  };
+}
+
 export function newCommentEmail(d: { orderNumber: string; authorName: string; preview: string; url: string }): EmailContent {
   return {
     subject: `New comment on order ${d.orderNumber}`,

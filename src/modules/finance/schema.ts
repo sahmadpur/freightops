@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { financeLineSideEnum, paymentDirectionEnum } from "@/db/schema";
-import { numericString } from "@/modules/transport/schema";
+import { financeCategoryEnum, financeLineSideEnum, paymentDirectionEnum } from "@/db/schema";
+import { dateString, numericString, optText } from "@/lib/validation";
 
 /** A money amount that must be present and strictly positive (for payments). */
 const positiveAmount = z
@@ -18,10 +18,16 @@ export const paymentInputSchema = z.object({
 
 export type PaymentInput = z.infer<typeof paymentInputSchema>;
 
-/** Order receivable/payable invoice amounts (optional, clearable). */
+/**
+ * Order receivable/payable invoice amounts (optional, clearable), plus the
+ * carrier's received invoice — recorded here rather than on the order form,
+ * which no longer carries any invoice fields.
+ */
 export const financialsInputSchema = z.object({
   amountReceivable: numericString,
   amountPayable: numericString,
+  carrierInvoiceNumber: optText(100),
+  carrierInvoiceDate: dateString,
 });
 
 export type FinancialsInput = z.infer<typeof financialsInputSchema>;
@@ -29,6 +35,8 @@ export type FinancialsInput = z.infer<typeof financialsInputSchema>;
 /** A revenue/cost line item (description + positive amount + optional note). */
 export const financeLineInputSchema = z.object({
   side: z.enum(financeLineSideEnum.enumValues),
+  /** Agent-expense category; meaningful for cost lines, "other" for revenue. */
+  category: z.enum(financeCategoryEnum.enumValues).default("other"),
   description: z.string().trim().min(1).max(300),
   amount: positiveAmount,
   note: z.string().trim().max(500).optional().or(z.literal("")),

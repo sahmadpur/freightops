@@ -3,19 +3,25 @@ import { PageHeader } from "@/components/ui/page-header";
 import { OrderForm } from "@/modules/orders/order-form";
 import { blankOrderInitial } from "@/modules/orders/order-form-initial";
 import { orderFormData } from "@/modules/orders/queries";
-import { transportModeOptions } from "@/modules/transport/queries";
+import { getAznRate } from "@/modules/fx/queries";
+import { DEFAULT_CURRENCY } from "@/lib/fx";
 
 export default async function NewOrderPage() {
   const t = await getTranslations("orders");
   const tn = await getTranslations("nav");
-  const [{ accountOpts, carrierOpts }, transportOpts] = await Promise.all([
+  const today = new Date().toISOString().slice(0, 10);
+  // Seed today's CBAR rate here rather than in an effect, so the form renders
+  // pre-filled. The field stays editable and refetches if the currency changes.
+  const [{ accountOpts, carrierOpts }, rate] = await Promise.all([
     orderFormData(),
-    transportModeOptions(),
+    getAznRate(DEFAULT_CURRENCY, today),
   ]);
+  const initial = { ...blankOrderInitial(), exchangeRate: rate ?? "" };
+
   return (
     <div className="mx-auto max-w-[1400px]">
       <PageHeader eyebrow={tn("orders")} title={t("newOrder")} />
-      <OrderForm initial={blankOrderInitial()} accountOpts={accountOpts} carrierOpts={carrierOpts} transportOpts={transportOpts} />
+      <OrderForm initial={initial} accountOpts={accountOpts} carrierOpts={carrierOpts} />
     </div>
   );
 }

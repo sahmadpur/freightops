@@ -4,7 +4,9 @@ import { ORDER_STATUS_RANK, leastAdvancedStatus } from "./order-status";
 describe("ORDER_STATUS_RANK", () => {
   it("orders the lifecycle from created (0) to closed (9)", () => {
     expect(ORDER_STATUS_RANK.created).toBe(0);
-    expect(ORDER_STATUS_RANK.closed).toBe(9);
+    expect(ORDER_STATUS_RANK.closed).toBe(10);
+    expect(ORDER_STATUS_RANK.waiting_pickup).toBe(1);
+    expect(ORDER_STATUS_RANK.received).toBeGreaterThan(ORDER_STATUS_RANK.waiting_pickup);
     expect(ORDER_STATUS_RANK.transit).toBeGreaterThan(ORDER_STATUS_RANK.loaded);
     expect(ORDER_STATUS_RANK.at_customs).toBeGreaterThan(ORDER_STATUS_RANK.at_border);
   });

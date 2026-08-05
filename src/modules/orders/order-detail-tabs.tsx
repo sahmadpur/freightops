@@ -3,24 +3,33 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
+type Tab = "info" | "finance" | "documents" | "comments" | "history";
+
+const TABS: readonly Tab[] = ["info", "finance", "documents", "comments", "history"];
+
 export function OrderDetailTabs({
   info,
   finance,
   documents,
   comments,
   history,
+  initialTab,
 }: {
   info: React.ReactNode;
   finance: React.ReactNode;
   documents: React.ReactNode;
   comments: React.ReactNode;
   history: React.ReactNode;
+  /** Lets a link (e.g. the invoice-required banner) open a specific tab. */
+  initialTab?: string;
 }) {
   const t = useTranslations("orders");
   const tf = useTranslations("finance");
   const tdoc = useTranslations("documents");
   const tc = useTranslations("comments");
-  const [tab, setTab] = useState<"info" | "finance" | "documents" | "comments" | "history">("info");
+  const [tab, setTab] = useState<Tab>(
+    TABS.includes(initialTab as Tab) ? (initialTab as Tab) : "info",
+  );
 
   const tabCls = (active: boolean) =>
     `border-b-2 -mb-px px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edge-focus ${

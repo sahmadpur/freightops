@@ -23,11 +23,12 @@ export default async function PortalOrderPage({ params }: { params: Promise<{ id
         id: data.order.id,
         number: data.order.number,
         title: data.order.title,
-        route: data.order.route,
+        fromCountry: data.order.fromCountry,
+        toCountry: data.order.toCountry,
+        transportType: data.order.transportType,
         status: data.order.status,
-        cargoDescription: data.order.cargoDescription,
+        cargoItems: data.order.cargoItems,
       }}
-      transportNumber={data.transportNumber}
       documents={documents}
       comments={comments}
       currentUserId={session.user.id}

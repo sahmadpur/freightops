@@ -1,53 +1,57 @@
-type TransportMode = "none" | "existing" | "new";
+import { DEFAULT_CURRENCY } from "@/lib/fx";
+
+/** One agent-expense row as the form holds it (all strings). */
+export type CostLineDraft = {
+  category: string;
+  amount: string;
+  note: string;
+};
 
 export type OrderFormInitial = {
   id?: string;
-  title: string;
-  clientOrderId: string;
+  transportType: string;
   accountId: string;
   carrierId: string;
-  route: string;
-  cargoDescription: string;
+  fromCountry: string;
+  toCountry: string;
+  title: string;
+  rollbackNumber: string;
+  deliveryFormat: string;
+  cargoItems: string[];
   packages: string;
   weightKg: string;
   volumeM3: string;
   incoterms: string;
-  deliveryFormat: string;
-  clientCharge: string;
-  carrierCost: string;
+  currency: string;
   exchangeRate: string;
-  invoiceNumber: string;
-  invoiceDate: string;
-  carrierInvoiceNumber: string;
-  carrierInvoiceDate: string;
-  transportMode: TransportMode;
-  transportModeId: string;
-  newTransport: {
-    modeType: string;
-    number: string;
-    fromCountry: string;
-    toCountry: string;
-    route: string;
-    loadingDate: string;
-    plannedArrivalDate: string;
-    totalWeightKg: string;
-    totalVolumeM3: string;
-  };
+  /** Create-only quick totals; on edit these live in the Finance tab. */
+  clientCharge: string;
+  costLines: CostLineDraft[];
 };
+
+export function emptyCostLine(): CostLineDraft {
+  return { category: "other", amount: "", note: "" };
+}
 
 /** Blank initial values for the create form. */
 export function blankOrderInitial(): OrderFormInitial {
   return {
-    title: "", clientOrderId: "", accountId: "", carrierId: "", route: "",
-    cargoDescription: "", packages: "", weightKg: "", volumeM3: "",
-    incoterms: "", deliveryFormat: "", clientCharge: "", carrierCost: "",
+    transportType: "",
+    accountId: "",
+    carrierId: "",
+    fromCountry: "",
+    toCountry: "",
+    title: "",
+    rollbackNumber: "",
+    deliveryFormat: "",
+    cargoItems: [],
+    packages: "",
+    weightKg: "",
+    volumeM3: "",
+    incoterms: "",
+    currency: DEFAULT_CURRENCY,
     exchangeRate: "",
-    invoiceNumber: "", invoiceDate: "",
-    carrierInvoiceNumber: "", carrierInvoiceDate: "",
-    transportMode: "none", transportModeId: "",
-    newTransport: {
-      modeType: "truck", number: "", fromCountry: "", toCountry: "",
-      route: "", loadingDate: "", plannedArrivalDate: "", totalWeightKg: "", totalVolumeM3: "",
-    },
+    clientCharge: "",
+    costLines: [],
   };
 }

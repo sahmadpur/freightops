@@ -1,15 +1,32 @@
-import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBar } from "@/components/dashboard/status-bar";
-import { dashboardData, reconciliationRows } from "@/modules/finance/queries";
+import { RankBars } from "@/components/dashboard/rank-bars";
+import { MonthPicker } from "@/components/dashboard/month-picker";
+import { dashboardData, monthRange, reconciliationRows } from "@/modules/finance/queries";
+import { customsPeriodTotals } from "@/modules/customs/queries";
 import { ReconciliationReport } from "@/modules/finance/reconciliation-report";
-import { formatMoney } from "@/lib/money";
+import { formatMoneyAzn } from "@/lib/money";
+import { routeLabel } from "@/lib/countries";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string }>;
+}) {
+  const { month: monthParam } = await searchParams;
   const t = await getTranslations("dashboard");
-  const [d, reconRows] = await Promise.all([dashboardData(), reconciliationRows()]);
-  const year = new Date().getFullYear();
+  const tt = await getTranslations();
+  const locale = await getLocale();
+  const { from, to } = monthRange(monthParam);
+  const [d, reconRows, customs] = await Promise.all([
+    dashboardData(monthParam),
+    reconciliationRows(),
+    customsPeriodTotals(from, to),
+  ]);
+  const year = d.year;
 
   const metric = (
     label: string,
@@ -37,6 +54,13 @@ export default async function DashboardPage() {
     </Card>
   );
 
+  const stat = (label: string, value: string) => (
+    <div className="flex items-center justify-between border-b border-slate-100 py-2 text-sm last:border-0">
+      <span className="text-slate-600">{label}</span>
+      <span className="font-semibold tabular-nums text-slate-900">{value}</span>
+    </div>
+  );
+
   const fin = (label: string, cents: number, tone?: "pos" | "neg") => (
     <div className="flex items-center justify-between border-b border-slate-100 py-2 text-sm last:border-0">
       <span className="text-slate-600">{label}</span>
@@ -49,24 +73,45 @@ export default async function DashboardPage() {
               : "text-slate-900"
         }`}
       >
-        {formatMoney(cents)}
+        {formatMoneyAzn(cents)}
       </span>
     </div>
   );
 
   return (
     <div>
-      <PageHeader title={t("title")} />
+      <PageHeader
+        title={t("title")}
+        action={<MonthPicker month={d.month} label={t("period")} />}
+      />
 
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{t("operationalOverview")}</div>
-      <div className="mb-5 grid grid-cols-4 gap-3">
+      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
         {metric(t("activeShipments"), d.operational.activeShipments, <IconTruck />, "indigo")}
+        {metric(t("awaitingPickup"), d.operational.awaitingPickup, <IconClipboard />, "violet")}
         {metric(t("cargoInTransit"), d.operational.cargoInTransit, <IconRoute />, "violet")}
         {metric(t("atCustoms"), d.operational.atCustoms, <IconStamp />, "indigo")}
         {metric(t("unfinishedOrders"), d.operational.unfinishedOrders, <IconClipboard />, "violet")}
       </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-4">
+      <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <span className="text-sm font-semibold">{t("periodResults", { month: d.month })}</span>
+            <span className="text-xs text-slate-500">{t("ordersCount", { count: d.period.orders })}</span>
+          </CardHeader>
+          <CardBody>
+            {fin(t("revenue"), d.period.revenueCents, "pos")}
+            {fin(t("carrierCosts"), -d.period.carrierCostCents, "neg")}
+            {fin(t("expectedProfit"), d.period.expectedProfitCents, "pos")}
+            {fin(t("actualProfit"), d.period.actualProfitCents, "pos")}
+            {d.period.unratedOrders > 0 && (
+              <p className="mt-2 text-[11px] text-ink-soft">
+                {t("unratedNote", { count: d.period.unratedOrders })}
+              </p>
+            )}
+          </CardBody>
+        </Card>
         <Card>
           <CardHeader><span className="text-sm font-semibold">{t("financialOverview")}</span></CardHeader>
           <CardBody>
@@ -81,6 +126,63 @@ export default async function DashboardPage() {
           <CardBody>
             {fin(t("accountsReceivable"), d.financial.clients.outstandingCents)}
             {fin(t("owedToCarriers"), d.financial.carriers.outstandingCents, "neg")}
+          </CardBody>
+        </Card>
+      </div>
+
+      <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <Card>
+          <CardHeader><span className="text-sm font-semibold">{tt("fields.transportType")}</span></CardHeader>
+          <CardBody>
+            <RankBars
+              empty={t("noData")}
+              rows={d.byTransportType.map((r) => ({
+                key: r.transportType ?? "none",
+                label: r.transportType ? tt(`transportTypes.${r.transportType}`) : "—",
+                value: r.count,
+              }))}
+            />
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader><span className="text-sm font-semibold">{t("topRoutes")}</span></CardHeader>
+          <CardBody>
+            <RankBars
+              empty={t("noData")}
+              rows={d.topRoutes.map((r) => ({
+                key: `${r.fromCountry}-${r.toCountry}`,
+                label: routeLabel(r.fromCountry, r.toCountry, locale) ?? "—",
+                value: r.count,
+              }))}
+            />
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader><span className="text-sm font-semibold">{t("topClients")}</span></CardHeader>
+          <CardBody>
+            <RankBars
+              empty={t("noData")}
+              rows={d.topClients.map((r) => ({
+                key: r.accountId,
+                label: r.accountTitle,
+                value: r.revenueCents,
+                caption: formatMoneyAzn(r.revenueCents),
+              }))}
+            />
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader>
+            <span className="text-sm font-semibold">{tt("nav.customs")}</span>
+            <Link href="/customs" className="text-xs text-brand hover:underline">
+              {tt("actions.view")}
+            </Link>
+          </CardHeader>
+          <CardBody>
+            {stat(t("clearances"), String(customs.count))}
+            {fin(tt("customs.totalBuy"), -customs.buyCents, "neg")}
+            {fin(tt("customs.totalSell"), customs.sellCents, "pos")}
+            {fin(tt("customs.margin"), customs.marginCents, customs.marginCents < 0 ? "neg" : "pos")}
           </CardBody>
         </Card>
       </div>
@@ -115,10 +217,10 @@ export default async function DashboardPage() {
                   {d.monthly.map((m) => (
                     <tr key={m.month} className="border-t border-slate-100">
                       <td className="py-2 pr-4 font-medium">{m.month}</td>
-                      <td className="py-2 pr-4">{formatMoney(m.revenueCents)}</td>
-                      <td className="py-2 pr-4">{formatMoney(m.carrierCostCents)}</td>
-                      <td className="py-2 pr-4">{formatMoney(m.expectedProfitCents)}</td>
-                      <td className="py-2 pr-4">{formatMoney(m.actualProfitCents)}</td>
+                      <td className="py-2 pr-4">{formatMoneyAzn(m.revenueCents)}</td>
+                      <td className="py-2 pr-4">{formatMoneyAzn(m.carrierCostCents)}</td>
+                      <td className="py-2 pr-4">{formatMoneyAzn(m.expectedProfitCents)}</td>
+                      <td className="py-2 pr-4">{formatMoneyAzn(m.actualProfitCents)}</td>
                     </tr>
                   ))}
                 </tbody>

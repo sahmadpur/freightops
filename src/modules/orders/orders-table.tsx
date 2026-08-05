@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { MoneyDual } from "@/components/ui/money";
 import { toCents } from "@/lib/money";
+import { routeLabel } from "@/lib/countries";
 import type { PaymentStatus } from "@/lib/finance";
 import type { OrderListRow } from "./queries";
 
@@ -22,6 +23,7 @@ const numOrDash = (v: string | null) => (v ? Number(v).toLocaleString("en-US") :
 export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
   const t = useTranslations();
   const tp = useTranslations("payStatus");
+  const locale = useLocale();
 
   const payPill = (status: PaymentStatus | null) => {
     if (!status) return <span className="text-ink-soft">—</span>;
@@ -41,22 +43,26 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
       key: "number",
       header: t("fields.orderId"),
       width: "120px",
-      render: (r) => <span className="font-medium text-brand">{r.number}</span>,
+      render: (r) => (
+        <Link href={`/orders/${r.id}`} className="font-medium text-brand hover:underline">
+          {r.number}
+        </Link>
+      ),
     },
     { key: "accountTitle", header: t("fields.client"), render: (r) => r.accountTitle },
     { key: "title", header: t("fields.orderTitle"), render: (r) => r.title },
     {
-      key: "clientOrderId",
-      header: t("fields.clientOrderId"),
+      key: "rollbackNumber",
+      header: t("fields.rollbackNumber"),
       width: "120px",
       hiddenOnMobile: true,
-      render: (r) => r.clientOrderId ?? "—",
+      render: (r) => r.rollbackNumber ?? "—",
     },
     {
       key: "route",
       header: t("fields.route"),
       hiddenOnMobile: true,
-      render: (r) => r.route ?? "—",
+      render: (r) => routeLabel(r.fromCountry, r.toCountry, locale) ?? "—",
     },
     {
       key: "weightKg",
@@ -75,11 +81,11 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
       render: (r) => numOrDash(r.volumeM3),
     },
     {
-      key: "transportNumber",
-      header: t("fields.transport"),
+      key: "transportType",
+      header: t("fields.transportType"),
       width: "110px",
       hiddenOnMobile: true,
-      render: (r) => r.transportNumber ?? "—",
+      render: (r) => (r.transportType ? t(`transportTypes.${r.transportType}`) : "—"),
     },
     {
       key: "clientCharge",
@@ -88,7 +94,7 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
       align: "right",
       render: (r) =>
         r.clientCharge ? (
-          <MoneyDual usdCents={toCents(r.clientCharge)} rate={r.exchangeRate} />
+          <MoneyDual cents={toCents(r.clientCharge)} currency={r.currency} rate={r.exchangeRate} />
         ) : (
           "—"
         ),
@@ -101,7 +107,7 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
       hiddenOnMobile: true,
       render: (r) =>
         r.carrierCost ? (
-          <MoneyDual usdCents={toCents(r.carrierCost)} rate={r.exchangeRate} />
+          <MoneyDual cents={toCents(r.carrierCost)} currency={r.currency} rate={r.exchangeRate} />
         ) : (
           "—"
         ),
@@ -183,6 +189,7 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
       rowKey={(r) => r.id}
       storageKey="orders"
       minWidth={1600}
+      rowHref={(r) => `/orders/${r.id}`}
       empty={t("orders.empty")}
     />
   );

@@ -5,8 +5,9 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { documents, orders } from "@/db/schema";
 import { recordAudit } from "@/lib/audit";
+import { routeLabel } from "@/lib/countries";
 import { nextDocNumber } from "@/lib/doc-number";
-import { convertUsdToAzn, toCents } from "@/lib/money";
+import { convertToAzn, toCents } from "@/lib/money";
 import { htmlToPdf } from "@/lib/pdf";
 import { deleteObject, putObject } from "@/lib/s3";
 import { requireArea } from "@/lib/session";
@@ -22,17 +23,17 @@ import type { ActionResult } from "@/lib/forms";
 
 function buildLines(row: OrderForDocgen, input: GenerateDocInput): DocLine[] {
   const t = COMMON_STRINGS[input.language];
-  // Itemized revenue lines (USD); fall back to the single clientCharge rollup.
+  // Itemized revenue lines; fall back to the single clientCharge rollup.
   const lines: DocLine[] =
     row.revenueLines.length > 0
       ? row.revenueLines.map((l) => ({ description: l.description, amountCents: toCents(l.amount) }))
       : [{ description: t.serviceForOrder(row.number), amountCents: toCents(row.clientCharge) }];
-  // Amounts are stored in USD; convert to AZN at the order's rate when the
-  // document currency is AZN (falls back to the USD value if no rate is set).
-  if (input.currency === "AZN") {
+  // Amounts are stored in the order's currency; convert to AZN at its rate when
+  // the document currency is AZN (falls back to the stored value if no rate).
+  if (input.currency === "AZN" && row.currency !== "AZN") {
     return lines.map((l) => ({
       ...l,
-      amountCents: convertUsdToAzn(l.amountCents, row.exchangeRate) ?? l.amountCents,
+      amountCents: convertToAzn(l.amountCents, row.exchangeRate) ?? l.amountCents,
     }));
   }
   return lines;
@@ -65,9 +66,11 @@ export async function generateOrderDocument(input: unknown): Promise<ActionResul
     currency: d.currency,
     order: {
       number: row.number,
-      clientOrderId: row.clientOrderId,
-      route: row.route,
-      cargoDescription: row.cargoDescription,
+      rollbackNumber: row.rollbackNumber,
+      // Documents are issued in one of three languages; render the route with
+      // country names in that language rather than bare ISO codes.
+      route: routeLabel(row.fromCountry, row.toCountry, d.language, { flags: false }),
+      cargoDescription: row.cargoItems.length ? row.cargoItems.join(", ") : null,
       packages: row.packages,
       weightKg: row.weightKg,
       volumeM3: row.volumeM3,

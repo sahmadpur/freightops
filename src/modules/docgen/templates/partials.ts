@@ -60,7 +60,7 @@ export function bankDetailsBlock(issuer: Issuer, t: CommonStrings): string {
 export function orderMetaBlock(order: DocOrderInfo, t: CommonStrings): string {
   return `<div class="meta">
     ${kv(t.orderRef, order.number)}
-    ${kv(t.clientRef, order.clientOrderId)}
+    ${kv(t.rollbackRef, order.rollbackNumber)}
     ${kv(t.route, order.route)}
     ${kv(t.cargo, order.cargoDescription)}
     ${kv(t.packages, order.packages != null ? String(order.packages) : null)}

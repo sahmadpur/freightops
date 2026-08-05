@@ -15,8 +15,8 @@ function sampleData(overrides: Partial<DocData> = {}): DocData {
     date: "2026-07-02",
     currency: "AZN",
     order: {
-      number: "ORD-2026-041",
-      clientOrderId: "PO-991",
+      number: "ALL2607041",
+      rollbackNumber: "RB-991",
       route: "Istanbul — Baku",
       cargoDescription: "Industrial spare parts",
       packages: 12,
@@ -25,7 +25,7 @@ function sampleData(overrides: Partial<DocData> = {}): DocData {
       incoterms: "FCA",
     },
     lines: [
-      { description: "Freight forwarding services for order ORD-2026-041", amountCents: 420000 },
+      { description: "Freight forwarding services for order ALL2607041", amountCents: 420000 },
       { description: "Customs terminal fees", amountCents: 15050 },
     ],
     totalCents: 435050,
@@ -54,7 +54,7 @@ describe.each(LANGS)("invoice template (%s)", (lang) => {
   it("contains the number, client, order and total", () => {
     expect(html).toContain("RL-020726007");
     expect(html).toContain("Acme Trading LLC");
-    expect(html).toContain("ORD-2026-041");
+    expect(html).toContain("ALL2607041");
     expect(html).toContain("4,350.50");
   });
   it("names the chosen currency and the amount in words", () => {

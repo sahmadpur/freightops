@@ -1,36 +1,38 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { CommentsTab } from "@/modules/comments/comments-tab";
 import { addClientComment } from "@/modules/comments/actions";
 import type { DocumentRow } from "@/modules/documents/queries";
 import type { CommentRow } from "@/modules/comments/queries";
+import { routeLabel } from "@/lib/countries";
 
 type DetailOrder = {
   id: string;
   number: string;
   title: string;
-  route: string | null;
+  fromCountry: string | null;
+  toCountry: string | null;
+  transportType: string | null;
   status: string;
-  cargoDescription: string | null;
+  cargoItems: string[];
 };
 
 export async function PortalOrderDetail({
   order,
-  transportNumber,
   documents,
   comments,
   currentUserId,
 }: {
   order: DetailOrder;
-  transportNumber: string | null;
   documents: DocumentRow[];
   comments: CommentRow[];
   currentUserId: string;
 }) {
   const t = await getTranslations();
   const td = await getTranslations("docType");
+  const locale = await getLocale();
 
   const row = (label: string, value: React.ReactNode) => (
     <div>
@@ -53,9 +55,15 @@ export async function PortalOrderDetail({
         <CardHeader><span className="text-sm font-semibold">{order.title}</span></CardHeader>
         <CardBody>
           <dl className="grid grid-cols-2 gap-3 text-sm">
-            {row(t("fields.route"), order.route)}
-            {row(t("fields.transport"), transportNumber)}
-            {row(t("fields.cargoDescription"), order.cargoDescription)}
+            {row(t("fields.route"), routeLabel(order.fromCountry, order.toCountry, locale))}
+            {row(
+              t("fields.transportType"),
+              order.transportType ? t(`transportTypes.${order.transportType}`) : null,
+            )}
+            {row(
+              t("fields.cargoDescription"),
+              order.cargoItems.length ? order.cargoItems.join(", ") : null,
+            )}
           </dl>
         </CardBody>
       </Card>

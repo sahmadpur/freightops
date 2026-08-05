@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 const STATUS_COLORS: Record<string, string> = {
   created: "bg-[#ddeaf9] text-[#0c447c]",
+  waiting_pickup: "bg-[#efe6d4] text-[#5c4413]",
   received: "bg-[#e3e0f7] text-[#3b2f7e]",
   internal_transit: "bg-[#d8eef7] text-[#0b4a63]",
   loaded: "bg-[#d4f2e7] text-[#085041]",

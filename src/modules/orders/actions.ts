@@ -2,83 +2,46 @@
 
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { orderFinanceLines, orders, transportModes } from "@/db/schema";
+import { orderFinanceLines, orders } from "@/db/schema";
 import { auditDiff, recordAudit } from "@/lib/audit";
-import { nextOrderNumber } from "@/lib/order-number";
+import { nextRecordNumber } from "@/lib/record-number";
 import { requireArea } from "@/lib/session";
 import { orderInputSchema, statusChangeSchema, type OrderInput } from "./schema";
 import type { ActionResult } from "@/lib/forms";
-import { orderRecipients } from "@/modules/notifications/recipients";
+import { orderRecipients, staffRecipientsForOrder } from "@/modules/notifications/recipients";
 import { enqueueMany } from "@/modules/notifications/enqueue";
-import { orderCreatedEmail, orderStatusChangedEmail } from "@/modules/notifications/templates";
+import {
+  invoiceRequiredEmail,
+  orderCreatedEmail,
+  orderStatusChangedEmail,
+} from "@/modules/notifications/templates";
 
 // Money rollups (clientCharge/carrierCost) are edited via finance lines, not the
 // order form, so they're audited by the finance-line actions instead.
 const AUDITED_FIELDS = [
-  "title", "clientOrderId", "accountId", "carrierId", "transportModeId", "route",
-  "cargoDescription", "packages", "weightKg", "volumeM3", "incoterms", "deliveryFormat",
-  "exchangeRate", "invoiceNumber", "invoiceDate",
-  "carrierInvoiceNumber", "carrierInvoiceDate",
+  "title", "rollbackNumber", "accountId", "carrierId", "transportType",
+  "fromCountry", "toCountry", "cargoItems", "packages", "weightKg", "volumeM3",
+  "incoterms", "deliveryFormat", "currency", "exchangeRate",
 ];
-
-type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
-
-class TransportNotFound extends Error {}
 
 function toRow(data: OrderInput) {
   return {
     title: data.title,
-    clientOrderId: data.clientOrderId || null,
+    rollbackNumber: data.rollbackNumber || null,
     accountId: data.accountId,
     carrierId: data.carrierId || null,
-    route: data.route || null,
-    cargoDescription: data.cargoDescription || null,
+    transportType: data.transportType || null,
+    fromCountry: data.fromCountry || null,
+    toCountry: data.toCountry || null,
+    cargoItems: data.cargoItems,
     packages: data.packages ? Number(data.packages) : null,
     weightKg: data.weightKg || null,
     volumeM3: data.volumeM3 || null,
     incoterms: data.incoterms || null,
     deliveryFormat: data.deliveryFormat || null,
+    currency: data.currency,
     exchangeRate: data.exchangeRate || null,
-    invoiceNumber: data.invoiceNumber || null,
-    invoiceDate: data.invoiceDate || null,
-    carrierInvoiceNumber: data.carrierInvoiceNumber || null,
-    carrierInvoiceDate: data.carrierInvoiceDate || null,
   };
-}
-
-// NOTE: choosing "new" transport while EDITING an order creates a fresh transport mode
-// and repoints the order; a previously inline-created mode is left unreferenced (appears
-// in the Transportation list). Acceptable for v1; revisit with orphan cleanup if needed.
-
-/** Resolve the transport sub-flow to a transportModeId, creating a new mode if requested. */
-async function resolveTransport(tx: Tx, data: OrderInput, userId: string): Promise<string | null> {
-  const tr = data.transport;
-  if (tr.mode === "none") return null;
-  if (tr.mode === "existing") {
-    const exists = await tx.query.transportModes.findFirst({
-      where: eq(transportModes.id, tr.transportModeId),
-      columns: { id: true },
-    });
-    if (!exists) throw new TransportNotFound();
-    return tr.transportModeId;
-  }
-  const [row] = await tx
-    .insert(transportModes)
-    .values({
-      modeType: tr.modeType,
-      number: tr.number,
-      fromCountry: tr.fromCountry || null,
-      toCountry: tr.toCountry || null,
-      route: tr.route || null,
-      loadingDate: tr.loadingDate || null,
-      plannedArrivalDate: tr.plannedArrivalDate || null,
-      totalWeightKg: tr.totalWeightKg || null,
-      totalVolumeM3: tr.totalVolumeM3 || null,
-      createdBy: userId,
-    })
-    .returning({ id: transportModes.id });
-  await recordAudit(tx, { userId, entityType: "transport_mode", entityId: row.id, action: "created" });
-  return row.id;
 }
 
 export async function createOrder(input: unknown): Promise<ActionResult> {
@@ -87,54 +50,65 @@ export async function createOrder(input: unknown): Promise<ActionResult> {
   if (!parsed.success) return { ok: false, fieldErrors: parsed.error.flatten().fieldErrors };
   const data = parsed.data;
 
-  let id: string;
-  try {
-    id = await db.transaction(async (tx) => {
-      const transportModeId = await resolveTransport(tx, data, session.user.id);
-      const number = await nextOrderNumber(tx, new Date().getFullYear());
-      const [row] = await tx
-        .insert(orders)
-        .values({
-          ...toRow(data),
-          // Rollups seeded from quick-entry totals below; refined via finance lines.
-          clientCharge: data.clientCharge || null,
-          carrierCost: data.carrierCost || null,
-          transportModeId,
-          number,
-          createdBy: session.user.id,
-        })
-        .returning({ id: orders.id });
-      // Seed one revenue and one cost line from the quick-entry totals so the
-      // itemized Finance tab starts consistent with the order's rollups.
-      const seedLines = [];
-      if (data.clientCharge)
-        seedLines.push({ orderId: row.id, side: "revenue" as const, description: "Freight forwarding services", amount: data.clientCharge, createdBy: session.user.id });
-      if (data.carrierCost)
-        seedLines.push({ orderId: row.id, side: "cost" as const, description: "Carrier cost", amount: data.carrierCost, createdBy: session.user.id });
-      if (seedLines.length) await tx.insert(orderFinanceLines).values(seedLines);
-      await recordAudit(tx, {
-        userId: session.user.id,
-        entityType: "order",
-        entityId: row.id,
-        action: "created",
+  const costLines = data.costLines.filter((l) => l.amount);
+  const costTotal = costLines.reduce((sum, l) => sum + Number(l.amount), 0);
+
+  const id = await db.transaction(async (tx) => {
+    const now = new Date();
+    const number = await nextRecordNumber(tx, "order", now.getFullYear(), now.getMonth() + 1);
+    const [row] = await tx
+      .insert(orders)
+      .values({
+        ...toRow(data),
+        // Rollups seeded from the quick-entry totals below; refined via finance lines.
+        clientCharge: data.clientCharge || null,
+        carrierCost: costTotal ? costTotal.toFixed(2) : null,
+        number,
+        createdBy: session.user.id,
+      })
+      .returning({ id: orders.id });
+    // Seed the itemized Finance tab so it starts consistent with the rollups.
+    const seedLines = [];
+    if (data.clientCharge)
+      seedLines.push({
+        orderId: row.id,
+        side: "revenue" as const,
+        description: "Freight forwarding services",
+        amount: data.clientCharge,
+        createdBy: session.user.id,
       });
-      const { clientEmails, carrierEmails } = await orderRecipients(tx, row.id);
-      await enqueueMany(
-        tx,
-        [...clientEmails, ...carrierEmails],
-        orderCreatedEmail({
-          orderNumber: number,
-          orderTitle: data.title,
-          url: `${process.env.APP_BASE_URL}/orders/${row.id}`,
-        }),
-        { type: "order", id: row.id },
-      );
-      return row.id;
+    costLines.forEach((line, i) =>
+      seedLines.push({
+        orderId: row.id,
+        side: "cost" as const,
+        category: line.category,
+        description: line.note || line.category,
+        amount: line.amount as string,
+        note: line.note || null,
+        sortOrder: i,
+        createdBy: session.user.id,
+      }),
+    );
+    if (seedLines.length) await tx.insert(orderFinanceLines).values(seedLines);
+    await recordAudit(tx, {
+      userId: session.user.id,
+      entityType: "order",
+      entityId: row.id,
+      action: "created",
     });
-  } catch (e) {
-    if (e instanceof TransportNotFound) return { ok: false, fieldErrors: { transport: ["Transport mode not found"] } };
-    throw e;
-  }
+    const { clientEmails, carrierEmails } = await orderRecipients(tx, row.id);
+    await enqueueMany(
+      tx,
+      [...clientEmails, ...carrierEmails],
+      orderCreatedEmail({
+        orderNumber: number,
+        orderTitle: data.title,
+        url: `${process.env.APP_BASE_URL}/orders/${row.id}`,
+      }),
+      { type: "order", id: row.id },
+    );
+    return row.id;
+  });
 
   return { ok: true, id };
 }
@@ -169,30 +143,23 @@ export async function updateOrder(id: string, input: unknown): Promise<ActionRes
   if (!parsed.success) return { ok: false, fieldErrors: parsed.error.flatten().fieldErrors };
   const data = parsed.data;
 
-  let result: "ok" | "not_found";
-  try {
-    result = await db.transaction(async (tx) => {
-      const before = await tx.query.orders.findFirst({ where: eq(orders.id, id) });
-      if (!before) return "not_found" as const;
-      const transportModeId = await resolveTransport(tx, data, session.user.id);
-      const after = { ...toRow(data), transportModeId };
-      await tx.update(orders).set(after).where(eq(orders.id, id));
-      const changes = auditDiff(before, after, AUDITED_FIELDS);
-      if (changes.length > 0) {
-        await recordAudit(tx, {
-          userId: session.user.id,
-          entityType: "order",
-          entityId: id,
-          action: "updated",
-          changes,
-        });
-      }
-      return "ok" as const;
-    });
-  } catch (e) {
-    if (e instanceof TransportNotFound) return { ok: false, fieldErrors: { transport: ["Transport mode not found"] } };
-    throw e;
-  }
+  const result = await db.transaction(async (tx) => {
+    const before = await tx.query.orders.findFirst({ where: eq(orders.id, id) });
+    if (!before) return "not_found" as const;
+    const after = toRow(data);
+    await tx.update(orders).set(after).where(eq(orders.id, id));
+    const changes = auditDiff(before, after, AUDITED_FIELDS);
+    if (changes.length > 0) {
+      await recordAudit(tx, {
+        userId: session.user.id,
+        entityType: "order",
+        entityId: id,
+        action: "updated",
+        changes,
+      });
+    }
+    return "ok" as const;
+  });
 
   if (result === "not_found") return { ok: false, error: "not_found" };
   return { ok: true, id };
@@ -208,7 +175,13 @@ export async function changeOrderStatus(id: string, input: unknown): Promise<Act
     const before = await tx.query.orders.findFirst({ where: eq(orders.id, id) });
     if (!before) return "not_found" as const;
     if (before.status === status) return "ok" as const;
-    await tx.update(orders).set({ status }).where(eq(orders.id, id));
+    // Closing an order settles it: it leaves the active list and lands in the
+    // archive, where "Show archived" still surfaces it.
+    const archiving = status === "closed" && before.deletedAt === null;
+    await tx
+      .update(orders)
+      .set({ status, ...(archiving ? { deletedAt: new Date() } : {}) })
+      .where(eq(orders.id, id));
     await recordAudit(tx, {
       userId: session.user.id,
       entityType: "order",
@@ -216,6 +189,14 @@ export async function changeOrderStatus(id: string, input: unknown): Promise<Act
       action: "status_changed",
       changes: [{ field: "status", oldValue: before.status, newValue: status }],
     });
+    if (archiving) {
+      await recordAudit(tx, {
+        userId: session.user.id,
+        entityType: "order",
+        entityId: id,
+        action: "archived",
+      });
+    }
     const { clientEmails } = await orderRecipients(tx, id);
     await enqueueMany(
       tx,
@@ -227,6 +208,21 @@ export async function changeOrderStatus(id: string, input: unknown): Promise<Act
       }),
       { type: "order", id },
     );
+    // Arrival is the trigger to bill the client. Nudge staff; the invoice is
+    // still generated by a human from the order's Documents tab.
+    if (status === "arrived" && !before.invoiceNumber) {
+      const staffEmails = await staffRecipientsForOrder(tx, id);
+      await enqueueMany(
+        tx,
+        staffEmails,
+        invoiceRequiredEmail({
+          orderNumber: before.number,
+          orderTitle: before.title,
+          url: `${process.env.APP_BASE_URL}/orders/${id}`,
+        }),
+        { type: "order", id },
+      );
+    }
     return "ok" as const;
   });
 

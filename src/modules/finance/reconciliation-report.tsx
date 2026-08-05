@@ -100,9 +100,9 @@ function SideTable({
                       <span className="ml-2 text-ink-soft">{r.title}</span>
                     </td>
                     <td className="py-1.5 pr-3">{side === "receivable" ? r.accountTitle : (r.carrierTitle ?? "—")}</td>
-                    <td className="py-1.5 pr-3 text-right"><MoneyDual usdCents={s.invoicedCents} rate={r.exchangeRate} /></td>
-                    <td className="py-1.5 pr-3 text-right"><MoneyDual usdCents={s.paidCents} rate={r.exchangeRate} /></td>
-                    <td className="py-1.5 pr-3 text-right"><MoneyDual usdCents={s.deltaCents} rate={r.exchangeRate} /></td>
+                    <td className="py-1.5 pr-3 text-right"><MoneyDual cents={s.invoicedCents} currency={r.currency} rate={r.exchangeRate} /></td>
+                    <td className="py-1.5 pr-3 text-right"><MoneyDual cents={s.paidCents} currency={r.currency} rate={r.exchangeRate} /></td>
+                    <td className="py-1.5 pr-3 text-right"><MoneyDual cents={s.deltaCents} currency={r.currency} rate={r.exchangeRate} /></td>
                     <td className="py-1.5 pr-3">
                       <InlineStatus orderId={r.id} current={r.status} status={s.status} />
                     </td>

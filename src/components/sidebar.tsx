@@ -9,7 +9,7 @@ const LIBRARY_NAV = [
   { href: "/dashboard", key: "dashboard" },
   { href: "/accounts", key: "accounts" },
   { href: "/carriers", key: "carriers" },
-  { href: "/transportation", key: "transportation" },
+  { href: "/customs", key: "customs" },
   { href: "/finance", key: "finance" },
   { href: "/documents", key: "documents" },
 ] as const;

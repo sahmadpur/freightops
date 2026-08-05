@@ -84,7 +84,12 @@ export async function deletePayment(paymentId: string): Promise<ActionResult> {
   return { ok: true, id: result };
 }
 
-const FINANCIAL_FIELDS = ["amountReceivable", "amountPayable"];
+const FINANCIAL_FIELDS = [
+  "amountReceivable",
+  "amountPayable",
+  "carrierInvoiceNumber",
+  "carrierInvoiceDate",
+];
 
 export async function updateOrderFinancials(orderId: string, input: unknown): Promise<ActionResult> {
   const { session } = await requireArea("staff");
@@ -98,6 +103,8 @@ export async function updateOrderFinancials(orderId: string, input: unknown): Pr
     const after = {
       amountReceivable: data.amountReceivable || null,
       amountPayable: data.amountPayable || null,
+      carrierInvoiceNumber: data.carrierInvoiceNumber || null,
+      carrierInvoiceDate: data.carrierInvoiceDate || null,
     };
     await tx.update(orders).set(after).where(eq(orders.id, orderId));
     const changes = auditDiff(before, after, FINANCIAL_FIELDS);
@@ -132,6 +139,7 @@ export async function addFinanceLine(orderId: string, input: unknown): Promise<A
       .values({
         orderId,
         side: data.side,
+        category: data.category,
         description: data.description,
         amount: data.amount,
         note: data.note || null,

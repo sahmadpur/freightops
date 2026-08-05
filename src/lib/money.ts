@@ -17,35 +17,47 @@ export function centsToString(cents: number): string {
   return (cents / 100).toFixed(2);
 }
 
-/** Cents → a display string with $ and thousands separators, e.g. 420000 → "$4,200.00". */
-export function formatMoney(cents: number): string {
+/** Symbol per supported currency; anything unknown falls back to its code. */
+const CURRENCY_SYMBOL: Record<string, string> = {
+  USD: "$",
+  EUR: "€",
+  AZN: "₼",
+  TRY: "₺",
+  RUB: "₽",
+};
+
+function groupCents(cents: number): { sign: string; formatted: string } {
   const sign = cents < 0 ? "-" : "";
-  const abs = Math.abs(cents);
-  const formatted = (abs / 100).toLocaleString("en-US", {
+  const formatted = (Math.abs(cents) / 100).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-  return `${sign}$${formatted}`;
+  return { sign, formatted };
+}
+
+/**
+ * Cents → a display string with a currency symbol and thousands separators,
+ * e.g. 420000 → "$4,200.00", or "TRY 4,200.00" for a currency with no symbol.
+ */
+export function formatMoney(cents: number, currency: string = "USD"): string {
+  const { sign, formatted } = groupCents(cents);
+  const symbol = CURRENCY_SYMBOL[currency];
+  return symbol ? `${sign}${symbol}${formatted}` : `${sign}${currency} ${formatted}`;
 }
 
 /** Cents → a display string with the manat symbol, e.g. 714000 → "₼7,140.00". */
 export function formatMoneyAzn(cents: number): string {
-  const sign = cents < 0 ? "-" : "";
-  const abs = Math.abs(cents);
-  const formatted = (abs / 100).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  return `${sign}₼${formatted}`;
+  return formatMoney(cents, "AZN");
 }
 
 /**
- * Convert USD cents to AZN cents at `rate` (AZN per 1 USD). Returns null when no
- * rate is set, so callers can fall back to USD-only display.
+ * Convert cents in an order's currency to AZN cents at `rate` (AZN per 1 unit
+ * of that currency). Returns null when no rate is set, so callers can fall back
+ * to showing the original currency alone.
  */
-export function convertUsdToAzn(usdCents: number, rate: string | number | null | undefined): number | null {
+export function convertToAzn(cents: number, rate: string | number | null | undefined): number | null {
   if (rate === null || rate === undefined || rate === "") return null;
   const r = typeof rate === "string" ? Number(rate) : rate;
   if (!Number.isFinite(r) || r <= 0) return null;
-  return Math.round(usdCents * r);
+  return Math.round(cents * r);
 }

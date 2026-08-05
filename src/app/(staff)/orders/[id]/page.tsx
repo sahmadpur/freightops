@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations, getFormatter } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SectionRule, DefRow } from "@/components/ui/record";
 import { OrderDetailTabs } from "@/modules/orders/order-detail-tabs";
+import { OrderHistory } from "@/modules/orders/order-history";
 import { StatusControl } from "@/modules/orders/status-control";
 import { ArchiveButton } from "@/components/ui/archive-button";
 import { archiveOrder, restoreOrder } from "@/modules/orders/actions";
@@ -19,12 +20,21 @@ import { CommentsTab } from "@/modules/comments/comments-tab";
 import { addComment } from "@/modules/comments/actions";
 import { requireArea } from "@/lib/session";
 import { formatMoney } from "@/lib/money";
+import { routeLabel } from "@/lib/countries";
+import { ORDER_STATUS_RANK } from "@/lib/order-status";
 
-export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function OrderDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const { id } = await params;
+  const { tab } = await searchParams;
   const { session } = await requireArea("staff");
   const t = await getTranslations();
-  const format = await getFormatter();
+  const locale = await getLocale();
   const data = await getOrder(id);
   if (!data) notFound();
   // Independent of each other — fetch in parallel.
@@ -37,7 +47,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       peekNextDocSeq("invoice", currentYear),
       peekNextDocSeq("act", currentYear),
     ]);
-  const { order, accountTitle, carrierTitle, transportNumber, transportModeType, history } = data;
+  const { order, accountTitle, carrierTitle, history } = data;
+  const route = routeLabel(order.fromCountry, order.toCountry, locale);
+  // Arrival is the trigger to bill the client (requirement #13).
+  const invoiceDue =
+    ORDER_STATUS_RANK[order.status] >= ORDER_STATUS_RANK.arrived && !order.invoiceNumber;
 
   const info = (
     <div className="space-y-7">
@@ -45,16 +59,12 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <SectionRule>{t("orders.sectionConsignment")}</SectionRule>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
           <DefRow label={t("fields.client")} value={accountTitle} />
-          <DefRow label={t("fields.clientOrderId")} value={order.clientOrderId} />
+          <DefRow label={t("fields.rollbackNumber")} value={order.rollbackNumber} />
           <DefRow label={t("fields.carrier")} value={carrierTitle} />
-          <DefRow label={t("fields.route")} value={order.route} />
+          <DefRow label={t("fields.route")} value={route} />
           <DefRow
-            label={t("fields.transport")}
-            value={
-              transportNumber
-                ? `${transportNumber}${transportModeType ? ` (${t(`transportModes.${transportModeType}`)})` : ""}`
-                : null
-            }
+            label={t("fields.transportType")}
+            value={order.transportType ? t(`transportTypes.${order.transportType}`) : null}
           />
           <DefRow label={t("fields.incoterms")} value={order.incoterms} />
         </dl>
@@ -64,7 +74,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
           <DefRow
             label={t("fields.cargoDescription")}
-            value={order.cargoDescription}
+            value={order.cargoItems.length ? order.cargoItems.join(", ") : null}
             className="sm:col-span-3"
           />
           <DefRow label={t("fields.packages")} value={order.packages != null ? String(order.packages) : null} />
@@ -79,6 +89,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <DefRow label={t("fields.invoiceDate")} value={order.invoiceDate} />
           <DefRow label={t("fields.carrierInvoiceNumber")} value={order.carrierInvoiceNumber} />
           <DefRow label={t("fields.carrierInvoiceDate")} value={order.carrierInvoiceDate} />
+          <DefRow label={t("fields.currency")} value={order.currency} />
           <DefRow label={t("fields.exchangeRate")} value={order.exchangeRate} />
           <DefRow label={t("fields.deliveryFormat")} value={order.deliveryFormat} />
           <DefRow label={t("fields.actNumber")} value={order.actNumber} />
@@ -86,32 +97,6 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         </dl>
       </section>
     </div>
-  );
-
-  const historyNode = (
-    <section>
-      <SectionRule>{t("orders.deliveryHistory")}</SectionRule>
-      {history.length === 0 ? (
-        <p className="text-sm text-ink-soft">{t("orders.noHistory")}</p>
-      ) : (
-        <ul className="space-y-2 text-sm">
-          {history.map((h) => (
-            <li
-              key={h.id}
-              className="flex items-baseline justify-between border-b border-edge-soft pb-2 last:border-0"
-            >
-              <span>
-                <span className="font-medium">{h.action}</span>
-                {h.field ? ` · ${h.field}: ${h.oldValue ?? "∅"} → ${h.newValue ?? "∅"}` : ""}
-              </span>
-              <span className="whitespace-nowrap font-mono text-[11px] text-ink-soft">
-                {format.dateTime(h.createdAt, { dateStyle: "medium", timeStyle: "short" })}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
   );
 
   const meta = (label: string, value: React.ReactNode) => (
@@ -176,18 +161,37 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1.5 border-t border-edge-soft pt-3 font-mono text-[11px]">
           {meta(t("fields.client"), accountTitle)}
           {metaDot}
-          {meta(t("fields.route"), order.route)}
+          {meta(t("fields.route"), route)}
           {metaDot}
-          {meta(t("fields.transport"), transportNumber ?? "—")}
+          {meta(
+            t("fields.transportType"),
+            order.transportType ? t(`transportTypes.${order.transportType}`) : "—",
+          )}
         </div>
       </div>
+
+      {invoiceDue && (
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[6px] border border-[rgb(var(--approval-pending-edge))] bg-[rgb(var(--approval-pending-bg))] px-4 py-3">
+          <p className="text-[13px] text-[rgb(var(--approval-pending-fg))]">
+            {t("orders.invoiceRequired")}
+          </p>
+          <Link href={`/orders/${order.id}?tab=documents`} className="btn-primary">
+            {t("docgen.createInvoice")}
+          </Link>
+        </div>
+      )}
 
       {/* Two-column workspace */}
       <div className="grid grid-cols-1 gap-x-8 gap-y-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
           <OrderDetailTabs
+            initialTab={tab}
             info={info}
-            finance={finance ? <FinanceTab orderId={order.id} finance={finance} /> : null}
+            finance={
+              finance ? (
+                <FinanceTab orderId={order.id} currency={order.currency} finance={finance} />
+              ) : null
+            }
             documents={
               <div className="space-y-6">
                 <DocumentsTab orderId={order.id} documents={orderDocuments} />
@@ -205,7 +209,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 sendAction={addComment}
               />
             }
-            history={historyNode}
+            history={<OrderHistory entries={history} />}
           />
         </div>
 
@@ -235,11 +239,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <div>
               <SectionRule>{t("finance.tab")}</SectionRule>
               <dl className="text-[13px]">
-                {snap(t("finance.revenue"), formatMoney(finance.clientChargeCents))}
-                {snap(t("finance.carrierCost"), `− ${formatMoney(finance.carrierCostCents)}`, "neg")}
+                {snap(t("finance.revenue"), formatMoney(finance.clientChargeCents, order.currency))}
+                {snap(t("finance.carrierCost"), `− ${formatMoney(finance.carrierCostCents, order.currency)}`, "neg")}
                 <div className="my-1.5 border-t border-edge-soft" />
-                {snap(t("finance.expectedProfit"), formatMoney(finance.expectedProfitCents), "strong")}
-                {snap(t("finance.actualProfit"), formatMoney(finance.settledProfitCents), "strong")}
+                {snap(t("finance.expectedProfit"), formatMoney(finance.expectedProfitCents, order.currency), "strong")}
+                {snap(t("finance.actualProfit"), formatMoney(finance.settledProfitCents, order.currency), "strong")}
               </dl>
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between">

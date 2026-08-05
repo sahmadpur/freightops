@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { routeLabel } from "@/lib/countries";
 import type { ClientOrderListRow } from "./queries";
 
 export function ClientOrdersTable({ rows }: { rows: ClientOrderListRow[] }) {
   const t = useTranslations();
+  const locale = useLocale();
 
   const columns: Column<ClientOrderListRow>[] = [
     {
@@ -21,11 +23,11 @@ export function ClientOrdersTable({ rows }: { rows: ClientOrderListRow[] }) {
       ),
     },
     { key: "title", header: t("fields.orderTitle"), render: (r) => r.title },
-    { key: "route", header: t("fields.route"), hiddenOnMobile: true, render: (r) => <span className="text-ink-soft">{r.route ?? "—"}</span> },
+    { key: "route", header: t("fields.route"), hiddenOnMobile: true, render: (r) => <span className="text-ink-soft">{routeLabel(r.fromCountry, r.toCountry, locale) ?? "—"}</span> },
     { key: "status", header: t("fields.status"), width: "140px", render: (r) => <StatusBadge status={r.status} /> },
   ];
 
   return (
-    <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} storageKey="portal-orders" minWidth={640} empty={t("portal.noOrders")} />
+    <DataTable columns={columns} rows={rows} rowKey={(r) => r.id} storageKey="portal-orders" minWidth={640} rowHref={(r) => `/portal/orders/${r.id}`} empty={t("portal.noOrders")} />
   );
 }

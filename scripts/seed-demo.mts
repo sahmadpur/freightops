@@ -13,13 +13,14 @@ import {
   accounts,
   carriers,
   contacts,
-  transportModes,
   orders,
   payments,
   orderFinanceLines,
   comments,
   auditLog,
-  orderCounters,
+  monthlyCounters,
+  customsClearances,
+  customsClearanceItems,
   documents,
   notifications,
 } from "../src/db/schema/domain";
@@ -58,13 +59,14 @@ async function main() {
     await db.delete(comments);
     await db.delete(documents);
     await db.delete(notifications);
+    await db.delete(customsClearanceItems);
+    await db.delete(customsClearances);
     await db.delete(orders);
     await db.delete(contacts);
-    await db.delete(transportModes);
     await db.delete(accounts);
     await db.delete(carriers);
     await db.delete(auditLog);
-    await db.delete(orderCounters);
+    await db.delete(monthlyCounters);
   }
 
   // ---- Accounts (clients) -------------------------------------------------
@@ -106,20 +108,6 @@ async function main() {
     { parentType: "carrier", parentId: car["Caspian Shipping Co."], name: "Elnur Mammadov", phones: ["+994 12 404 50 50"], emails: ["ops@caspianshipping.az"] },
   ]);
 
-  // ---- Transport modes ----------------------------------------------------
-  console.log("Seeding transport modes…");
-  const tmRows = await db
-    .insert(transportModes)
-    .values([
-      { modeType: "rail", number: "BTK-7741", fromCountry: "AZ", toCountry: "GE", route: "Alyat → Tbilisi", loadingDate: iso(5, 12), plannedArrivalDate: iso(5, 16), totalWeightKg: num(42000), totalVolumeM3: num(76), createdBy: by },
-      { modeType: "sea", number: "MSC-AZ-2031", fromCountry: "CN", toCountry: "AZ", route: "Shanghai → Baku (via Aktau)", loadingDate: iso(3, 2), plannedArrivalDate: iso(4, 1), totalWeightKg: num(180000), totalVolumeM3: num(320), createdBy: by },
-      { modeType: "truck", number: "TRK-3390", fromCountry: "AZ", toCountry: "TR", route: "Baku → Istanbul", loadingDate: iso(6, 4), plannedArrivalDate: iso(6, 9), totalWeightKg: num(21000), totalVolumeM3: num(58), createdBy: by },
-      { modeType: "air", number: "LH-8800", fromCountry: "DE", toCountry: "AZ", route: "Frankfurt → Baku", loadingDate: iso(6, 11), plannedArrivalDate: iso(6, 12), totalWeightKg: num(3400), totalVolumeM3: num(14), createdBy: by },
-      { modeType: "truck", number: "TRK-3412", fromCountry: "GE", toCountry: "AZ", route: "Poti → Baku", loadingDate: iso(2, 18), plannedArrivalDate: iso(2, 22), totalWeightKg: num(18500), totalVolumeM3: num(44), createdBy: by },
-    ])
-    .returning({ id: transportModes.id, number: transportModes.number });
-  const tm = Object.fromEntries(tmRows.map((t) => [t.number, t.id]));
-
   // ---- Orders -------------------------------------------------------------
   // Each row: financials, status, and (optionally) a payment plan.
   // pay: [receivedFraction, paidFraction] of [amountReceivable, amountPayable].
@@ -128,9 +116,10 @@ async function main() {
     title: string;
     account: string;
     carrier?: string;
-    transport?: string;
-    route: string;
-    cargo: string;
+    from: string;
+    to: string;
+    transportType: string;
+    cargo: string[];
     packages: number;
     weight: number;
     volume: number;
@@ -148,27 +137,29 @@ async function main() {
   };
 
   const seeds: Seed[] = [
-    { title: "Industrial CNC machines", account: "Caspian Traders LLC", carrier: "Caspian Shipping Co.", transport: "MSC-AZ-2031", route: "Shanghai → Baku", cargo: "3× CNC milling machines, crated", packages: 3, weight: 12400, volume: 48, incoterms: "CIF", deliveryFormat: "FCL", status: "delivered", client: 24800, carrierCost: 17200, additional: 640, addNote: "Port handling + crane", invoiced: true, pay: [1, 1], month: 3, date: 4 },
-    { title: "Cotton textiles consignment", account: "Silk Road Imports", carrier: "BTK Rail Cargo", transport: "BTK-7741", route: "Alyat → Tbilisi", cargo: "Baled cotton textiles", packages: 120, weight: 21000, volume: 64, incoterms: "DAP", deliveryFormat: "LCL", status: "delivered", client: 9600, carrierCost: 6300, additional: 220, invoiced: true, pay: [1, 1], month: 5, date: 18 },
-    { title: "Automotive spare parts", account: "Hanseatic GmbH", carrier: "Lufthansa Cargo", transport: "LH-8800", route: "Frankfurt → Baku", cargo: "Engine components, palletized", packages: 8, weight: 3400, volume: 14, incoterms: "CPT", deliveryFormat: "LTL", status: "at_customs", client: 14200, carrierCost: 10100, additional: 380, addNote: "Customs brokerage", invoiced: true, pay: [0.5, 0], month: 6, date: 11 },
-    { title: "Consumer electronics", account: "Caspian Traders LLC", carrier: "TransAnatolia Trucking", transport: "TRK-3390", route: "Baku → Istanbul", cargo: "Mixed electronics, 2 pallets", packages: 2, weight: 1800, volume: 9, incoterms: "DAP", deliveryFormat: "LTL", status: "transit", client: 7400, carrierCost: 4900, additional: 150, invoiced: true, pay: [0.3, 0], month: 6, date: 4 },
-    { title: "Agricultural machinery", account: "Volga Freight OOO", carrier: "Caspian Shipping Co.", route: "Astrakhan → Baku", cargo: "Tractor + implements", packages: 1, weight: 6800, volume: 32, incoterms: "FOB", deliveryFormat: "FCL", status: "loaded", client: 11200, carrierCost: 7600, additional: 300, invoiced: true, pay: [0, 0], month: 6, date: 9 },
-    { title: "Pharmaceutical cold chain", account: "Hanseatic GmbH", carrier: "Lufthansa Cargo", transport: "LH-8800", route: "Frankfurt → Baku", cargo: "Temperature-controlled pharma", packages: 14, weight: 920, volume: 6, incoterms: "CIP", deliveryFormat: "LTL", status: "arrived", client: 18600, carrierCost: 13400, additional: 720, addNote: "Reefer surcharge", invoiced: true, pay: [0.5, 0.5], month: 6, date: 12 },
-    { title: "Furniture container", account: "Silk Road Imports", carrier: "Black Sea Lines", route: "Poti → Batumi", cargo: "Flat-pack furniture", packages: 240, weight: 9400, volume: 70, incoterms: "EXW", deliveryFormat: "FCL", status: "at_border", client: 8200, carrierCost: 5400, additional: 180, invoiced: true, pay: [0, 0], month: 6, date: 7 },
-    { title: "Steel coils", account: "Volga Freight OOO", carrier: "BTK Rail Cargo", transport: "BTK-7741", route: "Alyat → Tbilisi", cargo: "Hot-rolled steel coils", packages: 18, weight: 41000, volume: 22, incoterms: "FCA", deliveryFormat: "FTL", status: "internal_transit", client: 13800, carrierCost: 9700, additional: 410, invoiced: true, pay: [0, 0], month: 6, date: 13 },
-    { title: "Retail apparel restock", account: "Anatolia Logistics A.Ş.", carrier: "TransAnatolia Trucking", transport: "TRK-3390", route: "Baku → Istanbul", cargo: "Apparel, hanging garments", packages: 60, weight: 2200, volume: 26, incoterms: "DAP", deliveryFormat: "LTL", status: "received", client: 6100, carrierCost: 3950, additional: 120, invoiced: false, month: 6, date: 14 },
-    { title: "Solar panel shipment", account: "Caspian Traders LLC", route: "Shenzhen → Baku", cargo: "Photovoltaic panels", packages: 320, weight: 15600, volume: 88, incoterms: "CIF", deliveryFormat: "FCL", status: "created", client: 21300, carrierCost: 0, additional: 0, invoiced: false, month: 6, date: 15 },
-    { title: "Wine export pallets", account: "Silk Road Imports", carrier: "TransAnatolia Trucking", transport: "TRK-3412", route: "Poti → Baku", cargo: "Bottled wine, palletized", packages: 44, weight: 8800, volume: 30, incoterms: "DAP", deliveryFormat: "LTL", status: "closed", client: 7900, carrierCost: 5100, additional: 260, addNote: "Excise documentation", invoiced: true, pay: [1, 1], month: 2, date: 18 },
-    { title: "Construction equipment", account: "Anatolia Logistics A.Ş.", carrier: "Caspian Shipping Co.", transport: "MSC-AZ-2031", route: "Mersin → Baku", cargo: "Excavator + attachments", packages: 1, weight: 19500, volume: 54, incoterms: "DPU", deliveryFormat: "FCL", status: "transit", client: 16700, carrierCost: 11900, additional: 540, invoiced: true, pay: [0.4, 0.25], month: 5, date: 28 },
-    { title: "Packaged food goods", account: "Volga Freight OOO", carrier: "BTK Rail Cargo", route: "Astrakhan → Tbilisi", cargo: "Canned goods, dry", packages: 800, weight: 24000, volume: 60, incoterms: "DAP", deliveryFormat: "FTL", status: "delivered", client: 10400, carrierCost: 6900, additional: 280, invoiced: true, pay: [1, 0.6], month: 4, date: 9 },
-    { title: "Medical devices", account: "Hanseatic GmbH", carrier: "Lufthansa Cargo", transport: "LH-8800", route: "Frankfurt → Baku", cargo: "Diagnostic equipment", packages: 22, weight: 1600, volume: 11, incoterms: "CIP", deliveryFormat: "LTL", status: "delivered", client: 22900, carrierCost: 16300, additional: 690, invoiced: true, pay: [1, 1], month: 5, date: 6 },
+    { title: "Industrial CNC machines", account: "Caspian Traders LLC", carrier: "Caspian Shipping Co.", from: "CN", to: "AZ", transportType: "sea", cargo: ["Machinery & equipment"], packages: 3, weight: 12400, volume: 48, incoterms: "CIF", deliveryFormat: "FCL", status: "delivered", client: 24800, carrierCost: 17200, additional: 640, addNote: "Port handling + crane", invoiced: true, pay: [1, 1], month: 3, date: 4 },
+    { title: "Cotton textiles consignment", account: "Silk Road Imports", carrier: "BTK Rail Cargo", from: "AZ", to: "GE", transportType: "rail", cargo: ["Textiles & apparel"], packages: 120, weight: 21000, volume: 64, incoterms: "DAP", deliveryFormat: "LCL", status: "delivered", client: 9600, carrierCost: 6300, additional: 220, invoiced: true, pay: [1, 1], month: 5, date: 18 },
+    { title: "Automotive spare parts", account: "Hanseatic GmbH", carrier: "Lufthansa Cargo", from: "DE", to: "AZ", transportType: "air", cargo: ["Automotive", "Spare parts"], packages: 8, weight: 3400, volume: 14, incoterms: "CPT", deliveryFormat: "LTL", status: "at_customs", client: 14200, carrierCost: 10100, additional: 380, addNote: "Customs brokerage", invoiced: true, pay: [0.5, 0], month: 6, date: 11 },
+    { title: "Consumer electronics", account: "Caspian Traders LLC", carrier: "TransAnatolia Trucking", from: "AZ", to: "TR", transportType: "truck", cargo: ["Electronics"], packages: 2, weight: 1800, volume: 9, incoterms: "DAP", deliveryFormat: "LTL", status: "transit", client: 7400, carrierCost: 4900, additional: 150, invoiced: true, pay: [0.3, 0], month: 6, date: 4 },
+    { title: "Agricultural machinery", account: "Volga Freight OOO", carrier: "Caspian Shipping Co.", from: "RU", to: "AZ", transportType: "sea", cargo: ["Machinery & equipment"], packages: 1, weight: 6800, volume: 32, incoterms: "FOB", deliveryFormat: "FCL", status: "loaded", client: 11200, carrierCost: 7600, additional: 300, invoiced: true, pay: [0, 0], month: 6, date: 9 },
+    { title: "Pharmaceutical cold chain", account: "Hanseatic GmbH", carrier: "Lufthansa Cargo", from: "DE", to: "AZ", transportType: "air", cargo: ["Pharmaceuticals", "Frozen/chilled goods"], packages: 14, weight: 920, volume: 6, incoterms: "CIP", deliveryFormat: "LTL", status: "arrived", client: 18600, carrierCost: 13400, additional: 720, addNote: "Reefer surcharge", invoiced: true, pay: [0.5, 0.5], month: 6, date: 12 },
+    { title: "Furniture container", account: "Silk Road Imports", carrier: "Black Sea Lines", from: "GE", to: "GE", transportType: "sea", cargo: ["Furniture"], packages: 240, weight: 9400, volume: 70, incoterms: "EXW", deliveryFormat: "FCL", status: "at_border", client: 8200, carrierCost: 5400, additional: 180, invoiced: true, pay: [0, 0], month: 6, date: 7 },
+    { title: "Steel coils", account: "Volga Freight OOO", carrier: "BTK Rail Cargo", from: "AZ", to: "GE", transportType: "rail", cargo: ["Construction materials"], packages: 18, weight: 41000, volume: 22, incoterms: "FCA", deliveryFormat: "FTL", status: "internal_transit", client: 13800, carrierCost: 9700, additional: 410, invoiced: true, pay: [0, 0], month: 6, date: 13 },
+    { title: "Retail apparel restock", account: "Anatolia Logistics A.Ş.", carrier: "TransAnatolia Trucking", from: "AZ", to: "TR", transportType: "truck", cargo: ["Textiles & apparel"], packages: 60, weight: 2200, volume: 26, incoterms: "DAP", deliveryFormat: "LTL", status: "received", client: 6100, carrierCost: 3950, additional: 120, invoiced: false, month: 6, date: 14 },
+    { title: "Solar panel shipment", account: "Caspian Traders LLC", from: "CN", to: "AZ", transportType: "container", cargo: ["Electronics", "Machinery & equipment"], packages: 320, weight: 15600, volume: 88, incoterms: "CIF", deliveryFormat: "FCL", status: "created", client: 21300, carrierCost: 0, additional: 0, invoiced: false, month: 6, date: 15 },
+    { title: "Wine export pallets", account: "Silk Road Imports", carrier: "TransAnatolia Trucking", from: "GE", to: "AZ", transportType: "truck", cargo: ["Foodstuffs"], packages: 44, weight: 8800, volume: 30, incoterms: "DAP", deliveryFormat: "LTL", status: "closed", client: 7900, carrierCost: 5100, additional: 260, addNote: "Excise documentation", invoiced: true, pay: [1, 1], month: 2, date: 18 },
+    { title: "Construction equipment", account: "Anatolia Logistics A.Ş.", carrier: "Caspian Shipping Co.", from: "TR", to: "AZ", transportType: "sea", cargo: ["Machinery & equipment"], packages: 1, weight: 19500, volume: 54, incoterms: "DPU", deliveryFormat: "FCL", status: "transit", client: 16700, carrierCost: 11900, additional: 540, invoiced: true, pay: [0.4, 0.25], month: 5, date: 28 },
+    { title: "Packaged food goods", account: "Volga Freight OOO", carrier: "BTK Rail Cargo", from: "RU", to: "GE", transportType: "rail", cargo: ["Foodstuffs"], packages: 800, weight: 24000, volume: 60, incoterms: "DAP", deliveryFormat: "FTL", status: "delivered", client: 10400, carrierCost: 6900, additional: 280, invoiced: true, pay: [1, 0.6], month: 4, date: 9 },
+    { title: "Medical devices", account: "Hanseatic GmbH", carrier: "Lufthansa Cargo", from: "DE", to: "AZ", transportType: "air", cargo: ["Pharmaceuticals", "Electronics"], packages: 22, weight: 1600, volume: 11, incoterms: "CIP", deliveryFormat: "LTL", status: "delivered", client: 22900, carrierCost: 16300, additional: 690, invoiced: true, pay: [1, 1], month: 5, date: 6 },
   ];
 
-  let seq = 0;
+  // Numbers restart every month, exactly like nextRecordNumber() does.
+  const seqByMonth = new Map<number, number>();
   const created: { id: string; number: string; status: string; title: string }[] = [];
   for (const s of seeds) {
-    seq += 1;
-    const number = `ORD-${YEAR}-${String(seq).padStart(3, "0")}`;
+    const seq = (seqByMonth.get(s.month) ?? 0) + 1;
+    seqByMonth.set(s.month, seq);
+    const number = `ALL${String(YEAR % 100).padStart(2, "0")}${String(s.month).padStart(2, "0")}${String(seq).padStart(3, "0")}`;
     // Carrier cost rollup now folds in the old "additional" costs (see finance lines below).
     const totalCarrierCost = s.carrierCost + s.additional;
     const when = day(s.month, s.date);
@@ -179,19 +170,21 @@ async function main() {
         title: s.title,
         accountId: acc[s.account],
         carrierId: s.carrier ? car[s.carrier] : null,
-        transportModeId: s.transport ? tm[s.transport] : null,
-        route: s.route,
-        cargoDescription: s.cargo,
+        transportType: s.transportType as never,
+        fromCountry: s.from,
+        toCountry: s.to,
+        cargoItems: s.cargo,
         packages: s.packages,
         weightKg: num(s.weight),
         volumeM3: num(s.volume),
         incoterms: s.incoterms as never,
         deliveryFormat: s.deliveryFormat as never,
         status: s.status as never,
+        currency: "USD",
         clientCharge: s.client ? money(s.client) : null,
         carrierCost: totalCarrierCost ? money(totalCarrierCost) : null,
         exchangeRate: "1.7000",
-        invoiceNumber: s.invoiced ? `INV-${YEAR}-${String(seq).padStart(3, "0")}` : null,
+        invoiceNumber: s.invoiced ? `INV-${YEAR}-${number.slice(-3)}${String(s.month).padStart(2, "0")}` : null,
         invoiceDate: s.invoiced ? iso(s.month, Math.min(28, s.date + 1)) : null,
         amountReceivable: s.invoiced ? money(s.client) : null,
         amountPayable: s.invoiced && totalCarrierCost ? money(totalCarrierCost) : null,
@@ -204,8 +197,8 @@ async function main() {
     // Itemized finance lines matching the rollups above.
     const lines = [];
     if (s.client) lines.push({ orderId: row.id, side: "revenue" as const, description: "Freight forwarding services", amount: money(s.client), createdBy: by });
-    if (s.carrierCost) lines.push({ orderId: row.id, side: "cost" as const, description: "Carrier cost", amount: money(s.carrierCost), createdBy: by });
-    if (s.additional) lines.push({ orderId: row.id, side: "cost" as const, description: s.addNote ?? "Additional costs", amount: money(s.additional), createdBy: by });
+    if (s.carrierCost) lines.push({ orderId: row.id, side: "cost" as const, category: "transport" as const, description: "Carrier cost", amount: money(s.carrierCost), createdBy: by });
+    if (s.additional) lines.push({ orderId: row.id, side: "cost" as const, category: "terminal" as const, description: s.addNote ?? "Additional costs", amount: money(s.additional), createdBy: by });
     if (lines.length) await db.insert(orderFinanceLines).values(lines);
 
     // Payments
@@ -238,11 +231,58 @@ async function main() {
     created.push({ id: row.id, number: row.number, status: s.status, title: s.title });
   }
 
-  // Order counter so the next real order continues the sequence.
-  await db
-    .insert(orderCounters)
-    .values({ year: YEAR, lastNumber: seq })
-    .onConflictDoUpdate({ target: orderCounters.year, set: { lastNumber: seq } });
+  // Monthly counters so the next real order continues each month's sequence.
+  for (const [month, last] of seqByMonth) {
+    await db
+      .insert(monthlyCounters)
+      .values({ kind: "order", year: YEAR, month, lastNumber: last })
+      .onConflictDoUpdate({
+        target: [monthlyCounters.kind, monthlyCounters.year, monthlyCounters.month],
+        set: { lastNumber: last },
+      });
+  }
+
+  // ---- Customs clearances -------------------------------------------------
+  console.log("Seeding customs clearances…");
+  const atCustomsOrder = created.find((o) => o.status === "at_customs");
+  const clearanceRows = await db
+    .insert(customsClearances)
+    .values([
+      {
+        number: `CC${String(YEAR % 100)}06001`,
+        orderId: atCustomsOrder?.id ?? null,
+        accountId: acc["Hanseatic GmbH"],
+        declarationNumber: "AZ-2026-118842",
+        description: "Import clearance, automotive parts",
+        currency: "USD",
+        exchangeRate: "1.7000",
+        clearedAt: iso(6, 13),
+        createdBy: by,
+      },
+      {
+        number: `CC${String(YEAR % 100)}06002`,
+        orderId: null,
+        accountId: acc["Caspian Traders LLC"],
+        declarationNumber: "AZ-2026-119003",
+        description: "Standalone brokerage — client's own shipment",
+        currency: "USD",
+        exchangeRate: "1.7000",
+        clearedAt: iso(6, 20),
+        createdBy: by,
+      },
+    ])
+    .returning({ id: customsClearances.id });
+  await db.insert(customsClearanceItems).values([
+    { clearanceId: clearanceRows[0].id, category: "documentation_fee", buyAmount: money(40), sellAmount: money(75), sortOrder: 0 },
+    { clearanceId: clearanceRows[0].id, category: "declaration_main_page", buyAmount: money(60), sellAmount: money(110), sortOrder: 1 },
+    { clearanceId: clearanceRows[0].id, category: "declaration_additional_page", buyAmount: money(15), sellAmount: money(30), sortOrder: 2 },
+    { clearanceId: clearanceRows[0].id, category: "broker_fee", buyAmount: money(120), sellAmount: money(200), sortOrder: 3 },
+    { clearanceId: clearanceRows[0].id, category: "handling", buyAmount: money(85), sellAmount: money(140), sortOrder: 4 },
+    { clearanceId: clearanceRows[1].id, category: "short_declaration", buyAmount: money(25), sellAmount: money(50), sortOrder: 0 },
+    { clearanceId: clearanceRows[1].id, category: "inspector_fee", buyAmount: money(70), sellAmount: money(120), sortOrder: 1 },
+    { clearanceId: clearanceRows[1].id, category: "terminal", buyAmount: money(95), sellAmount: money(160), sortOrder: 2 },
+    { clearanceId: clearanceRows[1].id, category: "delivery", buyAmount: money(180), sellAmount: money(280), sortOrder: 3 },
+  ]);
 
   // ---- Comments (on a couple of active orders) ---------------------------
   if (by) {
@@ -275,7 +315,7 @@ async function main() {
   if (auditRows.length) await db.insert(auditLog).values(auditRows);
 
   console.log(
-    `\nDone. Seeded ${accountRows.length} accounts, ${carrierRows.length} carriers, ${tmRows.length} transport modes, ${created.length} orders.`,
+    `\nDone. Seeded ${accountRows.length} accounts, ${carrierRows.length} carriers, ${created.length} orders, ${clearanceRows.length} customs clearances.`,
   );
   process.exit(0);
 }

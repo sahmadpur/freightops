@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/lib/use-is-mobile";
 
 export type Column<T> = {
@@ -25,6 +26,9 @@ const ALIGN: Record<NonNullable<Column<unknown>["align"]>, string> = {
  * right edge of each header; widths persist to localStorage per `storageKey`.
  * `hiddenOnMobile` columns drop below 768px. Resize is mouse-only and disabled
  * on touch/mobile.
+ *
+ * `rowHref` makes rows openable: double-click, or Enter/Space when the row has
+ * keyboard focus. Single click is left alone so text stays selectable.
  */
 export function DataTable<T>({
   columns,
@@ -33,6 +37,7 @@ export function DataTable<T>({
   empty,
   minWidth = 900,
   storageKey,
+  rowHref,
 }: {
   columns: Column<T>[];
   rows: T[];
@@ -40,8 +45,10 @@ export function DataTable<T>({
   empty?: ReactNode;
   minWidth?: number;
   storageKey?: string;
+  rowHref?: (row: T) => string;
 }) {
   const isMobile = useIsMobile(768);
+  const router = useRouter();
   const cols = isMobile ? columns.filter((c) => !c.hiddenOnMobile) : columns;
   const resizable = Boolean(storageKey) && !isMobile;
 
@@ -156,7 +163,27 @@ export function DataTable<T>({
             </tr>
           ) : (
             rows.map((row) => (
-              <tr key={rowKey(row)} className="hover:bg-surface-hover">
+              <tr
+                key={rowKey(row)}
+                className={`hover:bg-surface-hover ${
+                  rowHref ? "cursor-default focus:outline focus:outline-2 focus:outline-edge-focus" : ""
+                }`}
+                tabIndex={rowHref ? 0 : undefined}
+                onDoubleClick={rowHref ? () => router.push(rowHref(row)) : undefined}
+                onKeyDown={
+                  rowHref
+                    ? (e) => {
+                        // Only when the row itself has focus — never swallow keys
+                        // meant for a link or button inside a cell.
+                        if (e.target !== e.currentTarget) return;
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          router.push(rowHref(row));
+                        }
+                      }
+                    : undefined
+                }
+              >
                 {cols.map((c) => (
                   <td
                     key={c.key}

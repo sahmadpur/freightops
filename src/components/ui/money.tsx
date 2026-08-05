@@ -1,23 +1,26 @@
-import { convertUsdToAzn, formatMoney, formatMoneyAzn } from "@/lib/money";
+import { convertToAzn, formatMoney, formatMoneyAzn } from "@/lib/money";
 
 /**
- * Money in both currencies: USD (primary, stored) on top, the AZN equivalent —
- * converted at the order's exchange rate (AZN per 1 USD) — beneath. Falls back
- * to USD-only when the order has no rate. See requirement #11.
+ * Money in both currencies: the record's own currency on top, the AZN
+ * equivalent — converted at its exchange rate (AZN per 1 unit) — beneath.
+ * Falls back to the original currency alone when no rate is set, and shows
+ * nothing extra when the record is already in AZN.
  */
 export function MoneyDual({
-  usdCents,
+  cents,
+  currency = "USD",
   rate,
   className = "",
 }: {
-  usdCents: number;
+  cents: number;
+  currency?: string;
   rate: string | number | null | undefined;
   className?: string;
 }) {
-  const aznCents = convertUsdToAzn(usdCents, rate);
+  const aznCents = currency === "AZN" ? null : convertToAzn(cents, rate);
   return (
     <span className={`inline-flex flex-col leading-tight ${className}`}>
-      <span className="tabular-nums">{formatMoney(usdCents)}</span>
+      <span className="tabular-nums">{formatMoney(cents, currency)}</span>
       {aznCents !== null && (
         <span className="text-[10px] text-ink-soft tabular-nums">{formatMoneyAzn(aznCents)}</span>
       )}
