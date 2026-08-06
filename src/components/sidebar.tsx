@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -32,7 +33,7 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
         aria-current={active ? "page" : undefined}
         className={`mx-2 flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] transition-colors ${
           active
-            ? "bg-sidebar-chip font-medium text-white shadow-[inset_0_0_18px_rgba(142,174,255,0.5)]"
+            ? "bg-sidebar-chip font-medium text-brand-pale shadow-[inset_0_0_18px_rgba(142,174,255,0.5)]"
             : "text-sidebar-fg-soft hover:bg-surface-chip-active hover:text-brand"
         }`}
       >
@@ -52,8 +53,8 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
       {/* Wordmark */}
       <div className="flex items-center gap-2.5 px-[18px] pb-4 pt-4">
         <BrandMark />
-        <span className="font-display text-[17px] font-medium tracking-[-0.03em] text-sidebar-fg">
-          Freight<span className="text-brand">Ops</span>
+        <span className="font-display text-[17px] font-medium leading-[1.1] tracking-[-0.03em] text-sidebar-fg">
+          All In <span className="text-ink-soft">Logistics</span>
         </span>
       </div>
 
@@ -95,7 +96,7 @@ export function MobileNav({ isAdmin }: { isAdmin: boolean }) {
             aria-current={active ? "page" : undefined}
             className={`shrink-0 rounded-full px-3 py-1.5 text-[12.5px] transition-colors ${
               active
-                ? "bg-sidebar-chip font-medium text-white"
+                ? "bg-sidebar-chip font-medium text-brand-pale"
                 : "text-sidebar-fg-soft hover:bg-surface-chip-active hover:text-brand"
             }`}
           >
@@ -107,23 +108,7 @@ export function MobileNav({ isAdmin }: { isAdmin: boolean }) {
   );
 }
 
-/** Freight-box mark on a blue tile. */
+/** The company mark. */
 function BrandMark() {
-  return (
-    <span className="flex h-7 w-7 items-center justify-center rounded-[9px] bg-brand text-white shadow-[inset_0_0_18px_rgba(142,174,255,0.55)]">
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-4 w-4"
-        aria-hidden="true"
-      >
-        <path d="M3 7.5 12 3l9 4.5v9L12 21 3 16.5z" />
-        <path d="M3 7.5 12 12l9-4.5M12 12v9" />
-      </svg>
-    </span>
-  );
+  return <Image src="/all-in-logo.png" alt="" width={28} height={27} priority />;
 }

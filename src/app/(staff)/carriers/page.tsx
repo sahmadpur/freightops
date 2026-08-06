@@ -38,7 +38,7 @@ export default async function CarriersPage({
         </form>
         <Link
           href={archived ? "/carriers" : "/carriers?archived=1"}
-          className={`rounded-full border px-3 py-1 text-xs ${archived ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 text-slate-500 hover:bg-slate-50"}`}
+          className={`rounded-full border px-3 py-1 text-xs ${archived ? "border-indigo-600 bg-indigo-600 text-brand-pale" : "border-slate-300 text-slate-500 hover:bg-slate-50"}`}
         >
           {archived ? t("actions.showActive") : t("actions.showArchived")}
         </Link>

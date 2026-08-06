@@ -57,7 +57,9 @@ export function GenerateDocumentSection({
         setNumber("");
         router.refresh();
       } else {
-        setError(r.error === "not_found" ? t("notFound") : t("failed"));
+        setError(
+          r.error === "not_found" ? t("notFound") : r.error === "no_rate" ? t("noRate") : t("failed"),
+        );
       }
     } catch {
       setError(t("failed"));

@@ -27,9 +27,14 @@ describe("generateDocInputSchema", () => {
   it("rejects a malformed date", () => {
     expect(generateDocInputSchema.safeParse({ ...base, date: "02.07.2026" }).success).toBe(false);
   });
+  it("accepts every currency the company has an account for", () => {
+    for (const currency of ["AZN", "USD", "EUR", "RUB"]) {
+      expect(generateDocInputSchema.safeParse({ ...base, currency }).success).toBe(true);
+    }
+  });
   it("rejects unknown kinds, languages and currencies", () => {
     expect(generateDocInputSchema.safeParse({ ...base, kind: "waybill" }).success).toBe(false);
     expect(generateDocInputSchema.safeParse({ ...base, language: "de" }).success).toBe(false);
-    expect(generateDocInputSchema.safeParse({ ...base, currency: "EUR" }).success).toBe(false);
+    expect(generateDocInputSchema.safeParse({ ...base, currency: "TRY" }).success).toBe(false);
   });
 });

@@ -42,9 +42,9 @@ export function newCommentEmail(d: { orderNumber: string; authorName: string; pr
 
 export function passwordResetEmail(d: { url: string }): EmailContent {
   return {
-    subject: `Reset your FreightOps password`,
+    subject: `Reset your All In Logistics password`,
     body:
-      `We received a request to reset your FreightOps password.\n\n` +
+      `We received a request to reset your All In Logistics password.\n\n` +
       `Set a new password here: ${d.url}\n\n` +
       `This link expires in 1 hour. If you didn't request this, you can ignore this email.\n`,
   };
@@ -52,9 +52,9 @@ export function passwordResetEmail(d: { url: string }): EmailContent {
 
 export function invitationEmail(d: { url: string; role: string }): EmailContent {
   return {
-    subject: `You have been invited to FreightOps`,
+    subject: `You have been invited to All In Logistics`,
     body:
-      `You have been invited to FreightOps as a ${d.role}.\n\n` +
+      `You have been invited to All In Logistics as a ${d.role}.\n\n` +
       `Accept your invitation here: ${d.url}\n\n` +
       `This link expires in 7 days.\n`,
   };

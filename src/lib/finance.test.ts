@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { balance, expectedProfitCents, paymentStatus, settledProfitCents } from "./finance";
+import {
+  agingBucket,
+  balance,
+  bucketAging,
+  daysOutstanding,
+  expectedProfitCents,
+  paymentStatus,
+  settledProfitCents,
+} from "./finance";
 
 describe("expectedProfitCents", () => {
   it("is client charge minus carrier cost", () => {
@@ -29,6 +37,65 @@ describe("balance", () => {
   });
   it("handles no invoice amount and no payments", () => {
     expect(balance(null, [])).toEqual({ invoicedCents: 0, paidCents: 0, deltaCents: 0 });
+  });
+});
+
+describe("agingBucket", () => {
+  it("splits at 30 / 60 / 90 days", () => {
+    expect(agingBucket(0)).toBe("0-30");
+    expect(agingBucket(30)).toBe("0-30");
+    expect(agingBucket(31)).toBe("31-60");
+    expect(agingBucket(60)).toBe("31-60");
+    expect(agingBucket(61)).toBe("61-90");
+    expect(agingBucket(90)).toBe("61-90");
+    expect(agingBucket(91)).toBe("90+");
+  });
+});
+
+describe("daysOutstanding", () => {
+  const now = new Date("2026-08-05T12:00:00Z");
+  it("counts whole days elapsed", () => {
+    expect(daysOutstanding(new Date("2026-08-05T00:00:00Z"), now)).toBe(0);
+    expect(daysOutstanding(new Date("2026-07-06T12:00:00Z"), now)).toBe(30);
+  });
+  it("is never negative for a future date", () => {
+    expect(daysOutstanding(new Date("2026-09-01T00:00:00Z"), now)).toBe(0);
+  });
+});
+
+describe("bucketAging", () => {
+  const now = new Date("2026-08-05T00:00:00Z");
+  const day = (n: number) => new Date(now.getTime() - n * 86_400_000);
+
+  it("sums outstanding balances per bucket", () => {
+    const result = bucketAging(
+      [
+        { deltaCents: 10000, since: day(5) },
+        { deltaCents: 20000, since: day(45) },
+        { deltaCents: 30000, since: day(120) },
+        { deltaCents: 5000, since: day(120) },
+      ],
+      now,
+    );
+    expect(result.totalCents).toBe(65000);
+    expect(result.buckets).toEqual([
+      { bucket: "0-30", cents: 10000, count: 1 },
+      { bucket: "31-60", cents: 20000, count: 1 },
+      { bucket: "61-90", cents: 0, count: 0 },
+      { bucket: "90+", cents: 35000, count: 2 },
+    ]);
+  });
+
+  it("ignores settled and overpaid rows", () => {
+    const result = bucketAging(
+      [
+        { deltaCents: 0, since: day(200) },
+        { deltaCents: -5000, since: day(200) },
+      ],
+      now,
+    );
+    expect(result.totalCents).toBe(0);
+    expect(result.buckets.every((b) => b.count === 0)).toBe(true);
   });
 });
 

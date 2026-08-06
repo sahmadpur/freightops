@@ -1,19 +1,12 @@
 import { StatusBadge } from "@/components/ui/status-badge";
+import { statusHue } from "@/lib/status-hue";
 
-/** Same hue coding as `StatusBadge`, one step more saturated for the bar. */
-const SEGMENT_COLORS: Record<string, string> = {
-  created: "#91afff",
-  waiting_pickup: "#c3cad6",
-  received: "#a99cf0",
-  internal_transit: "#7dc4e3",
-  loaded: "#6cc9a5",
-  transit: "#f5c344",
-  at_border: "#f0a37a",
-  at_customs: "#e78fb1",
-  arrived: "#a8cf72",
-  delivered: "#22a06b",
-  closed: "#c4c4c4",
-};
+/**
+ * Same stage hues as `StatusBadge` (the `--status-*` tokens), lightened one
+ * step against the card so a 10px bar reads without shouting.
+ */
+const segment = (status: string) =>
+  `color-mix(in oklab, rgb(${statusHue(status)}) 65%, rgb(var(--surface-card)))`;
 
 export function StatusBar({ counts }: { counts: { status: string; count: number }[] }) {
   const total = counts.reduce((s, c) => s + c.count, 0);
@@ -28,7 +21,7 @@ export function StatusBar({ counts }: { counts: { status: string; count: number 
             .map((c) => (
               <div
                 key={c.status}
-                style={{ width: `${(c.count / total) * 100}%`, background: SEGMENT_COLORS[c.status] ?? "#ccc" }}
+                style={{ width: `${(c.count / total) * 100}%`, background: segment(c.status) }}
                 title={`${c.status}: ${c.count}`}
               />
             ))

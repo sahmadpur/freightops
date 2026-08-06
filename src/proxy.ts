@@ -14,7 +14,10 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Only /api/auth is public; all other /api/* routes are intentionally gated.
+  // Static assets are public too: the logo and the icons are needed on the
+  // sign-in page itself, and the image optimizer re-fetches them with no
+  // session cookie — gating them turns the asset into a redirect to /sign-in.
   matcher: [
-    "/((?!api/auth(?:/|$)|sign-in(?:/|$)|accept-invitation(?:/|$)|forgot-password(?:/|$)|reset-password(?:/|$)|_next(?:/|$)|favicon\\.ico).*)",
+    "/((?!api/auth(?:/|$)|sign-in(?:/|$)|accept-invitation(?:/|$)|forgot-password(?:/|$)|reset-password(?:/|$)|_next(?:/|$)|[^?]*\\.(?:png|jpe?g|svg|webp|gif|ico|webmanifest|txt|xml)$).*)",
   ],
 };

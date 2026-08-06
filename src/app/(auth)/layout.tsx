@@ -1,10 +1,12 @@
+import Image from "next/image";
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-paper-dim bg-grid px-5 py-14 font-sans text-ink">
       {/* Soft blue wash behind the card, top-centre */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(47,105,255,0.16)_0%,transparent_65%)]"
+        className="pointer-events-none absolute -top-40 left-1/2 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgb(var(--brand)/0.16)_0%,transparent_65%)]"
       />
       {/* The grid fades out toward the bottom of the page */}
       <div
@@ -31,15 +33,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         dot="bg-dot-done"
       />
 
-      <div className="relative w-full max-w-[26rem]">
-        {/* Lockup */}
-        <div className="mb-7 flex items-center justify-center gap-2.5">
-          <BrandMark />
-          <span className="font-display text-[19px] font-medium tracking-[-0.03em] text-brand-deep">
-            Freight<span className="text-brand">Ops</span>
-          </span>
-        </div>
+      {/* Lockup — outside the form column, which is narrower than the wordmark.
+          Both parts scale with the viewport so the single line never wraps. */}
+      <div className="relative mb-7 flex items-center justify-center gap-4">
+        <BrandMark />
+        <span className="whitespace-nowrap font-display text-[clamp(28px,7.5vw,76px)] font-medium leading-[1] tracking-[-0.03em] text-brand-deep">
+          All In <span className="text-ink-soft">Logistics</span>
+        </span>
+      </div>
 
+      <div className="relative w-full max-w-[26rem]">
         <div className="mb-6 text-center">
           <span className="eyebrow mb-3">Operations desk</span>
           <h1 className="font-display text-[32px] font-medium leading-[1.08] tracking-[-0.035em] text-brand-deep">
@@ -109,20 +112,13 @@ function ShipmentCard({
 
 function BrandMark() {
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-brand text-white shadow-[inset_0_0_20px_rgba(142,174,255,0.55),0_1px_2px_rgba(0,46,164,0.2)]">
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-[18px] w-[18px]"
-        aria-hidden="true"
-      >
-        <path d="M3 7.5 12 3l9 4.5v9L12 21 3 16.5z" />
-        <path d="M3 7.5 12 12l9-4.5M12 12v9" />
-      </svg>
-    </span>
+    <Image
+      src="/all-in-logo.png"
+      alt=""
+      width={136}
+      height={129}
+      priority
+      className="h-auto w-[clamp(52px,13vw,136px)]"
+    />
   );
 }

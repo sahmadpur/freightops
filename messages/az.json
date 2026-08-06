@@ -1,12 +1,17 @@
 {
   "common": {
-    "appName": "FreightOps",
+    "appName": "All In Logistics",
     "signIn": "Daxil ol",
     "signOut": "Çıxış",
     "save": "Yadda saxla",
     "cancel": "Ləğv et",
     "search": "Axtarış",
     "noResults": "Nəticə yoxdur"
+  },
+  "theme": {
+    "light": "İşıqlı",
+    "dark": "Qaranlıq",
+    "system": "Sistem"
   },
   "nav": {
     "orders": "Sifarişlər",
@@ -202,7 +207,27 @@
     "ledger": "Alınan / ödənilən jurnalı",
     "recordedBy": "{name} tərəfindən",
     "carrierInvoiceNumber": "Daşıyıcının hesab №-si",
-    "carrierInvoiceDate": "Daşıyıcının hesab tarixi"
+    "carrierInvoiceDate": "Daşıyıcının hesab tarixi",
+    "periodResults": "{month} üzrə nəticələr",
+    "trend": "Gəlir, xərclər və mənfəət — {year}",
+    "cashFlow": "Daxil olan və ödənilən vəsait — {year}",
+    "cashReceived": "Daxil olub",
+    "cashPaid": "Ödənilib",
+    "netCash": "Xalis vəsait",
+    "receivableAging": "Debitor borcları müddətə görə",
+    "payableAging": "Kreditor borcları müddətə görə",
+    "agingNote": "Debitor borcunun müddəti müştəri hesab-fakturasının tarixindən, kreditor borcunun müddəti daşıyıcı hesab-fakturasının tarixindən hesablanır; hesab-faktura tarixi yoxdursa, sifarişin yaradılma tarixindən hesablanır.",
+    "oldest": "Ən köhnə borclar",
+    "daysOld": "{days, plural, one {# gün} other {# gün}}",
+    "bucket0_30": "0–30 gün",
+    "bucket31_60": "31–60 gün",
+    "bucket61_90": "61–90 gün",
+    "bucket90plus": "90+ gün",
+    "revenueByCurrency": "Valyutalara görə gəlir",
+    "revenueByTransportType": "Daşıma növünə görə gəlir",
+    "marginByRoute": "Marşrutlara görə marja",
+    "topClientsByRevenue": "Gəlirə görə əsas müştərilər",
+    "allAmountsAzn": "Bütün məbləğlər hər sifarişin məzənnəsi ilə AZN-ə çevrilib."
   },
   "dashboard": {
     "title": "İdarə paneli",
@@ -292,6 +317,7 @@
     "generating": "Yaradılır…",
     "failed": "Sənədi yaratmaq mümkün olmadı",
     "notFound": "Sifariş tapılmadı",
+    "noRate": "Sənəd tarixinə bu valyuta üçün məzənnə yoxdur — sifarişdə məzənnəni təyin edin və ya başqa valyuta seçin",
     "hint": "PDF sifarişin sənədlərinə yazılır. Göstərilən nömrə yalnız yaratma zamanı rezerv olunur.",
     "createInvoice": "Hesab-faktura yarat"
   },

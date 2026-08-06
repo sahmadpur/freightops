@@ -1,5 +1,5 @@
 import type { DocCurrency } from "@/lib/amount-in-words";
-import type { Issuer } from "../issuer";
+import type { Issuer, IssuerBank } from "../issuer";
 
 export type DocLanguage = "en" | "ru" | "az";
 
@@ -24,12 +24,16 @@ export type DocOrderInfo = {
 
 export type DocLine = {
   description: string;
+  /** Printed in the "Quantity (units)" column; null leaves the cell empty. */
+  quantity: number | null;
   amountCents: number;
 };
 
 /** Shared payload for both document types; all amounts in integer minor units. */
 export type DocData = {
   issuer: Issuer;
+  /** Account and correspondent for the document's currency. */
+  bank: IssuerBank;
   client: DocParty;
   number: string;
   /** ISO date (YYYY-MM-DD) as chosen in the generate form. */
@@ -38,6 +42,7 @@ export type DocData = {
   currency: DocCurrency;
   order: DocOrderInfo;
   lines: DocLine[];
+  /** Net of VAT — Σ line amounts. VAT and the grand total are derived. */
   totalCents: number;
 };
 

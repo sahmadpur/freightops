@@ -1,4 +1,4 @@
-# FreightOps
+# All In Logistics
 
 Web platform for a freight forwarding company. See `docs/brd.md` (requirements)
 and `docs/superpowers/specs/2026-06-12-freightops-platform-design.md` (design).

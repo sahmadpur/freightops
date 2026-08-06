@@ -2,8 +2,17 @@ import { and, asc, desc, eq, gte, isNotNull, isNull, lt, sql } from "drizzle-orm
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import { accounts, carriers, orderFinanceLines, orders, payments, user } from "@/db/schema";
-import { balance, expectedProfitCents, paymentStatus, settledProfitCents, type PaymentStatus } from "@/lib/finance";
-import { toCents } from "@/lib/money";
+import {
+  balance,
+  bucketAging,
+  daysOutstanding,
+  expectedProfitCents,
+  paymentStatus,
+  settledProfitCents,
+  type AgingBucket,
+  type PaymentStatus,
+} from "@/lib/finance";
+import { convertToAzn, toCents } from "@/lib/money";
 import { ORDER_STATUS_RANK, type OrderStatus } from "@/lib/order-status";
 
 export type OrderPayment = {
@@ -110,9 +119,6 @@ export async function orderFinance(orderId: string): Promise<OrderFinance | null
 export async function financeTotals() {
   // All aggregates exclude soft-deleted (archived) orders.
   const liveOrder = isNull(orders.deletedAt);
-  // Payments are denominated in their order's currency; convert per payment.
-  const paymentAzn = sql<string>`coalesce(sum(${payments.amount} * coalesce((select o.exchange_rate from ${orders} o where o.id = ${payments.orderId}), 1)), 0)`;
-  const livePayment = sql`exists(select 1 from ${orders} o where o.id = ${payments.orderId} and o.deleted_at is null)`;
   const [recvAgg] = await db.select({ invoiced: azn(orders.amountReceivable) }).from(orders).where(liveOrder);
   const [payAgg] = await db.select({ invoiced: azn(orders.amountPayable) }).from(orders).where(liveOrder);
   const [inAgg] = await db.select({ total: paymentAzn }).from(payments).where(and(eq(payments.direction, "incoming"), livePayment));
@@ -170,6 +176,12 @@ const azn = (col: AnyPgColumn) =>
 
 const aznSettled = sql<string>`coalesce(sum((coalesce(${orders.amountReceivable}, 0) - coalesce(${orders.amountPayable}, 0)) * coalesce(${orders.exchangeRate}, 1)), 0)`;
 
+/** Payments are denominated in their order's currency; convert per payment. */
+const paymentAzn = sql<string>`coalesce(sum(${payments.amount} * coalesce((select o.exchange_rate from ${orders} o where o.id = ${payments.orderId}), 1)), 0)`;
+
+/** Excludes payments belonging to a soft-deleted (archived) order. */
+const livePayment = sql`exists(select 1 from ${orders} o where o.id = ${payments.orderId} and o.deleted_at is null)`;
+
 /** [start, end) for a YYYY-MM string; falls back to the current month. */
 export function monthRange(month?: string): { from: Date; to: Date; month: string } {
   const now = new Date();
@@ -214,16 +226,7 @@ export async function dashboardData(month?: string) {
 
   const [totals, periodAgg, byType, byRoute, byClient, monthly] = await Promise.all([
     financeTotals(),
-    db
-      .select({
-        orders: sql<number>`count(*)`.mapWith(Number),
-        revenue: azn(orders.clientCharge),
-        carrierCost: azn(orders.carrierCost),
-        settledProfit: aznSettled,
-        unrated: sql<number>`count(*) filter (where ${orders.exchangeRate} is null and (${orders.clientCharge} is not null or ${orders.carrierCost} is not null))`.mapWith(Number),
-      })
-      .from(orders)
-      .where(inPeriod),
+    periodTotals(from, to),
     db
       .select({
         transportType: orders.transportType,
@@ -244,35 +247,9 @@ export async function dashboardData(month?: string) {
       .groupBy(orders.fromCountry, orders.toCountry)
       .orderBy(desc(sql`count(*)`))
       .limit(6),
-    db
-      .select({
-        accountId: orders.accountId,
-        accountTitle: accounts.title,
-        revenue: azn(orders.clientCharge),
-        count: sql<number>`count(*)`.mapWith(Number),
-      })
-      .from(orders)
-      .innerJoin(accounts, eq(orders.accountId, accounts.id))
-      .where(inPeriod)
-      .groupBy(orders.accountId, accounts.title)
-      .orderBy(desc(azn(orders.clientCharge)))
-      .limit(6),
-    db
-      .select({
-        month: sql<string>`to_char(${orders.createdAt}, 'YYYY-MM')`,
-        revenue: azn(orders.clientCharge),
-        carrierCost: azn(orders.carrierCost),
-        settledProfit: aznSettled,
-      })
-      .from(orders)
-      .where(and(sql`extract(year from ${orders.createdAt}) = ${year}`, isNull(orders.deletedAt)))
-      .groupBy(sql`to_char(${orders.createdAt}, 'YYYY-MM')`)
-      .orderBy(desc(sql`to_char(${orders.createdAt}, 'YYYY-MM')`)),
+    topClientsByRevenue(from, to),
+    monthlyResults(year),
   ]);
-
-  const p = periodAgg[0];
-  const periodRevenue = toCents(p?.revenue);
-  const periodCost = toCents(p?.carrierCost);
 
   return {
     month: selected,
@@ -287,34 +264,280 @@ export async function dashboardData(month?: string) {
     statusCounts: orderStatusList().map((s) => ({ status: s, count: count(s) })),
     financial: totals,
     /** All AZN-normalized, scoped to the selected month. */
-    period: {
-      orders: p?.orders ?? 0,
-      revenueCents: periodRevenue,
-      carrierCostCents: periodCost,
-      expectedProfitCents: periodRevenue - periodCost,
-      actualProfitCents: toCents(p?.settledProfit),
-      /** Orders carrying money but no FX rate — counted at face value. */
-      unratedOrders: p?.unrated ?? 0,
-    },
+    period: periodAgg,
     byTransportType: byType.map((r) => ({ transportType: r.transportType, count: r.count })),
     topRoutes: byRoute.map((r) => ({
       fromCountry: r.fromCountry,
       toCountry: r.toCountry,
       count: r.count,
     })),
-    topClients: byClient.map((r) => ({
-      accountId: r.accountId,
-      accountTitle: r.accountTitle,
+    topClients: byClient,
+    monthly,
+  };
+}
+
+/**
+ * Revenue / cost / profit for one period, AZN-normalized. Shared by the
+ * Dashboard's "results for {month}" card and the Finance page's KPI row, so
+ * the two can never disagree.
+ */
+export async function periodTotals(from: Date, to: Date) {
+  const [agg] = await db
+    .select({
+      orders: sql<number>`count(*)`.mapWith(Number),
+      revenue: azn(orders.clientCharge),
+      carrierCost: azn(orders.carrierCost),
+      settledProfit: aznSettled,
+      unrated: sql<number>`count(*) filter (where ${orders.exchangeRate} is null and (${orders.clientCharge} is not null or ${orders.carrierCost} is not null))`.mapWith(Number),
+    })
+    .from(orders)
+    .where(and(isNull(orders.deletedAt), gte(orders.createdAt, from), lt(orders.createdAt, to)));
+
+  const revenueCents = toCents(agg?.revenue);
+  const carrierCostCents = toCents(agg?.carrierCost);
+  return {
+    orders: agg?.orders ?? 0,
+    revenueCents,
+    carrierCostCents,
+    expectedProfitCents: revenueCents - carrierCostCents,
+    actualProfitCents: toCents(agg?.settledProfit),
+    /** Orders carrying money but no FX rate — counted at face value. */
+    unratedOrders: agg?.unrated ?? 0,
+  };
+}
+
+/** Revenue / cost / profit per month for one calendar year, newest month first. */
+export async function monthlyResults(year: number) {
+  const rows = await db
+    .select({
+      month: sql<string>`to_char(${orders.createdAt}, 'YYYY-MM')`,
+      revenue: azn(orders.clientCharge),
+      carrierCost: azn(orders.carrierCost),
+      settledProfit: aznSettled,
+    })
+    .from(orders)
+    .where(and(sql`extract(year from ${orders.createdAt}) = ${year}`, isNull(orders.deletedAt)))
+    .groupBy(sql`to_char(${orders.createdAt}, 'YYYY-MM')`)
+    .orderBy(desc(sql`to_char(${orders.createdAt}, 'YYYY-MM')`));
+
+  return rows.map((m) => ({
+    month: m.month,
+    revenueCents: toCents(m.revenue),
+    carrierCostCents: toCents(m.carrierCost),
+    expectedProfitCents: toCents(m.revenue) - toCents(m.carrierCost),
+    actualProfitCents: toCents(m.settledProfit),
+  }));
+}
+
+/** The period's biggest clients by AZN revenue. */
+export async function topClientsByRevenue(from: Date, to: Date, limit = 6) {
+  const rows = await db
+    .select({
+      accountId: orders.accountId,
+      accountTitle: accounts.title,
+      revenue: azn(orders.clientCharge),
+      count: sql<number>`count(*)`.mapWith(Number),
+    })
+    .from(orders)
+    .innerJoin(accounts, eq(orders.accountId, accounts.id))
+    .where(and(isNull(orders.deletedAt), gte(orders.createdAt, from), lt(orders.createdAt, to)))
+    .groupBy(orders.accountId, accounts.title)
+    .orderBy(desc(azn(orders.clientCharge)))
+    .limit(limit);
+
+  return rows.map((r) => ({
+    accountId: r.accountId,
+    accountTitle: r.accountTitle,
+    revenueCents: toCents(r.revenue),
+    count: r.count,
+  }));
+}
+
+/**
+ * Money actually received vs paid per month of one calendar year, by payment
+ * value date (not order date) — this is cash, not accrual. Newest month first,
+ * to match `monthlyResults`.
+ */
+export async function cashFlowByMonth(year: number) {
+  const monthExpr = sql<string>`to_char(${payments.paidAt}, 'YYYY-MM')`;
+  const rows = await db
+    .select({
+      month: monthExpr,
+      direction: payments.direction,
+      total: paymentAzn,
+    })
+    .from(payments)
+    .where(and(sql`extract(year from ${payments.paidAt}) = ${year}`, livePayment))
+    .groupBy(monthExpr, payments.direction)
+    .orderBy(desc(monthExpr));
+
+  const byMonth = new Map<string, { receivedCents: number; paidCents: number }>();
+  for (const r of rows) {
+    const entry = byMonth.get(r.month) ?? { receivedCents: 0, paidCents: 0 };
+    if (r.direction === "incoming") entry.receivedCents += toCents(r.total);
+    else entry.paidCents += toCents(r.total);
+    byMonth.set(r.month, entry);
+  }
+
+  return [...byMonth].map(([month, e]) => ({
+    month,
+    ...e,
+    netCents: e.receivedCents - e.paidCents,
+  }));
+}
+
+export type MixRow = { key: string; label: string | null; revenueCents: number; count: number };
+
+/** Where the period's revenue comes from: by currency, and by transport type. */
+export async function revenueMix(from: Date, to: Date) {
+  const inPeriod = and(
+    isNull(orders.deletedAt),
+    gte(orders.createdAt, from),
+    lt(orders.createdAt, to),
+  );
+  const [byCurrency, byType, byRoute] = await Promise.all([
+    db
+      .select({
+        currency: orders.currency,
+        revenue: azn(orders.clientCharge),
+        count: sql<number>`count(*)`.mapWith(Number),
+      })
+      .from(orders)
+      .where(inPeriod)
+      .groupBy(orders.currency)
+      .orderBy(desc(azn(orders.clientCharge))),
+    db
+      .select({
+        transportType: orders.transportType,
+        revenue: azn(orders.clientCharge),
+        count: sql<number>`count(*)`.mapWith(Number),
+      })
+      .from(orders)
+      .where(inPeriod)
+      .groupBy(orders.transportType)
+      .orderBy(desc(azn(orders.clientCharge))),
+    db
+      .select({
+        fromCountry: orders.fromCountry,
+        toCountry: orders.toCountry,
+        margin: sql<string>`coalesce(sum((coalesce(${orders.clientCharge}, 0) - coalesce(${orders.carrierCost}, 0)) * coalesce(${orders.exchangeRate}, 1)), 0)`,
+        count: sql<number>`count(*)`.mapWith(Number),
+      })
+      .from(orders)
+      .where(and(inPeriod, isNotNull(orders.fromCountry)))
+      .groupBy(orders.fromCountry, orders.toCountry)
+      .orderBy(desc(sql`sum((coalesce(${orders.clientCharge}, 0) - coalesce(${orders.carrierCost}, 0)) * coalesce(${orders.exchangeRate}, 1))`))
+      .limit(6),
+  ]);
+
+  return {
+    byCurrency: byCurrency.map((r) => ({
+      currency: r.currency,
       revenueCents: toCents(r.revenue),
       count: r.count,
     })),
-    monthly: monthly.map((m) => ({
-      month: m.month,
-      revenueCents: toCents(m.revenue),
-      carrierCostCents: toCents(m.carrierCost),
-      expectedProfitCents: toCents(m.revenue) - toCents(m.carrierCost),
-      actualProfitCents: toCents(m.settledProfit),
+    byTransportType: byType.map((r) => ({
+      transportType: r.transportType,
+      revenueCents: toCents(r.revenue),
+      count: r.count,
     })),
+    byRoute: byRoute.map((r) => ({
+      fromCountry: r.fromCountry,
+      toCountry: r.toCountry,
+      marginCents: toCents(r.margin),
+      count: r.count,
+    })),
+  };
+}
+
+export type AgingSide = {
+  buckets: { bucket: AgingBucket; cents: number; count: number }[];
+  totalCents: number;
+  /** The oldest unsettled orders on this side, worst first. */
+  oldest: { id: string; number: string; title: string; days: number; cents: number }[];
+};
+
+/**
+ * How old the outstanding money is, both sides. Built from the reconciliation
+ * rows the Dashboard already loads rather than a second aggregate, so the
+ * numbers agree with the report by construction. Receivables age from the
+ * client invoice date, payables from the carrier invoice date; an order with
+ * no invoice date yet ages from when it was created.
+ */
+export function agingFromRows(
+  rows: ReconciliationRow[],
+  now: Date,
+): { receivable: AgingSide; payable: AgingSide } {
+  const side = (pick: (r: ReconciliationRow) => { deltaCents: number; since: Date }): AgingSide => {
+    const items = rows.map((r) => {
+      const { deltaCents, since } = pick(r);
+      // Face value when the order carries no FX rate — same rule as `azn()`.
+      const cents = convertToAzn(deltaCents, r.exchangeRate) ?? deltaCents;
+      return { row: r, cents, since, days: daysOutstanding(since, now) };
+    });
+    const { buckets, totalCents } = bucketAging(
+      items.map((i) => ({ deltaCents: i.cents, since: i.since })),
+      now,
+    );
+    return {
+      buckets,
+      totalCents,
+      oldest: items
+        .filter((i) => i.cents > 0)
+        .sort((a, b) => b.days - a.days)
+        .slice(0, 8)
+        .map((i) => ({
+          id: i.row.id,
+          number: i.row.number,
+          title: i.row.title,
+          days: i.days,
+          cents: i.cents,
+        })),
+    };
+  };
+
+  return {
+    receivable: side((r) => ({
+      deltaCents: r.receivable.deltaCents,
+      since: r.invoiceDate ?? r.createdAt,
+    })),
+    payable: side((r) => ({
+      deltaCents: r.payable.deltaCents,
+      since: r.carrierInvoiceDate ?? r.createdAt,
+    })),
+  };
+}
+
+/**
+ * Everything the Finance page draws, for one month (and its calendar year).
+ * `monthRange()` resolves the period, so an absent or malformed `month` falls
+ * back to the current one.
+ */
+export async function financeStats(month?: string) {
+  const { from, to, month: selected } = monthRange(month);
+  const year = from.getUTCFullYear();
+  const now = new Date();
+
+  const [totals, period, monthly, cashFlow, reconRows, topClients, mix] = await Promise.all([
+    financeTotals(),
+    periodTotals(from, to),
+    monthlyResults(year),
+    cashFlowByMonth(year),
+    reconciliationRows(),
+    topClientsByRevenue(from, to),
+    revenueMix(from, to),
+  ]);
+
+  return {
+    month: selected,
+    year,
+    totals,
+    period,
+    monthly,
+    cashFlow,
+    aging: agingFromRows(reconRows, now),
+    topClients,
+    mix,
   };
 }
 
@@ -328,6 +551,11 @@ export type ReconciliationRow = {
   carrierTitle: string | null;
   currency: string;
   exchangeRate: string | null;
+  /** Client invoice date — the clock receivables age from. */
+  invoiceDate: Date | null;
+  /** Carrier invoice date — the clock payables age from. */
+  carrierInvoiceDate: Date | null;
+  createdAt: Date;
   receivable: ReconciliationSide;
   payable: ReconciliationSide;
 };
@@ -348,6 +576,9 @@ export async function reconciliationRows(): Promise<ReconciliationRow[]> {
       exchangeRate: orders.exchangeRate,
       amountReceivable: orders.amountReceivable,
       amountPayable: orders.amountPayable,
+      invoiceDate: orders.invoiceDate,
+      carrierInvoiceDate: orders.carrierInvoiceDate,
+      createdAt: orders.createdAt,
       received,
       paid,
     })
@@ -369,6 +600,9 @@ export async function reconciliationRows(): Promise<ReconciliationRow[]> {
       carrierTitle: r.carrierTitle,
       currency: r.currency,
       exchangeRate: r.exchangeRate,
+      invoiceDate: r.invoiceDate ? new Date(r.invoiceDate) : null,
+      carrierInvoiceDate: r.carrierInvoiceDate ? new Date(r.carrierInvoiceDate) : null,
+      createdAt: r.createdAt,
       receivable: { ...recv, status: paymentStatus(recv.invoicedCents, recv.paidCents) },
       payable: { ...pay, status: paymentStatus(pay.invoicedCents, pay.paidCents) },
     };

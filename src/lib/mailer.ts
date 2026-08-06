@@ -23,7 +23,7 @@ function getTransport(): Transporter {
 /** Send one plain-text email. Throws on transport failure (the worker handles retry). */
 export async function sendMail(msg: { to: string; subject: string; text: string }): Promise<void> {
   await getTransport().sendMail({
-    from: process.env.SMTP_FROM ?? "FreightOps <no-reply@freightops.local>",
+    from: process.env.SMTP_FROM ?? "All In Logistics <no-reply@allinlog.az>",
     to: msg.to,
     subject: msg.subject,
     text: msg.text,

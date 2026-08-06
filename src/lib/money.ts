@@ -61,3 +61,16 @@ export function convertToAzn(cents: number, rate: string | number | null | undef
   if (!Number.isFinite(r) || r <= 0) return null;
   return Math.round(cents * r);
 }
+
+/**
+ * Convert cents between two currencies through AZN, given each side's rate in
+ * AZN per 1 unit (AZN itself is 1). Both rates must be positive and finite —
+ * callers establish them from the order or the CBAR bulletin.
+ */
+export function convertCents(cents: number, fromAznRate: number, toAznRate: number): number {
+  if (!Number.isFinite(fromAznRate) || !Number.isFinite(toAznRate)) {
+    throw new Error("convertCents: rates must be finite");
+  }
+  if (fromAznRate <= 0 || toAznRate <= 0) throw new Error("convertCents: rates must be positive");
+  return Math.round((cents * fromAznRate) / toAznRate);
+}

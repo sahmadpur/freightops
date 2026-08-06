@@ -85,6 +85,47 @@ Verified: typecheck + 131 unit tests + changed-file lint green; real PDFs
 rendered through Chromium in AZ/RU/EN for both invoice and ACT, AZN and USD —
 logo, glyphs, requisites, currency, numbering and amount-in-words all correct.
 
+## 2026-08-05 update — All In Logistics templates (AZN / USD / EUR / RUB)
+
+The company's own Word templates arrived (`temp/İNVOİCE Nümunə.docx`,
+`temp/Invoice_{USD,EUR,RUB} - 2026.docx`, `temp/AKT nümunə.docx`,
+`temp/Act_{USD,EUR,RUB} - 2026.docx`) and replace everything the RedLine set
+drove. What changed:
+
+- **Issuer** (`issuer.ts`): “ALL IN LOG” MMC — VÖEN 1506805111, KapitalBank ASC
+  Bravo 3 filialı, code 201296, bank VÖEN 9900003611, SWIFT AIIBAZ2XXXX,
+  director Ələkbərov Vüsal. `ISSUER_BANKS` holds the **per-currency** account and
+  correspondent (AZN via NABZ; USD via BNY Mellon; EUR via Raiffeisen Vienna;
+  RUB via Райффайзенбанк) — the currency selector picks the block to print.
+- **Currencies:** `DOC_CURRENCIES` is now AZN / USD / EUR / RUB, with
+  amount-in-words nouns for euro/cent and рубль/копейка in all three languages.
+- **FX:** amounts are stored in the order's currency, so a document in another
+  currency is cross-converted through AZN (`convertCents`): the order's own rate
+  where it has one — keeping documents in step with the finance module — and the
+  cached CBAR bulletin for the other leg (`getAznRate`, walks back to the last
+  published day). No rate for either leg ⇒ the action fails with `no_rate`
+  *before* a number is allocated, rather than quoting a guessed amount.
+- **VAT:** the templates end on Total / VAT 18% / Grand total, so line amounts are
+  net and 18% is added on top (`VAT_RATE`, `docTotals` in `partials.ts`). The
+  amount-in-words line and the ACT's declared value both spell the **gross**
+  figure. Note this makes an invoice 18% larger than the order's `clientCharge`,
+  which is net.
+- **Quantity column:** the templates' "Quantity (units)" is the shipment's
+  package count, printed against the first (freight) line; extra charge lines
+  leave the cell empty. No schema change.
+- **Letterhead** (`layout.ts`): the Word file's full-page bitmap is rebuilt in
+  CSS — mark + "All In Logistics" top right, watermark behind the text, red
+  address band pinned to the foot — so it stays sharp on A4 (the originals are
+  Letter-sized). Serif body type echoes the templates' Times New Roman;
+  requisite blocks are two-column so a full invoice still fits one page, and a
+  long line list repeats the table header on the next page.
+- **Branding:** ALL IN logo as favicon (`src/app/icon.png`, `apple-icon.png`) and
+  in the app shell (sidebar, mobile top bar, sign-in lockup, `public/all-in-logo.png`);
+  app name, page title and e-mail copy now say "All In Logistics".
+
+Not changed: the invoice number prefix is still `RL-DDMMYY###` — say so if it
+should become `AL-`; past documents keep their existing numbers either way.
+
 ## Environment / ops notes
 
 - Dockerfile runner stage and the `app-dev` compose command install
@@ -116,8 +157,9 @@ logo, glyphs, requisites, currency, numbering and amount-in-words all correct.
   support in `src/lib/mailer.ts`).
 - ~~Real client templates + real issuer requisites~~ — done 2026-07-06.
 - A settings UI for editable requisites is still out of scope (hard-coded in
-  `issuer.ts`). Currency is now per-document (AZN/USD); further currencies just
-  need adding to `DOC_CURRENCIES` + noun tables in `amount-in-words.ts`.
+  `issuer.ts` / `ISSUER_BANKS`). Currency is per-document (AZN/USD/EUR/RUB);
+  further currencies need an entry in `DOC_CURRENCIES`, `ISSUER_BANKS` and the
+  noun tables in `amount-in-words.ts`.
 - ACT `AKT № NN` numbers repeat across years (see assumption above).
 - `tmp/rename.jpeg` is an unrelated mockup of a **payments/reconciliation**
   table (carriers payable / clients receivable / paid / delta) — a separate

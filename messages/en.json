@@ -1,12 +1,17 @@
 {
   "common": {
-    "appName": "FreightOps",
+    "appName": "All In Logistics",
     "signIn": "Sign in",
     "signOut": "Sign out",
     "save": "Save",
     "cancel": "Cancel",
     "search": "Search",
     "noResults": "No matches"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   },
   "nav": {
     "orders": "Orders",
@@ -202,7 +207,27 @@
     "ledger": "Received / paid log",
     "recordedBy": "by {name}",
     "carrierInvoiceNumber": "Carrier invoice no.",
-    "carrierInvoiceDate": "Carrier invoice date"
+    "carrierInvoiceDate": "Carrier invoice date",
+    "periodResults": "Results for {month}",
+    "trend": "Revenue, expenses and profit — {year}",
+    "cashFlow": "Cash received vs paid — {year}",
+    "cashReceived": "Received",
+    "cashPaid": "Paid",
+    "netCash": "Net cash",
+    "receivableAging": "Receivables by age",
+    "payableAging": "Payables by age",
+    "agingNote": "Receivables age from the client invoice date, payables from the carrier invoice date; orders with no invoice date yet age from creation.",
+    "oldest": "Oldest outstanding",
+    "daysOld": "{days, plural, one {# day} other {# days}}",
+    "bucket0_30": "0–30 days",
+    "bucket31_60": "31–60 days",
+    "bucket61_90": "61–90 days",
+    "bucket90plus": "90+ days",
+    "revenueByCurrency": "Revenue by currency",
+    "revenueByTransportType": "Revenue by transport type",
+    "marginByRoute": "Margin by route",
+    "topClientsByRevenue": "Top clients by revenue",
+    "allAmountsAzn": "All amounts converted to AZN at each order's exchange rate."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -292,6 +317,7 @@
     "generating": "Generating…",
     "failed": "Generation failed",
     "notFound": "Order not found",
+    "noRate": "No exchange rate for this currency on the document date — set the order's rate or pick another currency",
     "hint": "The PDF is saved to this order's documents. The previewed number is reserved only when you generate.",
     "createInvoice": "Create invoice"
   },

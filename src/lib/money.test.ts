@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toCents, sumCents, centsToString, formatMoney, formatMoneyAzn, convertToAzn } from "./money";
+import { toCents, sumCents, centsToString, formatMoney, formatMoneyAzn, convertToAzn, convertCents } from "./money";
 
 describe("toCents", () => {
   it("parses numeric strings to integer cents", () => {
@@ -68,5 +68,23 @@ describe("convertToAzn", () => {
     expect(convertToAzn(420000, "")).toBeNull();
     expect(convertToAzn(420000, 0)).toBeNull();
     expect(convertToAzn(420000, "abc")).toBeNull();
+  });
+});
+
+describe("convertCents", () => {
+  it("cross-converts through AZN", () => {
+    // 100.00 USD at 1.70 AZN/USD → 170.00 AZN → 100.00 EUR at 1.70 AZN/EUR.
+    expect(convertCents(10000, 1.7, 1.7)).toBe(10000);
+    // 100.00 USD at 1.70 → 170.00 AZN → 1.85 AZN/EUR → 91.89 EUR.
+    expect(convertCents(10000, 1.7, 1.85)).toBe(9189);
+  });
+  it("treats AZN as the identity rate", () => {
+    expect(convertCents(10000, 1.7, 1)).toBe(17000);
+    expect(convertCents(17000, 1, 1.7)).toBe(10000);
+  });
+  it("rejects non-positive or non-finite rates", () => {
+    expect(() => convertCents(100, 0, 1.7)).toThrow();
+    expect(() => convertCents(100, 1.7, 0)).toThrow();
+    expect(() => convertCents(100, Number.NaN, 1.7)).toThrow();
   });
 });

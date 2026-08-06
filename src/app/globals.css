@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * FreightOps — "Signal Desk" design system
+ * All In Logistics — "Signal Desk" design system
  * ----------------------------------------
  * A light, product-grade SaaS language: near-white #f5f5f5 canvas, white
  * cards on hairline borders, soft charcoal ink, and one signal blue that
@@ -18,11 +18,17 @@
  * onto Tailwind's indigo/violet/slate/emerald/rose scales so the wider app
  * inherits the palette without rewriting every utility string.
  *
- * Light mode only — layouts paint their own surfaces and the product has no
- * theme toggle. (A dark token-flip is a clean future addition.)
+ * Dark mode is a pure token flip: `[data-theme="dark"]` below redeclares the
+ * same tokens, so every component — and the whole remapped Tailwind scale —
+ * inverts without touching a single utility string. `--brand` and
+ * `--brand-pale` swap roles (light mode: dark blue on white; dark mode: light
+ * blue, and dark text ON a blue button). Keep new colors in tokens, never in
+ * literal hex, or they will not follow the theme.
  */
 
 :root {
+  color-scheme: light;
+
   /* Brand — signal blue primary */
   --brand: 47 105 255; /* #2f69ff signal blue (PRIMARY) */
   --brand-hover: 31 84 224; /* #1f54e0 */
@@ -31,6 +37,8 @@
   --brand-light: 145 175 255; /* #91afff gradient tail */
   --brand-pale: 255 255 255; /* text/icon ON a blue button */
   --brand-chip: 74 124 255; /* #4a7cff mid blue */
+  --brand-wash: 235 241 255; /* #ebf1ff faintest blue fill */
+  --brand-strong: 23 62 168; /* #173ea8 deepest blue */
 
   /* Paper — the off-white chrome for auth / marketing surfaces */
   --paper: 250 250 250; /* #fafafa */
@@ -59,6 +67,35 @@
   --dot-pending: 180 180 180; /* #b4b4b4 */
   --dot-failed: 229 72 77; /* #e5484d */
 
+  /*
+   * Shipment-stage hues — one per order status, shared by the status badge
+   * (.status-chip) and the dashboard's stacked status bar so the two can't
+   * drift. Cool blues while the load is arranged, amber in motion, rose at the
+   * border, green once it lands. The hue is information: a table can be
+   * scanned without reading the labels.
+   */
+  --status-created: 32 73 196;
+  --status-waiting_pickup: 77 85 102;
+  --status-received: 68 54 184;
+  --status-internal_transit: 15 95 128;
+  --status-loaded: 18 119 90;
+  --status-transit: 138 90 6;
+  --status-at_border: 154 68 25;
+  --status-at_customs: 150 48 90;
+  --status-arrived: 61 107 22;
+  --status-delivered: 18 119 90;
+  --status-closed: 92 92 92;
+
+  /*
+   * Chart series, in fixed assignment order (revenue / cost / profit). Not
+   * cycled: a fourth measure gets its own chart, not a generated hue. Both
+   * themes are validated for colorblind separation, chroma and contrast
+   * against their own surface — re-run the check before changing a value.
+   */
+  --chart-1: 47 105 255; /* #2f69ff revenue / money in */
+  --chart-2: 234 88 12; /* #ea580c cost / money out */
+  --chart-3: 5 150 105; /* #059669 profit */
+
   /* Approval / workflow states (bg / fg / edge) */
   --approval-pending-bg: 255 250 235;
   --approval-pending-fg: 158 100 8;
@@ -80,6 +117,88 @@
   --sidebar-fg: 45 45 45; /* #2d2d2d active nav text */
   --sidebar-fg-soft: 124 124 124; /* #7c7c7c inactive nav text */
   --sidebar-chip: 47 105 255; /* #2f69ff active pill */
+}
+
+/*
+ * Dark theme — the same tokens, dark values. Set as `data-theme="dark"` on
+ * <html> from the `theme` cookie (src/lib/theme.ts); the inline script in
+ * layout.tsx resolves the "system" preference to light/dark before paint, so
+ * this block is the only place dark values live.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Brand — lifted so it reads on dark; --brand-pale inverts to dark ink
+     because it is the text ON a blue button. */
+  --brand: 122 162 255; /* #7aa2ff */
+  --brand-hover: 154 185 255; /* #9ab9ff */
+  --brand-deep: 236 239 244; /* heading ink → near-white */
+  --brand-accent: 122 162 255;
+  --brand-light: 64 100 186; /* gradient tail / hover edge */
+  --brand-pale: 12 18 30; /* text/icon ON a blue button */
+  --brand-chip: 74 124 255;
+  --brand-wash: 26 38 66;
+  --brand-strong: 176 199 255;
+
+  --paper: 20 25 33;
+  --paper-dim: 15 19 26;
+  --paper-edge: 42 50 62;
+
+  --ink: 226 230 237;
+  --ink-soft: 150 158 172;
+
+  --surface: 14 18 24;
+  --surface-card: 22 28 36;
+  --surface-hover: 30 37 47;
+  --surface-thead: 26 32 41;
+  --surface-chip-active: 30 46 82;
+
+  --edge-soft: 38 45 56;
+  --edge-chip: 62 72 88;
+  --edge-focus: 122 162 255;
+
+  --dot-done: 74 200 148;
+  --dot-progress: 245 196 68;
+  --dot-pending: 130 138 152;
+  --dot-failed: 240 122 126;
+
+  /* Stage hues lighten so they carry on dark surfaces. */
+  --status-created: 145 175 255;
+  --status-waiting_pickup: 176 184 198;
+  --status-received: 169 156 240;
+  --status-internal_transit: 125 196 227;
+  --status-loaded: 108 201 165;
+  --status-transit: 245 195 68;
+  --status-at_border: 240 163 122;
+  --status-at_customs: 231 143 177;
+  --status-arrived: 168 207 114;
+  --status-delivered: 74 200 148;
+  --status-closed: 168 172 180;
+
+  /* Own steps, not a flip of the light values — validated on #161c24. */
+  --chart-1: 77 139 255; /* #4d8bff */
+  --chart-2: 217 102 42; /* #d9662a */
+  --chart-3: 15 157 112; /* #0f9d70 */
+
+  --approval-pending-bg: 52 42 16;
+  --approval-pending-fg: 244 208 130;
+  --approval-pending-edge: 104 82 32;
+  --approval-approved-bg: 20 46 34;
+  --approval-approved-fg: 138 216 178;
+  --approval-approved-edge: 44 88 66;
+  --approval-rejected-bg: 62 26 28;
+  --approval-rejected-fg: 246 156 158;
+  --approval-rejected-edge: 116 52 54;
+
+  --danger-bg: 62 26 28;
+  --danger-fg: 246 156 158;
+  --danger-edge: 116 52 54;
+
+  /* Sidebar — a shade darker than the page, blue pill unchanged */
+  --sidebar-bg: 18 23 30;
+  --sidebar-fg: 232 236 242;
+  --sidebar-fg-soft: 150 158 172;
+  --sidebar-chip: 47 105 255;
 }
 
 @theme inline {
@@ -134,25 +253,25 @@
 
   /* indigo + violet → signal blue (primary brand family) */
   --color-indigo-50: rgb(var(--surface-chip-active));
-  --color-indigo-100: rgb(235 241 255);
+  --color-indigo-100: rgb(var(--brand-wash));
   --color-indigo-200: rgb(var(--brand-light));
   --color-indigo-300: rgb(var(--brand-light));
   --color-indigo-400: rgb(var(--brand-chip));
   --color-indigo-500: rgb(var(--brand-chip));
   --color-indigo-600: rgb(var(--brand));
   --color-indigo-700: rgb(var(--brand-hover));
-  --color-indigo-800: rgb(23 62 168);
+  --color-indigo-800: rgb(var(--brand-strong));
   --color-indigo-900: rgb(var(--brand-deep));
 
-  --color-violet-50: rgb(245 248 255);
-  --color-violet-100: rgb(235 241 255);
+  --color-violet-50: rgb(var(--surface-chip-active));
+  --color-violet-100: rgb(var(--brand-wash));
   --color-violet-200: rgb(var(--brand-light));
   --color-violet-300: rgb(var(--brand-light));
   --color-violet-400: rgb(var(--brand-chip));
   --color-violet-500: rgb(var(--brand-chip));
   --color-violet-600: rgb(var(--brand));
   --color-violet-700: rgb(var(--brand-hover));
-  --color-violet-800: rgb(23 62 168);
+  --color-violet-800: rgb(var(--brand-strong));
   --color-violet-900: rgb(var(--brand-deep));
 
   /* slate → ink / paper / edge (chrome, text, borders) */
@@ -265,6 +384,22 @@ body {
     @apply h-[5px] w-[5px] shrink-0 rounded-full bg-brand;
   }
 
+  /*
+   * Shipment-stage pill. The caller passes the stage hue as `--status-hue`
+   * (see StatusBadge); fill and label are mixed from it against the current
+   * surface and ink, so one hue per stage per theme is all that's needed.
+   */
+  .status-chip {
+    @apply inline-block whitespace-nowrap rounded-full px-2.5 py-0.5
+      text-[11px] font-medium;
+    background: color-mix(
+      in oklab,
+      rgb(var(--status-hue)) 14%,
+      rgb(var(--surface-card))
+    );
+    color: color-mix(in oklab, rgb(var(--status-hue)) 90%, rgb(var(--ink)));
+  }
+
   /* Blue-gradient display text, for hero headlines only. */
   .text-gradient {
     @apply bg-gradient-to-b from-brand to-brand-light bg-clip-text
@@ -298,9 +433,15 @@ body {
   animation-delay: 0.3s;
 }
 
-/* Graph-paper grid — dashed 120px guides behind hero/auth surfaces. */
+/* Graph-paper grid — dashed 120px guides behind hero/auth surfaces. The stroke
+   can't be a token (it lives inside a data URL), so dark gets its own copy. */
 .bg-grid {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg stroke='%233d3d3d' stroke-opacity='0.14' stroke-dasharray='5 6'%3E%3Cpath d='M0 0.5H120'/%3E%3Cpath d='M0.5 0V120'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 120px;
+}
+
+:root[data-theme="dark"] .bg-grid {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg stroke='%23e2e6ed' stroke-opacity='0.12' stroke-dasharray='5 6'%3E%3Cpath d='M0 0.5H120'/%3E%3Cpath d='M0.5 0V120'/%3E%3C/g%3E%3C/svg%3E");
   background-size: 120px 120px;
 }
 

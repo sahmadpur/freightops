@@ -8,7 +8,7 @@
  * Russian (with plural/gender agreement) and English. Currency: AZN or USD.
  */
 
-export const DOC_CURRENCIES = ["AZN", "USD"] as const;
+export const DOC_CURRENCIES = ["AZN", "USD", "EUR", "RUB"] as const;
 export type DocCurrency = (typeof DOC_CURRENCIES)[number];
 
 export type WordsLang = "en" | "ru" | "az";
@@ -160,6 +160,23 @@ const NOUNS: Record<DocCurrency, Record<WordsLang, LangNouns>> = {
     ru: {
       major: (n) => ruPlural(n, ["доллар", "доллара", "долларов"]),
       minor: (n) => ruPlural(n, ["цент", "цента", "центов"]),
+    },
+  },
+  EUR: {
+    az: { major: () => "avro", minor: () => "sent" },
+    en: { major: (n) => (n === 1 ? "euro" : "euros"), minor: (n) => (n === 1 ? "cent" : "cents") },
+    // "евро" is indeclinable in Russian; only the cents agree.
+    ru: {
+      major: () => "евро",
+      minor: (n) => ruPlural(n, ["цент", "цента", "центов"]),
+    },
+  },
+  RUB: {
+    az: { major: () => "rubl", minor: () => "qəpik" },
+    en: { major: (n) => (n === 1 ? "ruble" : "rubles"), minor: (n) => (n === 1 ? "kopeck" : "kopecks") },
+    ru: {
+      major: (n) => ruPlural(n, ["рубль", "рубля", "рублей"]),
+      minor: (n) => ruPlural(n, ["копейка", "копейки", "копеек"]),
     },
   },
 };

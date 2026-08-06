@@ -47,3 +47,21 @@ describe("amountInWords — English and USD", () => {
     expect(amountInWords(4200, "USD", "en")).toBe("Forty-two dollars and 00 cents");
   });
 });
+
+describe("amountInWords — EUR and RUB", () => {
+  it("spells EUR per language", () => {
+    expect(amountInWords(10000, "EUR", "en")).toBe("One hundred euros and 00 cents");
+    expect(amountInWords(10000, "EUR", "az")).toBe("Yüz avro 00 sent");
+    // "евро" is indeclinable; only the cents agree.
+    expect(amountInWords(10000, "EUR", "ru")).toBe("Сто евро 00 центов");
+  });
+  it("agrees the Russian ruble and kopeck nouns", () => {
+    expect(amountInWords(100, "RUB", "ru")).toBe("Один рубль 00 копеек");
+    expect(amountInWords(300, "RUB", "ru")).toBe("Три рубля 00 копеек");
+    expect(amountInWords(50001, "RUB", "ru")).toBe("Пятьсот рублей 01 копейка");
+  });
+  it("spells RUB in English and Azerbaijani", () => {
+    expect(amountInWords(100, "RUB", "en")).toBe("One ruble and 00 kopecks");
+    expect(amountInWords(20050, "RUB", "az")).toBe("İki yüz rubl 50 qəpik");
+  });
+});

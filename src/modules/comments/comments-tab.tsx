@@ -62,7 +62,7 @@ export function CommentsTab({
               <li key={c.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
                 <div
                   className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-                    mine ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-800"
+                    mine ? "bg-indigo-600 text-brand-pale" : "bg-slate-100 text-slate-800"
                   }`}
                 >
                   <div className="whitespace-pre-wrap break-words">{c.body}</div>
