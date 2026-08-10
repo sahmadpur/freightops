@@ -85,6 +85,48 @@
       "when": 1785918993491,
       "tag": "0011_drop_transport_and_legacy_order_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1786344852420,
+      "tag": "0012_crm_foundations",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1786345390642,
+      "tag": "0013_requests_legs_cargo",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1786346299835,
+      "tag": "0014_request_documents_and_incoterm_other",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1786347496156,
+      "tag": "0015_quotations",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1786348085775,
+      "tag": "0016_order_lifecycle",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1786349233186,
+      "tag": "0017_communication_seams",
+      "breakpoints": true
     }
   ]
 }

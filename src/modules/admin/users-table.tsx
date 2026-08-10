@@ -48,6 +48,7 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
           className={`${inputCls} w-auto`}
         >
           <option value="admin">{t("roleAdmin")}</option>
+          <option value="supervisor">{t("roleSupervisor")}</option>
           <option value="operator">{t("roleOperator")}</option>
           <option value="client">{t("roleClient")}</option>
         </select>

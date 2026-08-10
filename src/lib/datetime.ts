@@ -81,3 +81,41 @@ export function formatDateTime(
     timeZone: TIME_ZONE,
   }).format(date);
 }
+
+/**
+ * `<input type="datetime-local">` value for an instant, read in the desk's zone.
+ *
+ * The input has no time zone of its own, so left to itself it would show the
+ * *browser's* reading of the instant — a manager travelling would see a
+ * different "received at" than the one recorded. Both directions of this pair
+ * go through `TIME_ZONE`, so what is typed is what is stored.
+ */
+export function toLocalInput(value: Date | string | number): string {
+  const date = value instanceof Date ? value : new Date(value);
+  const p = partsIn(date);
+  return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
+}
+
+/**
+ * The inverse: interpret a `datetime-local` value as desk time and return an
+ * absolute ISO instant. The offset is read back from the zone rather than
+ * hard-coded, so this keeps working if Azerbaijan ever reintroduces DST.
+ */
+export function fromLocalInput(value: string): string {
+  // Matched explicitly rather than left to `new Date`, whose parser is lenient
+  // enough to turn arbitrary text into a plausible-looking instant.
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return "";
+  // Read the naive string as UTC, see how far that lands from the same wall
+  // clock in TIME_ZONE, and subtract the difference.
+  const asUtc = new Date(`${value}:00Z`);
+  if (Number.isNaN(asUtc.getTime())) return "";
+  const p = partsIn(asUtc);
+  const wallInZone = Date.UTC(
+    Number(p.year),
+    Number(p.month) - 1,
+    Number(p.day),
+    Number(p.hour),
+    Number(p.minute),
+  );
+  return new Date(asUtc.getTime() * 2 - wallInZone).toISOString();
+}

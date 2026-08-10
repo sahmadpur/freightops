@@ -45,6 +45,7 @@ export function InviteUserForm({ accounts }: { accounts: { id: string; title: st
         <label className="mb-1 block text-[11.5px] font-medium text-ink-soft">{t("role")}</label>
         <select value={role} onChange={(e) => setRole(e.target.value)} className={`${inputCls} w-auto`}>
           <option value="admin">{t("roleAdmin")}</option>
+          <option value="supervisor">{t("roleSupervisor")}</option>
           <option value="operator">{t("roleOperator")}</option>
           <option value="client">{t("roleClient")}</option>
         </select>

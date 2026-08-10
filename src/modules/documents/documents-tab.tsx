@@ -21,7 +21,7 @@ export function DocumentsTab({
 }: {
   orderId: string;
   documents: DocRow[];
-  parentType?: "order" | "customs_clearance";
+  parentType?: "order" | "customs_clearance" | "request";
 }) {
   const t = useTranslations("documents");
   const tf = useTranslations("fields");

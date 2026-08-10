@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { carriers, contacts, orders } from "@/db/schema";
 import { PAGE_SIZE } from "@/components/ui/paginator";
@@ -85,4 +85,14 @@ export async function getCarrier(id: string) {
     .orderBy(desc(orders.createdAt))
     .limit(50);
   return { carrier, contacts: carrierContacts, orders: carrierOrders };
+}
+
+/** Active carriers as combobox options — for pickers outside the carrier module. */
+export async function carrierPickerOptions(): Promise<{ value: string; label: string }[]> {
+  const rows = await db
+    .select({ id: carriers.id, title: carriers.title })
+    .from(carriers)
+    .where(isNull(carriers.deletedAt))
+    .orderBy(asc(carriers.title));
+  return rows.map((c) => ({ value: c.id, label: c.title }));
 }

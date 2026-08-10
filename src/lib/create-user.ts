@@ -5,7 +5,7 @@ const createUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(128),
   name: z.string().min(1).max(200),
-  role: z.enum(["admin", "operator", "client"]),
+  role: z.enum(["admin", "operator", "supervisor", "client"]),
   accountId: z.string().nullish(),
   language: z.enum(["en", "ru", "az"]).default("en"),
 });

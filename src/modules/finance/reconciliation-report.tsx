@@ -6,10 +6,11 @@ import { useTranslations } from "next-intl";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { MoneyDual } from "@/components/ui/money";
 import { changeOrderStatus } from "@/modules/orders/actions";
+import { ORDER_STATUSES } from "@/lib/order-status";
 import type { PaymentStatus } from "@/lib/finance";
 import type { ReconciliationRow, ReconciliationSide } from "./queries";
 
-const STATUSES = ["created", "received", "internal_transit", "loaded", "transit", "at_border", "at_customs", "arrived", "delivered", "closed"] as const;
+const STATUSES = ORDER_STATUSES;
 
 export function ReconciliationReport({ rows }: { rows: ReconciliationRow[] }) {
   const t = useTranslations();

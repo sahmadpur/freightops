@@ -20,9 +20,14 @@ export default async function EditCarrierPage({ params }: { params: Promise<{ id
           address: data.carrier.address ?? "",
           notes: data.carrier.notes ?? "",
           contacts: data.contacts.map((c) => ({
+            id: c.id,
             name: c.name,
+            position: c.position ?? "",
             phones: c.phones.length ? c.phones : [""],
             emails: c.emails.length ? c.emails : [""],
+            whatsapp: c.whatsapp ?? "",
+            preferredChannel: c.preferredChannel ?? "",
+            notes: c.notes ?? "",
           })),
         }}
       />

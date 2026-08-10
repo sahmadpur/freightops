@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations, getFormatter } from "next-intl/server";
+import { getTranslations, getFormatter, getLocale } from "next-intl/server";
+import { countryLabel } from "@/lib/countries";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -12,6 +13,7 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const t = await getTranslations();
   const format = await getFormatter();
+  const locale = await getLocale();
   const data = await getAccount(id);
   if (!data) notFound();
   const { account, contacts, orders } = data;
@@ -59,6 +61,22 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
                 <dd>{account.address ?? "—"}</dd>
               </div>
               <div>
+                <dt className="text-xs text-slate-500">{t("fields.country")}</dt>
+                <dd>{countryLabel(account.country, locale) || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">{t("fields.city")}</dt>
+                <dd>{account.city ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">{t("fields.phones")}</dt>
+                <dd>{account.phones.join(" · ") || "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">{t("fields.emailDomains")}</dt>
+                <dd>{account.emailDomains.join(" · ") || "—"}</dd>
+              </div>
+              <div>
                 <dt className="text-xs text-slate-500">{t("fields.notes")}</dt>
                 <dd className="whitespace-pre-wrap">{account.notes ?? "—"}</dd>
               </div>
@@ -79,8 +97,10 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
               {contacts.map((c) => (
                 <div key={c.id} className="rounded-lg bg-slate-50 p-3 text-sm">
                   <div className="font-medium">{c.name}</div>
+                  {c.position && <div className="text-slate-500">{c.position}</div>}
                   {c.phones.length > 0 && <div className="text-slate-500">{c.phones.join(" · ")}</div>}
                   {c.emails.length > 0 && <div className="text-slate-500">{c.emails.join(" · ")}</div>}
+                  {c.whatsapp && <div className="text-slate-500">WhatsApp: {c.whatsapp}</div>}
                 </div>
               ))}
             </div>

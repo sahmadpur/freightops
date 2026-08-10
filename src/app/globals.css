@@ -75,6 +75,10 @@
    * scanned without reading the labels.
    */
   --status-created: 32 73 196;
+  --status-operations: 68 54 184;
+  --status-booked: 15 95 128;
+  --status-in_transit: 138 90 6;
+  /* Retired stages — kept because the history tab still renders them as old values. */
   --status-waiting_pickup: 77 85 102;
   --status-received: 68 54 184;
   --status-internal_transit: 15 95 128;
@@ -85,6 +89,22 @@
   --status-arrived: 61 107 22;
   --status-delivered: 18 119 90;
   --status-closed: 92 92 92;
+
+  /*
+   * Request-stage hues — the commercial lifecycle, which runs before an order
+   * exists. Deliberately a different family from the shipment hues above: grey
+   * while the enquiry is untouched, indigo while it is being worked and priced,
+   * then a hard green/red/grey split on the decision, so a won request never
+   * reads like a cargo milestone.
+   */
+  --status-new: 77 85 102;
+  --status-in_progress: 32 73 196;
+  --status-quotation: 68 54 184;
+  --status-quotation_sent: 96 48 168;
+  --status-waiting_client: 138 90 6;
+  --status-won: 18 119 90;
+  --status-lost: 176 42 55;
+  --status-cancelled: 110 110 110;
 
   /*
    * Chart series, in fixed assignment order (revenue / cost / profit). Not
@@ -164,6 +184,9 @@
 
   /* Stage hues lighten so they carry on dark surfaces. */
   --status-created: 145 175 255;
+  --status-operations: 169 156 240;
+  --status-booked: 125 196 227;
+  --status-in_transit: 245 195 68;
   --status-waiting_pickup: 176 184 198;
   --status-received: 169 156 240;
   --status-internal_transit: 125 196 227;
@@ -174,6 +197,15 @@
   --status-arrived: 168 207 114;
   --status-delivered: 74 200 148;
   --status-closed: 168 172 180;
+
+  --status-new: 176 184 198;
+  --status-in_progress: 145 175 255;
+  --status-quotation: 169 156 240;
+  --status-quotation_sent: 196 152 240;
+  --status-waiting_client: 245 195 68;
+  --status-won: 74 200 148;
+  --status-lost: 240 132 138;
+  --status-cancelled: 152 156 164;
 
   /* Own steps, not a flip of the light values — validated on #161c24. */
   --chart-1: 77 139 255; /* #4d8bff */

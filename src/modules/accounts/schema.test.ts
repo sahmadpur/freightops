@@ -67,4 +67,38 @@ describe("accountInputSchema", () => {
     expect(r.success).toBe(true);
     if (r.success) expect(r.data.taxId || null).toBeNull();
   });
+
+  it("upper-cases a country code and rejects an unknown one", () => {
+    const ok = accountInputSchema.safeParse({ ...valid, country: "de" });
+    expect(ok.success).toBe(true);
+    expect(ok.success && ok.data.country).toBe("DE");
+    expect(accountInputSchema.safeParse({ ...valid, country: "XX" }).success).toBe(false);
+  });
+
+  it("lower-cases email domains and rejects anything that is not one", () => {
+    const ok = accountInputSchema.safeParse({ ...valid, emailDomains: ["Bosch.COM", "bosch.de"] });
+    expect(ok.success).toBe(true);
+    expect(ok.success && ok.data.emailDomains).toEqual(["bosch.com", "bosch.de"]);
+    // An address, a bare TLD and a scheme are all rejected — the column holds domains only.
+    expect(accountInputSchema.safeParse({ ...valid, emailDomains: ["john@bosch.com"] }).success).toBe(false);
+    expect(accountInputSchema.safeParse({ ...valid, emailDomains: ["bosch"] }).success).toBe(false);
+    expect(accountInputSchema.safeParse({ ...valid, emailDomains: ["https://bosch.com"] }).success).toBe(false);
+  });
+
+  it("round-trips a contact id so ids stay stable across an edit", () => {
+    const r = accountInputSchema.safeParse({
+      ...valid,
+      contacts: [{ id: "c-1", name: "X", position: "Head of logistics", phones: [], emails: [] }],
+    });
+    expect(r.success).toBe(true);
+    expect(r.success && r.data.contacts[0].id).toBe("c-1");
+  });
+
+  it("rejects an unknown preferred channel", () => {
+    const r = accountInputSchema.safeParse({
+      ...valid,
+      contacts: [{ name: "X", phones: [], emails: [], preferredChannel: "telegram" }],
+    });
+    expect(r.success).toBe(false);
+  });
 });

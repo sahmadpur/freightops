@@ -6,21 +6,8 @@ import {
   modeTypeEnum,
   financeCategoryEnum,
 } from "@/db/schema";
-import { numericString, optText } from "@/lib/validation";
+import { countryCode, intString, numericString, optEnum, optText } from "@/lib/validation";
 import { ORDER_CURRENCIES } from "@/lib/fx";
-import { isCountryCode } from "@/lib/countries";
-
-const optEnum = <T extends readonly [string, ...string[]]>(values: T) =>
-  z.enum(values).optional().or(z.literal(""));
-
-/** ISO 3166-1 alpha-2, or empty. Guarded so free text can't reach the column. */
-const countryCode = z
-  .string()
-  .trim()
-  .toUpperCase()
-  .refine((v) => v === "" || isCountryCode(v), "Unknown country")
-  .optional()
-  .or(z.literal(""));
 
 /** One agent-expense row from the create form; seeds a cost finance line. */
 export const orderCostLineSchema = z.object({
@@ -40,12 +27,7 @@ export const orderInputSchema = z.object({
   rollbackNumber: optText(100),
   deliveryFormat: optEnum(deliveryFormatEnum.enumValues),
   cargoItems: z.array(z.string().trim().min(1).max(200)).max(30).default([]),
-  packages: z
-    .string()
-    .trim()
-    .regex(/^\d+$/, "Must be a whole number")
-    .optional()
-    .or(z.literal("")),
+  packages: intString,
   weightKg: numericString,
   volumeM3: numericString,
   incoterms: optEnum(incotermsEnum.enumValues),

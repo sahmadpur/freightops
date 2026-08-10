@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 const LIBRARY_NAV = [
+  { href: "/requests", key: "requests" },
   { href: "/orders", key: "orders" },
   { href: "/dashboard", key: "dashboard" },
   { href: "/accounts", key: "accounts" },

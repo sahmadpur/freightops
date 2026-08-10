@@ -2,9 +2,10 @@
 
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { carriers, contacts, orders } from "@/db/schema";
+import { carriers, orders } from "@/db/schema";
 import { auditDiff, recordAudit } from "@/lib/audit";
 import { requireArea } from "@/lib/session";
+import { syncContacts } from "@/modules/accounts/sync-contacts";
 import { carrierInputSchema, type ActionResult } from "./schema";
 
 const AUDITED_FIELDS = ["title", "address", "notes"];
@@ -56,17 +57,7 @@ export async function createCarrier(input: unknown): Promise<ActionResult> {
       })
       .returning({ id: carriers.id });
 
-    if (data.contacts.length > 0) {
-      await tx.insert(contacts).values(
-        data.contacts.map((c) => ({
-          parentType: "carrier" as const,
-          parentId: row.id,
-          name: c.name,
-          phones: c.phones,
-          emails: c.emails,
-        })),
-      );
-    }
+    await syncContacts(tx, "carrier", row.id, data.contacts);
 
     await recordAudit(tx, {
       userId: session.user.id,
@@ -90,12 +81,6 @@ export async function updateCarrier(id: string, input: unknown): Promise<ActionR
     const before = await tx.query.carriers.findFirst({ where: eq(carriers.id, id) });
     if (!before) return "not_found" as const;
 
-    const beforeContacts = await tx
-      .select({ name: contacts.name })
-      .from(contacts)
-      .where(and(eq(contacts.parentType, "carrier"), eq(contacts.parentId, id)))
-      .orderBy(contacts.createdAt);
-
     const after = {
       title: data.title,
       address: data.address || null,
@@ -103,25 +88,11 @@ export async function updateCarrier(id: string, input: unknown): Promise<ActionR
     };
     await tx.update(carriers).set(after).where(eq(carriers.id, id));
 
-    // Contacts: replace-all strategy (simple and audit-friendly for v1).
-    // Contact ids regenerate on every update — fine while nothing references them
-    // (Phase 4 notifications re-read contact emails at send time).
-    await tx.delete(contacts).where(and(eq(contacts.parentType, "carrier"), eq(contacts.parentId, id)));
-    if (data.contacts.length > 0) {
-      await tx.insert(contacts).values(
-        data.contacts.map((c) => ({
-          parentType: "carrier" as const,
-          parentId: id,
-          name: c.name,
-          phones: c.phones,
-          emails: c.emails,
-        })),
-      );
-    }
+    const contactNames = await syncContacts(tx, "carrier", id, data.contacts);
 
     const changes = auditDiff(before, after, AUDITED_FIELDS);
-    const oldNames = beforeContacts.map((c) => c.name).join(", ") || null;
-    const newNames = data.contacts.map((c) => c.name).join(", ") || null;
+    const oldNames = contactNames.before.join(", ") || null;
+    const newNames = contactNames.after.join(", ") || null;
     if (oldNames !== newNames) {
       changes.push({ field: "contacts", oldValue: oldNames, newValue: newNames });
     }

@@ -34,6 +34,17 @@ export const AUDIT_FIELD_LABELS: Record<string, string> = {
   paid: "paid",
   revenue: "revenue",
   cost: "cost",
+  // Request fields (§19 History tab).
+  contactId: "contactPerson",
+  responsibleUserId: "responsibleManager",
+  leadSource: "leadSource",
+  sourceAgentAccountId: "sourceAgent",
+  emailSubject: "emailSubject",
+  transportFamily: "transportType",
+  incotermPlace: "incotermPlace",
+  cargoReadyDate: "cargoReadyDate",
+  requestedDeliveryDate: "requestedDeliveryDate",
+  receivedAt: "receivedAt",
 };
 
 /** Fields holding an ISO country code, rendered with a flag and localized name. */

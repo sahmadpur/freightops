@@ -19,11 +19,20 @@ export default async function EditAccountPage({ params }: { params: Promise<{ id
           title: data.account.title,
           taxId: data.account.taxId ?? "",
           address: data.account.address ?? "",
+          country: data.account.country ?? "",
+          city: data.account.city ?? "",
+          phones: data.account.phones,
+          emailDomains: data.account.emailDomains,
           notes: data.account.notes ?? "",
           contacts: data.contacts.map((c) => ({
+            id: c.id,
             name: c.name,
+            position: c.position ?? "",
             phones: c.phones.length ? c.phones : [""],
             emails: c.emails.length ? c.emails : [""],
+            whatsapp: c.whatsapp ?? "",
+            preferredChannel: c.preferredChannel ?? "",
+            notes: c.notes ?? "",
           })),
         }}
       />

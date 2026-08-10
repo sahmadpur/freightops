@@ -2,12 +2,13 @@
 
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { accounts, contacts, orders } from "@/db/schema";
+import { accounts, orders } from "@/db/schema";
 import { auditDiff, recordAudit } from "@/lib/audit";
 import { requireArea } from "@/lib/session";
 import { accountInputSchema, type ActionResult } from "./schema";
+import { syncContacts } from "./sync-contacts";
 
-const AUDITED_FIELDS = ["title", "taxId", "address", "notes"];
+const AUDITED_FIELDS = ["title", "taxId", "address", "country", "city", "notes"];
 
 /** Soft-delete (archive) an account. Blocked while it has non-archived orders. */
 export async function archiveAccount(id: string): Promise<ActionResult> {
@@ -52,22 +53,16 @@ export async function createAccount(input: unknown): Promise<ActionResult> {
         title: data.title,
         taxId: data.taxId || null,
         address: data.address || null,
+        country: data.country || null,
+        city: data.city || null,
+        phones: data.phones,
+        emailDomains: data.emailDomains,
         notes: data.notes || null,
         createdBy: session.user.id,
       })
       .returning({ id: accounts.id });
 
-    if (data.contacts.length > 0) {
-      await tx.insert(contacts).values(
-        data.contacts.map((c) => ({
-          parentType: "account" as const,
-          parentId: row.id,
-          name: c.name,
-          phones: c.phones,
-          emails: c.emails,
-        })),
-      );
-    }
+    await syncContacts(tx, "account", row.id, data.contacts);
 
     await recordAudit(tx, {
       userId: session.user.id,
@@ -91,39 +86,23 @@ export async function updateAccount(id: string, input: unknown): Promise<ActionR
     const before = await tx.query.accounts.findFirst({ where: eq(accounts.id, id) });
     if (!before) return "not_found" as const;
 
-    const beforeContacts = await tx
-      .select({ name: contacts.name })
-      .from(contacts)
-      .where(and(eq(contacts.parentType, "account"), eq(contacts.parentId, id)))
-      .orderBy(contacts.createdAt);
-
     const after = {
       title: data.title,
       taxId: data.taxId || null,
       address: data.address || null,
+      country: data.country || null,
+      city: data.city || null,
+      phones: data.phones,
+      emailDomains: data.emailDomains,
       notes: data.notes || null,
     };
     await tx.update(accounts).set(after).where(eq(accounts.id, id));
 
-    // Contacts: replace-all strategy (simple and audit-friendly for v1).
-    // Contact ids regenerate on every update — fine while nothing references them
-    // (Phase 4 notifications re-read contact emails at send time).
-    await tx.delete(contacts).where(and(eq(contacts.parentType, "account"), eq(contacts.parentId, id)));
-    if (data.contacts.length > 0) {
-      await tx.insert(contacts).values(
-        data.contacts.map((c) => ({
-          parentType: "account" as const,
-          parentId: id,
-          name: c.name,
-          phones: c.phones,
-          emails: c.emails,
-        })),
-      );
-    }
+    const contactNames = await syncContacts(tx, "account", id, data.contacts);
 
     const changes = auditDiff(before, after, AUDITED_FIELDS);
-    const oldNames = beforeContacts.map((c) => c.name).join(", ") || null;
-    const newNames = data.contacts.map((c) => c.name).join(", ") || null;
+    const oldNames = contactNames.before.join(", ") || null;
+    const newNames = contactNames.after.join(", ") || null;
     if (oldNames !== newNames) {
       changes.push({ field: "contacts", oldValue: oldNames, newValue: newNames });
     }

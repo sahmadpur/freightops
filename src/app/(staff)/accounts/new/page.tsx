@@ -7,7 +7,19 @@ export default async function NewAccountPage() {
   return (
     <div>
       <PageHeader title={t("newAccount")} />
-      <AccountForm initial={{ title: "", taxId: "", address: "", notes: "", contacts: [] }} />
+      <AccountForm
+        initial={{
+          title: "",
+          taxId: "",
+          address: "",
+          country: "",
+          city: "",
+          phones: [],
+          emailDomains: [],
+          notes: "",
+          contacts: [],
+        }}
+      />
     </div>
   );
 }

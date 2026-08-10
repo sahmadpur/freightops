@@ -1,6 +1,6 @@
 import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { db } from "@/db";
-import { documents, orders, accounts, docTypeEnum } from "@/db/schema";
+import { documents, orders, accounts, docTypeEnum, documentParentEnum } from "@/db/schema";
 
 export type DocumentRow = {
   id: string;
@@ -11,8 +11,13 @@ export type DocumentRow = {
   createdAt: Date;
 };
 
-/** Documents attached to one order (Documents tab), newest first. */
-export async function listOrderDocuments(orderId: string): Promise<DocumentRow[]> {
+type DocumentParent = (typeof documentParentEnum.enumValues)[number];
+
+/** Documents attached to one record (Documents tab), newest first. */
+export async function listDocuments(
+  parentType: DocumentParent,
+  parentId: string,
+): Promise<DocumentRow[]> {
   const rows = await db
     .select({
       id: documents.id,
@@ -23,10 +28,13 @@ export async function listOrderDocuments(orderId: string): Promise<DocumentRow[]
       createdAt: documents.createdAt,
     })
     .from(documents)
-    .where(and(eq(documents.parentType, "order"), eq(documents.parentId, orderId)))
+    .where(and(eq(documents.parentType, parentType), eq(documents.parentId, parentId)))
     .orderBy(desc(documents.createdAt));
   return rows;
 }
+
+export const listOrderDocuments = (orderId: string) => listDocuments("order", orderId);
+export const listRequestDocuments = (requestId: string) => listDocuments("request", requestId);
 
 /** One document's storage info (for the download route). Null/undefined if missing. */
 export async function getDocument(id: string) {

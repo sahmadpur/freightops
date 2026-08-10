@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
+import { RequestKpiSection } from "@/modules/requests/kpi-section";
+import { requestKpis } from "@/modules/requests/kpi";
 import { StatusBar } from "@/components/dashboard/status-bar";
 import { RankBars } from "@/components/dashboard/rank-bars";
 import { MonthPicker } from "@/components/dashboard/month-picker";
@@ -21,10 +23,11 @@ export default async function DashboardPage({
   const tt = await getTranslations();
   const locale = await getLocale();
   const { from, to } = monthRange(monthParam);
-  const [d, reconRows, customs] = await Promise.all([
+  const [d, reconRows, customs, kpis] = await Promise.all([
     dashboardData(monthParam),
     reconciliationRows(),
     customsPeriodTotals(from, to),
+    requestKpis(monthParam),
   ]);
   const year = d.year;
 
@@ -85,12 +88,15 @@ export default async function DashboardPage({
         action={<MonthPicker month={d.month} label={t("period")} />}
       />
 
+      {/* The commercial funnel comes first: it is what feeds everything below it. */}
+      <RequestKpiSection kpis={kpis} />
+
       <div className="mb-2.5"><span className="eyebrow">{t("operationalOverview")}</span></div>
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
         {metric(t("activeShipments"), d.operational.activeShipments, <IconTruck />, "indigo")}
-        {metric(t("awaitingPickup"), d.operational.awaitingPickup, <IconClipboard />, "violet")}
+        {metric(t("inOperations"), d.operational.inOperations, <IconClipboard />, "violet")}
         {metric(t("cargoInTransit"), d.operational.cargoInTransit, <IconRoute />, "violet")}
-        {metric(t("atCustoms"), d.operational.atCustoms, <IconStamp />, "indigo")}
+        {metric(t("bookedWithCarrier"), d.operational.bookedWithCarrier, <IconStamp />, "indigo")}
         {metric(t("unfinishedOrders"), d.operational.unfinishedOrders, <IconClipboard />, "violet")}
       </div>
 

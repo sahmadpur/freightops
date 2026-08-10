@@ -10,6 +10,7 @@ import type { Theme } from "@/lib/theme";
 
 export function Topbar({ userName, theme }: { userName: string; theme: Theme }) {
   const t = useTranslations("common");
+  const ts = useTranslations("search");
   const router = useRouter();
 
   const initials = userName
@@ -29,7 +30,17 @@ export function Topbar({ userName, theme }: { userName: string; theme: Theme }) 
           All In <span className="text-ink-soft">Logistics</span>
         </span>
       </span>
-      <div className="flex-1" />
+      {/* Global search across requests and orders — a plain GET form, so the
+          results page is a shareable URL like every other list in the app. */}
+      <form action="/search" className="flex-1">
+        <input
+          type="search"
+          name="q"
+          placeholder={ts("placeholder")}
+          aria-label={ts("title")}
+          className="w-full max-w-sm rounded-[10px] border border-edge-chip bg-surface-card px-3 py-1.5 text-[12.5px] text-ink outline-none transition-colors placeholder:text-ink-soft/55 focus:border-edge-focus focus:ring-2 focus:ring-brand/15"
+        />
+      </form>
       <ThemeSwitcher theme={theme} />
       <LanguageSwitcher />
       <div className="flex items-center gap-2">

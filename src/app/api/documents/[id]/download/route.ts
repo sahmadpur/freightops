@@ -6,7 +6,7 @@ import { getSession } from "@/lib/session";
 import { getDocument } from "@/modules/documents/queries";
 import { getObject } from "@/lib/s3";
 import { clientMayDownload } from "@/lib/document-access";
-import type { Role } from "@/lib/roles";
+import { isStaffRole, type Role } from "@/lib/roles";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getSession();
@@ -17,7 +17,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   if (!doc) return new NextResponse("Not found", { status: 404 });
 
   const role = session.user.role as Role;
-  const isStaff = role === "admin" || role === "operator";
+  const isStaff = isStaffRole(role);
   if (!isStaff) {
     // Client: only own-account order's client-visible documents.
     let orderAccountId: string | null = null;

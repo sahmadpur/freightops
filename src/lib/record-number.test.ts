@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatRecordNumber } from "./record-number";
+import { formatAnnualNumber, formatRecordNumber } from "./record-number";
 
 describe("formatRecordNumber", () => {
   it("renders the client's ALLYYMMNNN format", () => {
@@ -26,5 +26,24 @@ describe("formatRecordNumber", () => {
 
   it("uses a distinct prefix per record kind", () => {
     expect(formatRecordNumber("customs", 2026, 7, 1)).toBe("CC2607001");
+  });
+});
+
+describe("formatAnnualNumber", () => {
+  it("renders the specification's PREFIX-YYYY-NNNN format", () => {
+    expect(formatAnnualNumber("request", 2026, 145)).toBe("REQ-2026-0145");
+    expect(formatAnnualNumber("order", 2026, 87)).toBe("ORD-2026-0087");
+  });
+
+  it("zero-pads the sequence to four digits", () => {
+    expect(formatAnnualNumber("request", 2026, 1)).toBe("REQ-2026-0001");
+  });
+
+  it("does not truncate sequences beyond 9999", () => {
+    expect(formatAnnualNumber("request", 2026, 10000)).toBe("REQ-2026-10000");
+  });
+
+  it("keeps the full year, so the sequence can restart each January", () => {
+    expect(formatAnnualNumber("order", 2027, 1)).toBe("ORD-2027-0001");
   });
 });

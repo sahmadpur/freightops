@@ -1,12 +1,23 @@
-import { ORDER_STATUS_RANK, type OrderStatus } from "./order-status";
+import { ORDER_STATUSES, RETIRED_ORDER_STATUSES } from "./order-status";
+import { REQUEST_STATUSES } from "./request-status";
 
 /**
- * CSS reference to a shipment stage's hue token (`--status-*` in globals.css).
- * Shared by the status badge and the dashboard's stacked status bar so the two
- * can't drift, and so both follow the light/dark token flip. Unknown values
- * fall back to the closed/neutral hue.
+ * Every status that has a `--status-*` token in globals.css — including the
+ * retired order statuses, which still appear as old values in the history tab.
+ */
+const KNOWN: ReadonlySet<string> = new Set<string>([
+  ...ORDER_STATUSES,
+  ...RETIRED_ORDER_STATUSES,
+  ...REQUEST_STATUSES,
+]);
+
+/**
+ * CSS reference to a stage's hue token (`--status-*` in globals.css). Shared by
+ * the status badge and the dashboard's stacked status bar so the two can't
+ * drift, and so both follow the light/dark token flip. Covers both the order
+ * (shipment) and request (commercial) lifecycles — their value sets are
+ * disjoint. Unknown values fall back to the closed/neutral hue.
  */
 export function statusHue(status: string): string {
-  const known = status in ORDER_STATUS_RANK ? (status as OrderStatus) : "closed";
-  return `var(--status-${known})`;
+  return `var(--status-${KNOWN.has(status) ? status : "closed"})`;
 }

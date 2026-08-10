@@ -16,10 +16,10 @@ import { ORDER_CURRENCIES } from "@/lib/fx";
 import { CARGO_TYPES } from "@/lib/cargo-types";
 import { FINANCE_CATEGORIES } from "@/lib/finance-categories";
 import { convertToAzn, formatMoneyAzn, toCents } from "@/lib/money";
+import { INCOTERMS } from "@/lib/incoterms";
 import { emptyCostLine, type OrderFormInitial } from "./order-form-initial";
 import type { ActionResult } from "@/lib/forms";
 
-const INCOTERMS = ["EXW", "FCA", "FAS", "FOB", "CFR", "CIF", "CPT", "CIP", "DAP", "DPU", "DDP"] as const;
 const DELIVERY_FORMATS = ["FCL", "LCL", "FTL", "LTL"] as const;
 
 type Option = { id: string; title?: string };

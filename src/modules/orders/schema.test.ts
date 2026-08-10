@@ -113,13 +113,17 @@ describe("orderInputSchema", () => {
 });
 
 describe("statusChangeSchema", () => {
-  it("accepts a valid status", () => {
-    expect(statusChangeSchema.safeParse({ status: "transit" }).success).toBe(true);
+  it("accepts every stage of the §15 lifecycle", () => {
+    for (const status of ["created", "operations", "booked", "in_transit", "delivered", "closed"]) {
+      expect(statusChangeSchema.safeParse({ status }).success).toBe(true);
+    }
   });
-  it("accepts the new waiting-for-pickup status", () => {
-    expect(statusChangeSchema.safeParse({ status: "waiting_pickup" }).success).toBe(true);
+  it("rejects the stages retired when the lifecycle was reduced", () => {
+    expect(statusChangeSchema.safeParse({ status: "at_customs" }).success).toBe(false);
+    expect(statusChangeSchema.safeParse({ status: "waiting_pickup" }).success).toBe(false);
   });
-  it("rejects an unknown status", () => {
+  it("rejects a request status — the two lifecycles are separate", () => {
     expect(statusChangeSchema.safeParse({ status: "lost" }).success).toBe(false);
+    expect(statusChangeSchema.safeParse({ status: "quotation" }).success).toBe(false);
   });
 });

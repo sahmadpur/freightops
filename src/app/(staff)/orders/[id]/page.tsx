@@ -22,6 +22,7 @@ import { requireArea } from "@/lib/session";
 import { formatMoney } from "@/lib/money";
 import { routeLabel } from "@/lib/countries";
 import { ORDER_STATUS_RANK } from "@/lib/order-status";
+import { missingFinancials } from "@/lib/order-financials";
 
 export default async function OrderDetailPage({
   params,
@@ -49,9 +50,12 @@ export default async function OrderDetailPage({
     ]);
   const { order, accountTitle, carrierTitle, history } = data;
   const route = routeLabel(order.fromCountry, order.toCountry, locale);
-  // Arrival is the trigger to bill the client (requirement #13).
+  // Delivery is the trigger to bill the client (requirement #13).
   const invoiceDue =
-    ORDER_STATUS_RANK[order.status] >= ORDER_STATUS_RANK.arrived && !order.invoiceNumber;
+    ORDER_STATUS_RANK[order.status] >= ORDER_STATUS_RANK.delivered && !order.invoiceNumber;
+  // §16: the standing indicator that an order still has money to record. Shown
+  // from creation onward, and what blocks closing.
+  const financialsMissing = missingFinancials(order);
 
   const info = (
     <div className="space-y-7">
@@ -176,6 +180,22 @@ export default async function OrderDetailPage({
           </p>
           <Link href={`/orders/${order.id}?tab=documents`} className="btn-primary">
             {t("docgen.createInvoice")}
+          </Link>
+        </div>
+      )}
+
+      {/* §16: a direct order is created without a price on purpose. This says so
+          plainly, and names what is still owed, until the order can be closed. */}
+      {financialsMissing.length > 0 && (
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-[rgb(var(--approval-pending-edge))] bg-[rgb(var(--approval-pending-bg))] px-4 py-3">
+          <p className="text-[13px] text-[rgb(var(--approval-pending-fg))]">
+            {t("orders.financialDataIncomplete")}{" "}
+            <span className="font-medium">
+              {financialsMissing.map((f) => t(`fields.${f}`)).join(", ")}
+            </span>
+          </p>
+          <Link href={`/orders/${order.id}?tab=finance`} className="btn-primary">
+            {t("finance.tab")}
           </Link>
         </div>
       )}

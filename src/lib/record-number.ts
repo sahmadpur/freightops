@@ -1,10 +1,15 @@
 import { and, eq, sql } from "drizzle-orm";
-import { monthlyCounters } from "@/db/schema";
+import { annualCounters, monthlyCounters } from "@/db/schema";
 import type { db } from "@/db";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-/** Counter kinds. The prefix is what the number is rendered with. */
+/**
+ * Monthly counter kinds. The prefix is what the number is rendered with.
+ *
+ * `order` is legacy: orders issued before the CRM spec landed carry `ALL2607001`
+ * and keep it forever. New orders are numbered by the annual family below.
+ */
 export const RECORD_PREFIX = {
   order: "ALL",
   customs: "CC",
@@ -75,4 +80,54 @@ export async function peekRecordNumber(
       ),
     );
   return formatRecordNumber(kind, year, month, (row?.lastNumber ?? 0) + 1);
+}
+
+/**
+ * Year-sequential counter kinds, the format the CRM specification calls for:
+ * `REQ-2026-0145`, `ORD-2026-0087`. The sequence restarts every January.
+ */
+export const ANNUAL_PREFIX = {
+  request: "REQ",
+  order: "ORD",
+} as const;
+
+export type AnnualKind = keyof typeof ANNUAL_PREFIX;
+
+/**
+ * `REQ-2026-0145` — prefix, full year, 4-digit sequence.
+ *
+ * `seq` is left-padded to 4 digits and never truncated: the 10 000th request of
+ * a year renders as `REQ-2026-10000` rather than silently colliding.
+ */
+export function formatAnnualNumber(kind: AnnualKind, year: number, seq: number): string {
+  return `${ANNUAL_PREFIX[kind]}-${year}-${String(seq).padStart(4, "0")}`;
+}
+
+/**
+ * Atomically allocate the next number for `kind` in the given year. MUST run
+ * inside the creating transaction — same row-lock upsert as `nextRecordNumber`.
+ */
+export async function nextAnnualNumber(tx: Tx, kind: AnnualKind, year: number): Promise<string> {
+  const [row] = await tx
+    .insert(annualCounters)
+    .values({ kind, year, lastNumber: 1 })
+    .onConflictDoUpdate({
+      target: [annualCounters.kind, annualCounters.year],
+      set: { lastNumber: sql`${annualCounters.lastNumber} + 1` },
+    })
+    .returning({ lastNumber: annualCounters.lastNumber });
+  return formatAnnualNumber(kind, year, row.lastNumber);
+}
+
+/** Non-consuming peek, for form previews only. Not authoritative. */
+export async function peekAnnualNumber(
+  executor: Pick<typeof db, "select">,
+  kind: AnnualKind,
+  year: number,
+): Promise<string> {
+  const [row] = await executor
+    .select({ lastNumber: annualCounters.lastNumber })
+    .from(annualCounters)
+    .where(and(eq(annualCounters.kind, kind), eq(annualCounters.year, year)));
+  return formatAnnualNumber(kind, year, (row?.lastNumber ?? 0) + 1);
 }
