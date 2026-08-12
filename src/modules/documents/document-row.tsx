@@ -33,10 +33,10 @@ export function DocumentRow({ doc }: { doc: DocRow }) {
   }
 
   return (
-    <li className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+    <li className="flex items-center gap-3 rounded-control border border-edge-chip bg-surface px-3 py-2 text-sm">
       <span className="flex-1 truncate">
         <span className="font-medium">{doc.fileName}</span>
-        <span className="ml-2 text-xs text-slate-400">{td(doc.docType)}</span>
+        <span className="ml-2 text-xs text-ink-soft">{td(doc.docType)}</span>
       </span>
       <button
         type="button"

@@ -153,6 +153,7 @@
   },
   "fields": {
     "companyTitle": "Şirkətin adı",
+    "roles": "Rollar",
     "taxId": "VÖEN",
     "address": "Şirkətin ünvanı",
     "notes": "Şərhlər / qeydlər",
@@ -296,6 +297,14 @@
     "noContacts": "Bu şirkətin hələ əlaqə şəxsi yoxdur",
     "titleAuto": "Avtomatik yaradılır — dəyişdirilə bilər"
   },
+  "companyRoles": {
+    "client": "Müştəri",
+    "agent": "Agent",
+    "carrier": "Daşıyıcı",
+    "supplier": "Təchizatçı",
+    "customs_broker": "Gömrük brokeri",
+    "other": "Digər"
+  },
   "accounts": {
     "newAccount": "Yeni müştəri",
     "editAccount": "Müştərini redaktə et",
@@ -314,6 +323,8 @@
     "title": "Sifarişlər",
     "newOrder": "Yeni sifariş",
     "editOrder": "Sifarişi redaktə et",
+    "sourceRequest": "Mənbə sorğu",
+    "sourceQuotation": "Təklif v{version}",
     "notFound": "Sifariş tapılmadı",
     "searchPlaceholder": "Nömrə, mövzu, müştəri, ölkə üzrə axtar…",
     "empty": "Hələ sifariş yoxdur — birincisini yaradın.",
@@ -365,7 +376,11 @@
     "convertDirectHint": "Sifariş qiymətsiz yaradılır. Maliyyə məlumatları tamamlanmayana qədər bağlana bilməz.",
     "convertNoQuotation": "Əsas götürüləcək təklif yoxdur.",
     "convertNoClient": "Əvvəlcə müştəri seçin.",
-    "convertAlready": "Bu sorğu üzrə artıq sifariş var."
+    "convertAlready": "Bu sorğu üzrə artıq sifariş var.",
+    "newClient": "Yeni müştəri",
+    "newClientName": "Şirkət adı",
+    "reeferSuggest": "Refrijerator avadanlığı seçilib — yük temperatur rejimlidirmi?",
+    "reeferSuggestApply": "Temperatur rejimini aktivləşdir"
   },
   "search": {
     "title": "Axtarış",

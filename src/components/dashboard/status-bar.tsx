@@ -14,7 +14,7 @@ export function StatusBar({ counts }: { counts: { status: string; count: number 
     <div>
       <div className="flex h-2.5 overflow-hidden rounded-full">
         {total === 0 ? (
-          <div className="h-full w-full bg-slate-100" />
+          <div className="h-full w-full bg-edge-soft" />
         ) : (
           counts
             .filter((c) => c.count > 0)

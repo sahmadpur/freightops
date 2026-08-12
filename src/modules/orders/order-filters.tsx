@@ -94,7 +94,7 @@ export function OrderFilters({
       {open && (
         <form
           action="/orders"
-          className="mt-3 rounded-[10px] border border-edge-soft bg-surface-card p-4"
+          className="mt-3 rounded-control border border-edge-soft bg-surface-card p-4"
         >
           {q && <input type="hidden" name="q" value={q} />}
           {status && <input type="hidden" name="status" value={status} />}

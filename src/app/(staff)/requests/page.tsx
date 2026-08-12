@@ -75,7 +75,7 @@ export default async function RequestsPage({ searchParams }: { searchParams: Pro
       <Link
         key={label}
         href={href}
-        className={`rounded-full border px-3 py-1 text-xs ${active ? "border-indigo-600 bg-indigo-600 text-brand-pale" : "border-slate-300 text-slate-500 hover:bg-slate-50"}`}
+        className={`rounded-full border px-3 py-1 text-xs ${active ? "border-brand bg-brand text-brand-pale" : "border-edge-chip text-ink-soft hover:bg-surface-hover"}`}
       >
         {label}
       </Link>
@@ -102,7 +102,7 @@ export default async function RequestsPage({ searchParams }: { searchParams: Pro
         {REQUEST_STATUSES.map((s) => pill(t(`status.${s}`), s, status === s))}
         <Link
           href={archiveParams.toString() ? `/requests?${archiveParams}` : "/requests"}
-          className={`ml-auto rounded-full border px-3 py-1 text-xs ${archived ? "border-indigo-600 bg-indigo-600 text-brand-pale" : "border-slate-300 text-slate-500 hover:bg-slate-50"}`}
+          className={`ml-auto rounded-full border px-3 py-1 text-xs ${archived ? "border-brand bg-brand text-brand-pale" : "border-edge-chip text-ink-soft hover:bg-surface-hover"}`}
         >
           {archived ? t("actions.showActive") : t("actions.showArchived")}
         </Link>

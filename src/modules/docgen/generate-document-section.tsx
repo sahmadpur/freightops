@@ -71,7 +71,7 @@ export function GenerateDocumentSection({
   return (
     <Card>
       <CardHeader>
-        <span className="text-sm font-semibold">{t("title")}</span>
+        <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("title")}</span>
       </CardHeader>
       <CardBody>
         <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-2">

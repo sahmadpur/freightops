@@ -120,7 +120,7 @@ export function DataTable<T>({
     colWidths[c.key] != null ? `${colWidths[c.key]}px` : c.width;
 
   return (
-    <div className="overflow-x-auto rounded-[10px] border border-edge-soft bg-surface-card">
+    <div className="overflow-x-auto rounded-card border border-edge-soft bg-surface-card">
       <table
         className="w-full border-collapse"
         style={{ tableLayout: "fixed", minWidth }}
@@ -134,7 +134,7 @@ export function DataTable<T>({
                   thRefs.current[c.key] = el;
                 }}
                 style={{ width: widthFor(c) }}
-                className={`group relative border-b border-edge-soft px-3 py-2.5 text-[11.5px] font-medium leading-tight text-ink-soft ${ALIGN[c.align ?? "left"]}`}
+                className={`group relative border-b border-edge-chip px-3 py-3 text-[10px] font-semibold uppercase leading-[1.35] tracking-[0.05em] text-ink-faint ${ALIGN[c.align ?? "left"]}`}
               >
                 {c.header}
                 {resizable && (
@@ -142,7 +142,7 @@ export function DataTable<T>({
                     onMouseDown={(e) => startDrag(e, c.key)}
                     className={`absolute right-0 top-0 h-full w-[4px] cursor-col-resize select-none transition-opacity motion-reduce:transition-none hover:bg-edge-chip ${
                       dragKey === c.key
-                        ? "bg-brand/40 opacity-100"
+                        ? "bg-brand opacity-100"
                         : "opacity-0 group-hover:opacity-100"
                     }`}
                   />
@@ -156,7 +156,7 @@ export function DataTable<T>({
             <tr>
               <td
                 colSpan={cols.length}
-                className="py-12 text-center text-sm text-ink-soft"
+                className="py-16 text-center text-[13px] text-ink-soft"
               >
                 {empty}
               </td>
@@ -188,7 +188,7 @@ export function DataTable<T>({
                   <td
                     key={c.key}
                     style={{ width: widthFor(c) }}
-                    className={`border-b border-edge-soft px-3 py-2.5 align-middle text-[12.5px] text-ink ${ALIGN[c.align ?? "left"]}`}
+                    className={`border-b border-edge-soft px-3 py-3 align-middle text-[12.5px] text-ink ${ALIGN[c.align ?? "left"]}`}
                   >
                     {c.render(row)}
                   </td>

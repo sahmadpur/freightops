@@ -48,7 +48,7 @@ export default async function OrderDetailPage({
       peekNextDocSeq("invoice", currentYear),
       peekNextDocSeq("act", currentYear),
     ]);
-  const { order, accountTitle, carrierTitle, history } = data;
+  const { order, accountTitle, carrierTitle, history, sourceRequestId, sourceRequestNumber, sourceQuotationVersion } = data;
   const route = routeLabel(order.fromCountry, order.toCountry, locale);
   // Delivery is the trigger to bill the client (requirement #13).
   const invoiceDue =
@@ -174,7 +174,7 @@ export default async function OrderDetailPage({
       </div>
 
       {invoiceDue && (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-[rgb(var(--approval-pending-edge))] bg-[rgb(var(--approval-pending-bg))] px-4 py-3">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-control border border-[rgb(var(--approval-pending-edge))] bg-[rgb(var(--approval-pending-bg))] px-4 py-3">
           <p className="text-[13px] text-[rgb(var(--approval-pending-fg))]">
             {t("orders.invoiceRequired")}
           </p>
@@ -187,7 +187,7 @@ export default async function OrderDetailPage({
       {/* §16: a direct order is created without a price on purpose. This says so
           plainly, and names what is still owed, until the order can be closed. */}
       {financialsMissing.length > 0 && (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-[rgb(var(--approval-pending-edge))] bg-[rgb(var(--approval-pending-bg))] px-4 py-3">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-control border border-[rgb(var(--approval-pending-edge))] bg-[rgb(var(--approval-pending-bg))] px-4 py-3">
           <p className="text-[13px] text-[rgb(var(--approval-pending-fg))]">
             {t("orders.financialDataIncomplete")}{" "}
             <span className="font-medium">
@@ -233,6 +233,22 @@ export default async function OrderDetailPage({
         </div>
 
         <aside className="space-y-7 lg:sticky lg:top-4 lg:self-start">
+          {sourceRequestId && sourceRequestNumber && (
+            <div>
+              <SectionRule>{t("orders.sourceRequest")}</SectionRule>
+              <Link
+                href={`/requests/${sourceRequestId}`}
+                className="text-[13px] font-medium text-brand hover:underline"
+              >
+                {sourceRequestNumber}
+              </Link>
+              {sourceQuotationVersion != null && (
+                <p className="mt-1 text-[12px] text-ink-soft">
+                  {t("orders.sourceQuotation", { version: sourceQuotationVersion })}
+                </p>
+              )}
+            </div>
+          )}
           <div>
             <SectionRule>{t("orders.updateStatus")}</SectionRule>
             <StatusControl orderId={order.id} current={order.status} />

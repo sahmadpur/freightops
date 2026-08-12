@@ -41,12 +41,16 @@ export function CargoEditor({
   cargo,
   onChange,
   errors,
+  suggestTempControl = false,
 }: {
   cargo: CargoDraft;
   onChange: (next: CargoDraft) => void;
   errors: Record<string, string[]>;
+  /** §8: reefer equipment on a leg suggests — never forces — temperature control. */
+  suggestTempControl?: boolean;
 }) {
   const t = useTranslations("fields");
+  const tr = useTranslations("requests");
   const tst = useTranslations("stackable");
   const set = (patch: Partial<CargoDraft>) => onChange({ ...cargo, ...patch });
 
@@ -153,6 +157,19 @@ export function CargoEditor({
           </button>
         </div>
       </Field>
+
+      {suggestTempControl && !cargo.temperatureControlled && (
+        <p className="mb-3.5 flex flex-wrap items-center gap-2 rounded-control border border-edge-chip bg-surface-hover px-3 py-2 text-[12px] text-ink-soft">
+          {tr("reeferSuggest")}
+          <button
+            type="button"
+            onClick={() => set({ temperatureControlled: true })}
+            className="text-brand hover:underline"
+          >
+            {tr("reeferSuggestApply")}
+          </button>
+        </p>
+      )}
 
       <div className={gridCls}>
         <Toggle

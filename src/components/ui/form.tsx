@@ -1,5 +1,5 @@
 export const inputCls =
-  "w-full rounded-[10px] border border-edge-chip bg-surface-card px-3 py-2 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-soft/55 focus:border-edge-focus focus:ring-2 focus:ring-brand/15";
+  "w-full rounded-control border border-edge-chip bg-transparent px-3 py-2 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-brand";
 
 export function Field({
   label,
@@ -15,7 +15,9 @@ export function Field({
   className?: string;
 }) {
   return (
-    <div className={`mb-3.5 ${className}`}>
+    <div className={`mb-4 ${className}`}>
+      {/* Sentence case, not the uppercase micro label: a long form has forty of
+          these, and shouting forty times is not emphasis. */}
       <label
         htmlFor={htmlFor}
         className="mb-1.5 block text-[12px] font-medium text-ink-soft"

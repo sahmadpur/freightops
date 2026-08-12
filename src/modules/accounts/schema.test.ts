@@ -94,6 +94,18 @@ describe("accountInputSchema", () => {
     expect(r.success && r.data.contacts[0].id).toBe("c-1");
   });
 
+  it("defaults roles to client and accepts several", () => {
+    const r = accountInputSchema.safeParse(valid);
+    expect(r.success && r.data.roles).toEqual(["client"]);
+    const r2 = accountInputSchema.safeParse({ ...valid, roles: ["carrier", "agent"] });
+    expect(r2.success && r2.data.roles).toEqual(["carrier", "agent"]);
+  });
+
+  it("rejects an unknown role and an empty role list", () => {
+    expect(accountInputSchema.safeParse({ ...valid, roles: ["pirate"] }).success).toBe(false);
+    expect(accountInputSchema.safeParse({ ...valid, roles: [] }).success).toBe(false);
+  });
+
   it("rejects an unknown preferred channel", () => {
     const r = accountInputSchema.safeParse({
       ...valid,

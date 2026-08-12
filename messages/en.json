@@ -153,6 +153,7 @@
   },
   "fields": {
     "companyTitle": "Company title",
+    "roles": "Roles",
     "taxId": "Tax ID",
     "address": "Company address",
     "notes": "Comments / notes",
@@ -296,6 +297,14 @@
     "noContacts": "This company has no contacts yet",
     "titleAuto": "Generated automatically — editable"
   },
+  "companyRoles": {
+    "client": "Client",
+    "agent": "Agent",
+    "carrier": "Carrier",
+    "supplier": "Supplier",
+    "customs_broker": "Customs broker",
+    "other": "Other"
+  },
   "accounts": {
     "newAccount": "New account",
     "editAccount": "Edit account",
@@ -314,6 +323,8 @@
     "title": "Orders",
     "newOrder": "New order",
     "editOrder": "Edit order",
+    "sourceRequest": "Source request",
+    "sourceQuotation": "Quotation v{version}",
     "notFound": "Order not found",
     "searchPlaceholder": "Search by number, subject, client, country…",
     "empty": "No orders yet — create the first one.",
@@ -365,7 +376,11 @@
     "convertDirectHint": "The order is created without a price. It cannot be closed until the financial data is complete.",
     "convertNoQuotation": "There is no quotation to convert from.",
     "convertNoClient": "Choose a client before creating the order.",
-    "convertAlready": "This request already has an order."
+    "convertAlready": "This request already has an order.",
+    "newClient": "New client",
+    "newClientName": "Company name",
+    "reeferSuggest": "Refrigerated equipment selected — is the cargo temperature controlled?",
+    "reeferSuggestApply": "Set temperature controlled"
   },
   "search": {
     "title": "Search",

@@ -46,8 +46,8 @@ export default async function FinancePage({
   const kpi = (label: string, value: string) => (
     <Card>
       <CardBody>
-        <div className="text-xs font-medium text-ink-soft">{label}</div>
-        <div className="mt-1 text-[21px] font-semibold tracking-tight tabular-nums text-brand-deep">
+        <div className="eyebrow">{label}</div>
+        <div className="mt-2 font-display text-[26px] font-extrabold leading-none tracking-[-0.04em] tabular-nums text-brand-deep">
           {value}
         </div>
       </CardBody>
@@ -84,7 +84,7 @@ export default async function FinancePage({
   const aging = (title: string, side: AgingSide) => (
     <Card>
       <CardHeader>
-        <span className="text-sm font-semibold">{title}</span>
+        <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{title}</span>
         <span className="text-xs tabular-nums text-ink-soft">{formatMoneyAzn(side.totalCents)}</span>
       </CardHeader>
       <CardBody>
@@ -145,7 +145,7 @@ export default async function FinancePage({
       )}
 
       <Card className="mb-4">
-        <CardHeader><span className="text-sm font-semibold">{t("trend", { year })}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("trend", { year })}</span></CardHeader>
         <CardBody>
           <BarChart
             points={trendPoints}
@@ -184,7 +184,7 @@ export default async function FinancePage({
       </Card>
 
       <Card className="mb-4">
-        <CardHeader><span className="text-sm font-semibold">{t("cashFlow", { year })}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("cashFlow", { year })}</span></CardHeader>
         <CardBody>
           <BarChart
             points={cashPoints}
@@ -234,7 +234,7 @@ export default async function FinancePage({
 
       <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("clients")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("clients")}</span></CardHeader>
           <CardBody>
             {fin(t("totalReceivable"), d.totals.clients.totalReceivableCents)}
             {fin(t("totalReceived"), d.totals.clients.totalReceivedCents, "pos")}
@@ -242,7 +242,7 @@ export default async function FinancePage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("carriers")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("carriers")}</span></CardHeader>
           <CardBody>
             {fin(t("totalPayable"), d.totals.carriers.totalPayableCents)}
             {fin(t("totalPaid"), d.totals.carriers.totalPaidCents, "pos")}
@@ -250,7 +250,7 @@ export default async function FinancePage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("ytdResults", { year })}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("ytdResults", { year })}</span></CardHeader>
           <CardBody>
             {fin(t("totalRevenue"), d.totals.ytd.revenueCents, "pos")}
             {fin(t("totalCarrierCosts"), -d.totals.ytd.carrierCostsCents, "neg")}
@@ -262,7 +262,7 @@ export default async function FinancePage({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("revenueByCurrency")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("revenueByCurrency")}</span></CardHeader>
           <CardBody>
             <RankBars
               empty={td("noData")}
@@ -276,7 +276,7 @@ export default async function FinancePage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("revenueByTransportType")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("revenueByTransportType")}</span></CardHeader>
           <CardBody>
             <RankBars
               empty={td("noData")}
@@ -290,7 +290,7 @@ export default async function FinancePage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("topClientsByRevenue")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("topClientsByRevenue")}</span></CardHeader>
           <CardBody>
             <RankBars
               empty={td("noData")}
@@ -304,7 +304,7 @@ export default async function FinancePage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("marginByRoute")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("marginByRoute")}</span></CardHeader>
           <CardBody>
             <RankBars
               empty={td("noData")}

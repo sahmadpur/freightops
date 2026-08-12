@@ -53,7 +53,7 @@ export function ContactsEditor({
       {/* Index keys are fine here: rows are only user-edited, inputs are controlled,
           and state lives in the parent form. Not suitable for sorted/filtered lists. */}
       {contacts.map((c, i) => (
-        <div key={i} className="rounded-[12px] border border-edge-soft bg-surface-hover p-3">
+        <div key={i} className="rounded-control border border-edge-soft bg-surface-hover p-3">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-[11.5px] font-medium text-ink-soft">
               {t("contacts")} {i + 1}
@@ -150,7 +150,7 @@ export function ContactsEditor({
       <button
         type="button"
         onClick={() => onChange([...contacts, emptyContact()])}
-        className="rounded-[12px] border border-dashed border-edge-chip px-3 py-2 text-sm text-ink-soft hover:bg-surface-hover"
+        className="rounded-control border border-dashed border-edge-chip px-3 py-2 text-sm text-ink-soft hover:bg-surface-hover"
       >
         + {t("addContact")}
       </button>

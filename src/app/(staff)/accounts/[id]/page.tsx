@@ -26,7 +26,7 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
           <div className="flex items-center gap-3">
             <Link
               href={`/accounts/${account.id}/edit`}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+              className="rounded-control border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
             >
               {t("actions.edit")}
             </Link>
@@ -48,7 +48,7 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
       <div className="grid grid-cols-2 gap-4">
         <Card>
           <CardHeader>
-            <span className="text-sm font-semibold">{t("nav.accounts")}</span>
+            <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("nav.accounts")}</span>
           </CardHeader>
           <CardBody>
             <dl className="space-y-2 text-sm">
@@ -89,13 +89,13 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
         </Card>
         <Card>
           <CardHeader>
-            <span className="text-sm font-semibold">{t("fields.contacts")}</span>
+            <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("fields.contacts")}</span>
           </CardHeader>
           <CardBody>
             {contacts.length === 0 && <p className="text-sm text-slate-400">—</p>}
             <div className="space-y-3">
               {contacts.map((c) => (
-                <div key={c.id} className="rounded-lg bg-slate-50 p-3 text-sm">
+                <div key={c.id} className="rounded-control bg-slate-50 p-3 text-sm">
                   <div className="font-medium">{c.name}</div>
                   {c.position && <div className="text-slate-500">{c.position}</div>}
                   {c.phones.length > 0 && <div className="text-slate-500">{c.phones.join(" · ")}</div>}
@@ -109,7 +109,7 @@ export default async function AccountDetailPage({ params }: { params: Promise<{ 
       </div>
       <Card className="mt-4">
         <CardHeader>
-          <span className="text-sm font-semibold">{t("fields.orderHistory")}</span>
+          <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("fields.orderHistory")}</span>
         </CardHeader>
         <CardBody>
           {orders.length === 0 ? (

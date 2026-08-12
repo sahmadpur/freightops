@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   missingForStatus,
+  orderSourceFields,
   requestInputSchema,
   requestStatusChangeSchema,
   type LegInput,
@@ -251,6 +252,32 @@ describe("missingForStatus", () => {
       ],
     };
     expect(missingForStatus("in_progress", multimodal)).toEqual(["destinationCountry"]);
+  });
+});
+
+describe("orderSourceFields", () => {
+  it("carries every source-reference column from the request onto the order (§26)", () => {
+    expect(
+      orderSourceFields(
+        {
+          id: "req-1",
+          contactId: "con-1",
+          responsibleUserId: "usr-1",
+          cargoReadyDate: "2026-08-12",
+          requestedDeliveryDate: "2026-08-20",
+          specialInstructions: "Call before delivery",
+        },
+        "quo-1",
+      ),
+    ).toEqual({
+      requestId: "req-1",
+      quotationId: "quo-1",
+      contactId: "con-1",
+      responsibleUserId: "usr-1",
+      cargoReadyDate: "2026-08-12",
+      requestedDeliveryDate: "2026-08-20",
+      specialInstructions: "Call before delivery",
+    });
   });
 });
 

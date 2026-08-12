@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Geist_Mono, Inter, Manrope } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { THEME_SCRIPT } from "@/lib/theme";
 import { getTheme } from "@/lib/theme-server";
 import "./globals.css";
 
-// Display — Geist carries headings and hero text, set tight and medium.
-const geist = Geist({
-  variable: "--font-geist",
+// Display — Manrope carries headings, navigation and numbers, set tight and
+// heavy. The 800 weight is the loudest thing in the interface.
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin", "latin-ext", "cyrillic"],
-  weight: ["400", "500", "600"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -51,7 +52,7 @@ export default async function RootLayout({
       data-theme={theme === "system" ? "light" : theme}
       data-theme-pref={theme}
       suppressHydrationWarning
-      className={`${geist.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${manrope.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-surface text-ink">
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />

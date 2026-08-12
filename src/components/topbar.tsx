@@ -22,12 +22,12 @@ export function Topbar({ userName, theme }: { userName: string; theme: Theme }) 
     .toUpperCase();
 
   return (
-    <header className="flex items-center gap-3 border-b border-edge-soft bg-surface-card px-4 py-2 md:px-[22px]">
+    <header className="flex items-center gap-3 border-b border-edge-soft bg-surface px-4 py-2.5 md:px-6">
       {/* The rail carries the wordmark from md up; on a phone it lives here. */}
       <span className="flex items-center gap-2 md:hidden">
-        <Image src="/all-in-logo.png" alt="" width={24} height={23} />
-        <span className="font-display text-[16px] font-medium tracking-[-0.03em] text-brand-deep">
-          All In <span className="text-ink-soft">Logistics</span>
+        <Image src="/all-in-logo.png" alt="" width={22} height={21} />
+        <span className="font-display text-[15px] font-extrabold tracking-[-0.04em] text-brand-deep">
+          All In <span className="font-medium text-ink-soft">Logistics</span>
         </span>
       </span>
       {/* Global search across requests and orders — a plain GET form, so the
@@ -38,19 +38,21 @@ export function Topbar({ userName, theme }: { userName: string; theme: Theme }) 
           name="q"
           placeholder={ts("placeholder")}
           aria-label={ts("title")}
-          className="w-full max-w-sm rounded-[10px] border border-edge-chip bg-surface-card px-3 py-1.5 text-[12.5px] text-ink outline-none transition-colors placeholder:text-ink-soft/55 focus:border-edge-focus focus:ring-2 focus:ring-brand/15"
+          className="w-full max-w-sm rounded-full border border-edge-chip bg-transparent px-4 py-[7px] text-[12.5px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-brand"
         />
       </form>
       <ThemeSwitcher theme={theme} />
       <LanguageSwitcher />
       <div className="flex items-center gap-2">
         <span
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-chip-active text-[11px] font-semibold text-brand"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-brand font-display text-[10.5px] font-bold text-brand-pale"
           aria-hidden="true"
         >
           {initials}
         </span>
-        <span className="text-[12.5px] text-ink">{userName}</span>
+        <span className="hidden text-[12.5px] text-ink sm:inline">
+          {userName}
+        </span>
       </div>
       <button
         onClick={async () => {

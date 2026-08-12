@@ -1,28 +1,38 @@
-import { and, desc, eq, ilike, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, arrayContains, asc, desc, eq, ilike, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { accounts, contacts, orders } from "@/db/schema";
 import { PAGE_SIZE } from "@/components/ui/paginator";
+import type { CompanyRole } from "@/lib/company-roles";
 
 export type AccountListRow = {
   id: string;
   title: string;
+  roles: string[];
   taxId: string | null;
   orderCount: number;
   contact1: { name: string; phone: string | null; email: string | null } | null;
   contact2Name: string | null;
 };
 
-export async function listAccounts(opts: { q?: string; page?: number; archived?: boolean }) {
+export async function listAccounts(opts: {
+  q?: string;
+  page?: number;
+  archived?: boolean;
+  /** Only companies holding this role (e.g. the /carriers view). */
+  role?: CompanyRole;
+}) {
   const page = Math.max(1, opts.page ?? 1);
   const where = and(
     opts.archived ? isNotNull(accounts.deletedAt) : isNull(accounts.deletedAt),
     opts.q ? ilike(accounts.title, `%${opts.q}%`) : undefined,
+    opts.role ? arrayContains(accounts.roles, [opts.role]) : undefined,
   );
 
   const rows = await db
     .select({
       id: accounts.id,
       title: accounts.title,
+      roles: accounts.roles,
       taxId: accounts.taxId,
       orderCount: sql<number>`(select count(*) from ${orders} o where o.account_id = ${accounts.id} and o.deleted_at is null)`.mapWith(Number),
     })
@@ -87,4 +97,14 @@ export async function getAccount(id: string) {
     .orderBy(desc(orders.createdAt))
     .limit(50);
   return { account, contacts: accountContacts, orders: accountOrders };
+}
+
+/** Active accounts as combobox options, optionally narrowed to one role. */
+export async function accountPickerOptions(role?: CompanyRole): Promise<{ value: string; label: string }[]> {
+  const rows = await db
+    .select({ id: accounts.id, title: accounts.title })
+    .from(accounts)
+    .where(and(isNull(accounts.deletedAt), role ? arrayContains(accounts.roles, [role]) : undefined))
+    .orderBy(asc(accounts.title));
+  return rows.map((a) => ({ value: a.id, label: a.title }));
 }

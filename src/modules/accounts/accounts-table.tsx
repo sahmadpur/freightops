@@ -10,6 +10,16 @@ export function AccountsTable({ rows }: { rows: AccountListRow[] }) {
 
   const columns: Column<AccountListRow>[] = [
     { key: "title", header: t("fields.companyTitle"), render: (r) => <span className="font-medium">{r.title}</span> },
+    {
+      key: "roles",
+      header: t("fields.roles"),
+      hiddenOnMobile: true,
+      render: (r) => (
+        <span className="text-ink-soft">
+          {r.roles.map((role) => t(`companyRoles.${role}`)).join(", ") || "—"}
+        </span>
+      ),
+    },
     { key: "taxId", header: t("fields.taxId"), width: "130px", hiddenOnMobile: true, render: (r) => <span className="text-ink-soft">{r.taxId ?? "—"}</span> },
     { key: "contact1", header: `${t("fields.contacts")} 1`, hiddenOnMobile: true, render: (r) => r.contact1?.name ?? "—" },
     { key: "contact2", header: `${t("fields.contacts")} 2`, hiddenOnMobile: true, render: (r) => r.contact2Name ?? "—" },

@@ -31,7 +31,7 @@ function AcceptForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="mb-6">
-        <h2 className="font-display text-[21px] font-medium tracking-[-0.02em] text-brand-deep">
+        <h2 className="font-display text-[22px] font-extrabold tracking-[-0.035em] text-brand-deep">
           Set up your account
         </h2>
         <p className="mt-1.5 text-[13px] text-ink-soft">

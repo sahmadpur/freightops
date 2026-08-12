@@ -33,13 +33,13 @@ export default async function DocumentsPage({
             <option key={d} value={d}>{t(`docType.${d}`)}</option>
           ))}
         </select>
-        <button type="submit" className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">
+        <button type="submit" className="rounded-control border border-edge-chip px-4 py-2 text-sm text-ink-soft hover:bg-surface-hover">
           {t("common.search")}
         </button>
       </form>
 
       {groups.length === 0 ? (
-        <p className="text-sm text-slate-400">{t("documents.empty")}</p>
+        <p className="text-sm text-ink-soft">{t("documents.empty")}</p>
       ) : (
         <div className="space-y-3">
           {groups.map((g) => (
@@ -48,7 +48,7 @@ export default async function DocumentsPage({
                 <Link href={`/orders/${g.orderId}`} className="text-sm font-semibold text-indigo-600 hover:underline">
                   {g.orderNumber} · {g.orderTitle}
                 </Link>
-                <span className="text-xs text-slate-400">{g.accountTitle}</span>
+                <span className="text-xs text-ink-soft">{g.accountTitle}</span>
               </CardHeader>
               <CardBody>
                 <ul className="space-y-1.5">
@@ -56,7 +56,7 @@ export default async function DocumentsPage({
                     <li key={d.id} className="flex items-center gap-3 text-sm">
                       <span className="flex-1 truncate">
                         <span className="font-medium">{d.fileName}</span>
-                        <span className="ml-2 text-xs text-slate-400">{t(`docType.${d.docType}`)}</span>
+                        <span className="ml-2 text-xs text-ink-soft">{t(`docType.${d.docType}`)}</span>
                       </span>
                       {d.visibleToClient ? (
                         <span className="rounded-full bg-[rgb(var(--approval-approved-bg))] px-2 py-0.5 text-[10.5px] text-[rgb(var(--approval-approved-fg))]">{t("documents.clientVisible")}</span>

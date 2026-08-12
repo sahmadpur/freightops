@@ -247,7 +247,7 @@ export async function contactOptions(accountId: string) {
 export async function requestFormData() {
   const [accountRows, staffRows] = await Promise.all([
     db
-      .select({ id: accounts.id, title: accounts.title })
+      .select({ id: accounts.id, title: accounts.title, roles: accounts.roles })
       .from(accounts)
       .where(isNull(accounts.deletedAt))
       .orderBy(asc(accounts.title)),
@@ -259,6 +259,9 @@ export async function requestFormData() {
   ]);
   return {
     accountOpts: accountRows.map((a) => ({ value: a.id, label: a.title })),
+    agentOpts: accountRows
+      .filter((a) => a.roles.includes("agent"))
+      .map((a) => ({ value: a.id, label: a.title })),
     staffOpts: staffRows.map((u) => ({ value: u.id, label: u.name })),
   };
 }

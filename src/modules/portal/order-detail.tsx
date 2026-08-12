@@ -52,7 +52,7 @@ export async function PortalOrderDetail({
       </div>
 
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{order.title}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{order.title}</span></CardHeader>
         <CardBody>
           <dl className="grid grid-cols-2 gap-3 text-sm">
             {row(t("fields.route"), routeLabel(order.fromCountry, order.toCountry, locale))}
@@ -69,14 +69,14 @@ export async function PortalOrderDetail({
       </Card>
 
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("documents.tab")}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("documents.tab")}</span></CardHeader>
         <CardBody>
           {documents.length === 0 ? (
             <p className="text-sm text-slate-400">{t("portal.noDocuments")}</p>
           ) : (
             <ul className="space-y-2">
               {documents.map((d) => (
-                <li key={d.id} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                <li key={d.id} className="flex items-center gap-3 rounded-control border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
                   <span className="flex-1 truncate">
                     <span className="font-medium">{d.fileName}</span>
                     <span className="ml-2 text-xs text-slate-400">{td(d.docType)}</span>
@@ -90,7 +90,7 @@ export async function PortalOrderDetail({
       </Card>
 
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("comments.tab")}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("comments.tab")}</span></CardHeader>
         <CardBody>
           <CommentsTab orderId={order.id} comments={comments} currentUserId={currentUserId} sendAction={addClientComment} />
         </CardBody>

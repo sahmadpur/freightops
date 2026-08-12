@@ -1,13 +1,6 @@
-import { getTranslations } from "next-intl/server";
-import { PageHeader } from "@/components/ui/page-header";
-import { CarrierForm } from "@/modules/carriers/carrier-form";
+import { redirect } from "next/navigation";
 
-export default async function NewCarrierPage() {
-  const t = await getTranslations("carriers");
-  return (
-    <div>
-      <PageHeader title={t("newCarrier")} />
-      <CarrierForm initial={{ title: "", address: "", notes: "", contacts: [] }} />
-    </div>
-  );
+/** Carriers are accounts now — the account form with the carrier role pre-set. */
+export default function NewCarrierPage() {
+  redirect("/accounts/new?role=carrier");
 }

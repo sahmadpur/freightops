@@ -4,7 +4,8 @@ import type { db } from "@/db";
 import type { ContactInput } from "./schema";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
-type ParentType = "account" | "carrier";
+// Since companies unified, every contact hangs off an account.
+type ParentType = "account";
 
 /**
  * Reconcile a company's contacts against what the form submitted.

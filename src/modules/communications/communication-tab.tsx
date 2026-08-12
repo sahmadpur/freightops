@@ -77,7 +77,7 @@ export function CommunicationTab({
         ) : (
           <ul className="space-y-3">
             {messages.map((m) => (
-              <li key={m.id} className="rounded-[12px] border border-edge-soft bg-surface-hover p-3">
+              <li key={m.id} className="rounded-control border border-edge-soft bg-surface-hover p-3">
                 <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2 text-[11.5px] text-ink-soft">
                   <span>
                     <span className="font-medium text-ink">
@@ -133,7 +133,7 @@ export function CommunicationTab({
           onChange={(e) => search(e.target.value)}
         />
         {hits.length > 0 && (
-          <ul className="mt-2 divide-y divide-edge-soft rounded-[10px] border border-edge-chip">
+          <ul className="mt-2 divide-y divide-edge-soft rounded-control border border-edge-chip">
             {hits.map((h) => (
               <li key={h.id}>
                 <button

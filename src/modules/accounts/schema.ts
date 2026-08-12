@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { COMPANY_ROLES } from "@/lib/company-roles";
 import { countryCode } from "@/lib/validation";
 export type { ActionResult } from "@/lib/forms";
 
@@ -32,6 +33,8 @@ const emailDomain = (s: z.ZodString) =>
 
 export const accountInputSchema = z.object({
   title: z.string().trim().min(1).max(300),
+  /** Which hats the company wears; at least one. */
+  roles: z.array(z.enum(COMPANY_ROLES)).min(1).default(["client"]),
   taxId: z.string().trim().max(50).optional().or(z.literal("")),
   address: z.string().trim().max(500).optional().or(z.literal("")),
   country: countryCode,

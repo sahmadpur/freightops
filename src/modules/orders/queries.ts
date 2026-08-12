@@ -1,24 +1,37 @@
 import {
-  and, asc, desc, eq, gte, ilike, isNotNull, isNull, lte, or, sql,
+  and, arrayContains, asc, desc, eq, gte, ilike, isNotNull, isNull, lte, or, sql,
   type SQL, type SQLWrapper,
 } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import {
   orders,
   accounts,
-  carriers,
   auditLog,
   orderStatusEnum,
   modeTypeEnum,
   payments,
   documents,
   user,
+  requests,
+  quotations,
 } from "@/db/schema";
 import { PAGE_SIZE } from "@/components/ui/paginator";
 import { paymentStatus, type PaymentStatus } from "@/lib/finance";
 import { toCents } from "@/lib/money";
 import type { OrderStatus } from "@/lib/order-status";
 import type { TransportType } from "@/lib/transport-types";
+
+// The carrier is an account too (role "carrier"); alias for joins next to the client.
+const carrierAccounts = alias(accounts, "carrier_accounts");
+
+const carrierOptsQuery = () =>
+  db
+    .select({ id: accounts.id, title: accounts.title })
+    .from(accounts)
+    .where(and(isNull(accounts.deletedAt), arrayContains(accounts.roles, ["carrier"])))
+    .orderBy(accounts.title)
+    .limit(1000);
 
 export type OrderListRow = {
   id: string;
@@ -206,11 +219,18 @@ export async function getOrder(id: string) {
     .select({
       order: orders,
       accountTitle: accounts.title,
-      carrierTitle: carriers.title,
+      carrierTitle: carrierAccounts.title,
+      // Joined via requests.orderId so orders converted before orders.request_id
+      // existed still show their source request.
+      sourceRequestId: requests.id,
+      sourceRequestNumber: requests.number,
+      sourceQuotationVersion: quotations.version,
     })
     .from(orders)
     .innerJoin(accounts, eq(orders.accountId, accounts.id))
-    .leftJoin(carriers, eq(orders.carrierId, carriers.id))
+    .leftJoin(carrierAccounts, eq(orders.carrierId, carrierAccounts.id))
+    .leftJoin(requests, eq(requests.orderId, orders.id))
+    .leftJoin(quotations, eq(orders.quotationId, quotations.id))
     .where(eq(orders.id, id))
     .limit(1);
   if (!row) return null;
@@ -237,7 +257,7 @@ export async function getOrder(id: string) {
 export async function orderFormData() {
   const [accountOpts, carrierOpts] = await Promise.all([
     db.select({ id: accounts.id, title: accounts.title }).from(accounts).where(isNull(accounts.deletedAt)).orderBy(accounts.title).limit(1000),
-    db.select({ id: carriers.id, title: carriers.title }).from(carriers).where(isNull(carriers.deletedAt)).orderBy(carriers.title).limit(1000),
+    carrierOptsQuery(),
   ]);
   return { accountOpts, carrierOpts };
 }
@@ -246,7 +266,7 @@ export async function orderFormData() {
 export async function orderFilterData() {
   const [accountOpts, carrierOpts, countryRows] = await Promise.all([
     db.select({ id: accounts.id, title: accounts.title }).from(accounts).where(isNull(accounts.deletedAt)).orderBy(accounts.title).limit(1000),
-    db.select({ id: carriers.id, title: carriers.title }).from(carriers).where(isNull(carriers.deletedAt)).orderBy(carriers.title).limit(1000),
+    carrierOptsQuery(),
     db
       .select({ code: sql<string>`c` })
       .from(
@@ -305,11 +325,11 @@ export async function getClientOrder(id: string, accountId: string) {
     .select({
       order: orders,
       accountTitle: accounts.title,
-      carrierTitle: carriers.title,
+      carrierTitle: carrierAccounts.title,
     })
     .from(orders)
     .innerJoin(accounts, eq(orders.accountId, accounts.id))
-    .leftJoin(carriers, eq(orders.carrierId, carriers.id))
+    .leftJoin(carrierAccounts, eq(orders.carrierId, carrierAccounts.id))
     .where(and(eq(orders.id, id), eq(orders.accountId, accountId), isNull(orders.deletedAt)))
     .limit(1);
   return row ?? null;

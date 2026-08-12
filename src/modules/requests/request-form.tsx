@@ -15,6 +15,7 @@ import {
   type LegTransportType,
 } from "@/lib/transport-matrix";
 import { INCOTERMS } from "@/lib/incoterms";
+import { createAccount } from "@/modules/accounts/actions";
 import { createRequest, fetchContactOptions, updateRequest } from "./actions";
 import { CargoEditor } from "./cargo-editor";
 import { LegEditor } from "./leg-editor";
@@ -26,11 +27,13 @@ const gridCls = "grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3";
 export function RequestForm({
   initial,
   accountOpts,
+  agentOpts,
   staffOpts,
   contactOpts: initialContactOpts,
 }: {
   initial: RequestFormInitial;
   accountOpts: ComboOption[];
+  agentOpts: ComboOption[];
   staffOpts: ComboOption[];
   contactOpts: ComboOption[];
 }) {
@@ -43,9 +46,16 @@ export function RequestForm({
   const router = useRouter();
 
   const [v, setV] = useState(initial);
+  /** Local copy so an inline-created client shows up without a round trip. */
+  const [accounts, setAccounts] = useState(accountOpts);
   const [contactOpts, setContactOpts] = useState(initialContactOpts);
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<ActionResult | null>(null);
+
+  const [newClientOpen, setNewClientOpen] = useState(false);
+  const [newClientName, setNewClientName] = useState("");
+  const [newClientPending, setNewClientPending] = useState(false);
+  const [newClientError, setNewClientError] = useState<string | null>(null);
 
   const set = (patch: Partial<RequestFormInitial>) => setV((s) => ({ ...s, ...patch }));
 
@@ -64,6 +74,28 @@ export function RequestForm({
     const opts = await fetchContactOptions(accountId);
     setContactOpts(opts);
     if (opts.length === 1) set({ contactId: opts[0].value });
+  }
+
+  /**
+   * Inline client creation (§5): only the name, everything else is filled in
+   * later on the account page. Reuses the accounts module's action, so the
+   * validation and audit trail are the same as the full form's.
+   */
+  async function addClient() {
+    const title = newClientName.trim();
+    if (!title || newClientPending) return;
+    setNewClientPending(true);
+    const r = await createAccount({ title, contacts: [] });
+    setNewClientPending(false);
+    if (!r.ok) {
+      setNewClientError(r.fieldErrors?.title?.[0] ?? r.error ?? "error");
+      return;
+    }
+    setAccounts((opts) => [...opts, { value: r.id, label: title }]);
+    setNewClientOpen(false);
+    setNewClientName("");
+    setNewClientError(null);
+    await changeClient(r.id);
   }
 
   const source = v.leadSource as (typeof LEAD_SOURCES)[number];
@@ -101,7 +133,7 @@ export function RequestForm({
   const generatedTitle = useMemo(() => {
     const first = v.legs[0];
     const last = v.legs[v.legs.length - 1];
-    const client = accountOpts.find((a) => a.value === v.accountId)?.label ?? null;
+    const client = accounts.find((a) => a.value === v.accountId)?.label ?? null;
     const family = v.transportFamily;
     return buildRequestTitle({
       clientName: client,
@@ -110,7 +142,7 @@ export function RequestForm({
       transport: family ? tf(family) : null,
       subtype: v.legs.length === 1 && first?.subtype ? ts(first.subtype) : null,
     });
-  }, [v.accountId, v.legs, v.transportFamily, accountOpts, tf, ts]);
+  }, [v.accountId, v.legs, v.transportFamily, accounts, tf, ts]);
 
   const [titleTouched, setTitleTouched] = useState(Boolean(initial.title));
   const title = titleTouched ? v.title : generatedTitle;
@@ -164,9 +196,55 @@ export function RequestForm({
             id="accountId"
             value={v.accountId}
             onChange={changeClient}
-            options={accountOpts}
+            options={accounts}
             placeholder={t("selectClient")}
           />
+          {newClientOpen ? (
+            <div className="mt-1.5 flex items-center gap-2">
+              <input
+                className={inputCls}
+                placeholder={tr("newClientName")}
+                value={newClientName}
+                autoFocus
+                onChange={(e) => setNewClientName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addClient();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={addClient}
+                disabled={newClientPending}
+                className="shrink-0 text-xs text-brand hover:underline disabled:opacity-40"
+              >
+                {newClientPending ? ta("saving") : ta("save")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setNewClientOpen(false);
+                  setNewClientError(null);
+                }}
+                className="shrink-0 text-xs text-ink-soft hover:underline"
+              >
+                {ta("cancel")}
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setNewClientOpen(true)}
+              className="mt-1 text-xs text-brand hover:underline"
+            >
+              + {tr("newClient")}
+            </button>
+          )}
+          {newClientError && (
+            <p className="mt-1 text-[11.5px] text-[rgb(var(--danger-fg))]">{newClientError}</p>
+          )}
         </Field>
         <Field label={t("contactPerson")} htmlFor="contactId" error={fe.contactId}>
           <Combobox
@@ -216,7 +294,12 @@ export function RequestForm({
               id="sourceAgentAccountId"
               value={v.sourceAgentAccountId}
               onChange={(value) => set({ sourceAgentAccountId: value })}
-              options={accountOpts}
+              options={
+                // Keep a previously saved agent visible even if its role was removed.
+                v.sourceAgentAccountId && !agentOpts.some((o) => o.value === v.sourceAgentAccountId)
+                  ? [...agentOpts, ...accounts.filter((a) => a.value === v.sourceAgentAccountId)]
+                  : agentOpts
+              }
             />
           </Field>
         )}
@@ -271,12 +354,20 @@ export function RequestForm({
       <LegEditor
         family={v.transportFamily}
         legs={v.legs}
+        cargo={v.cargo}
         onChange={(legs) => set({ legs })}
         errors={{ ...nested("legs"), ...(fe.legs ? { legs: fe.legs } : {}) }}
       />
 
       <SectionRule>{tr("sectionCargo")}</SectionRule>
-      <CargoEditor cargo={v.cargo} onChange={(cargo) => set({ cargo })} errors={nested("cargo")} />
+      <CargoEditor
+        cargo={v.cargo}
+        onChange={(cargo) => set({ cargo })}
+        errors={nested("cargo")}
+        suggestTempControl={v.legs.some(
+          (l) => l.vehicleType === "reefer" || l.containerType === "20rf" || l.containerType === "40rf",
+        )}
+      />
 
       <SectionRule>{tr("sectionTerms")}</SectionRule>
       <div className={gridCls}>

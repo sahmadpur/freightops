@@ -1,94 +1,111 @@
 @import "tailwindcss";
 
 /*
- * All In Logistics — "Signal Desk" design system
- * ----------------------------------------
- * A light, product-grade SaaS language: near-white #f5f5f5 canvas, white
- * cards on hairline borders, soft charcoal ink, and one signal blue that
- * carries every primary action, active state and accent. Two typographic
- * voices — Geist for display, Inter for UI/body — plus Geist Mono reserved
- * for record numbers and other machine-readable data.
+ * All In Logistics — "Ledger" design system
+ * -----------------------------------------
+ * A flat, near-monochrome workspace. Paper white page, one step down to a
+ * #fafafa card, hairline borders, pure black ink — and no shadows anywhere.
+ * Colour is spent in exactly three places: the mint accent that only ever
+ * appears on an ink surface, the amber "needs attention" signal, and the
+ * status hues that make a table scannable without reading the labels.
  *
- * Shape language: pill controls (radius 999px), 14px cards, whisper shadows.
- * Signature: a dashed graph-paper grid (.bg-grid) behind chrome and auth
- * surfaces, with white record cards floating over it.
+ * Shape language: 18px containers, 10px controls, 100px pills, 5px chips.
+ * Type: Manrope carries display, navigation and numbers, set tight and heavy;
+ * Inter carries body and forms; Geist Mono is reserved for record numbers.
  *
- * Colors are space-separated RGB channels consumed via rgb(var(--token)),
- * so every token supports opacity. The semantic tokens below are also mapped
- * onto Tailwind's indigo/violet/slate/emerald/rose scales so the wider app
- * inherits the palette without rewriting every utility string.
+ * Signature: the inverted pill. The primary action and the active nav route
+ * are a solid ink pill with paper text and a mint icon — black on light, white
+ * on dark, always the opposite of the page it sits on. Nothing else in the
+ * interface is filled, so the pill is the only place the eye lands first.
  *
- * Dark mode is a pure token flip: `[data-theme="dark"]` below redeclares the
- * same tokens, so every component — and the whole remapped Tailwind scale —
- * inverts without touching a single utility string. `--brand` and
- * `--brand-pale` swap roles (light mode: dark blue on white; dark mode: light
- * blue, and dark text ON a blue button). Keep new colors in tokens, never in
- * literal hex, or they will not follow the theme.
+ * Colors are space-separated RGB channels consumed via rgb(var(--token)), so
+ * every token supports opacity. The semantic tokens are also mapped onto
+ * Tailwind's indigo/violet/slate/emerald/rose scales so the wider app inherits
+ * the palette without rewriting every utility string.
+ *
+ * Dark mode is a pure token flip: `[data-theme="dark"]` redeclares the same
+ * tokens, so every component inverts without touching a utility string.
+ * `--brand` and `--brand-pale` swap roles (light: black pill, white label;
+ * dark: white pill, black label). Keep new colors in tokens, never literal
+ * hex, or they will not follow the theme.
  */
 
 :root {
   color-scheme: light;
 
-  /* Brand — signal blue primary */
-  --brand: 47 105 255; /* #2f69ff signal blue (PRIMARY) */
-  --brand-hover: 31 84 224; /* #1f54e0 */
-  --brand-deep: 45 45 45; /* #2d2d2d heading ink */
-  --brand-accent: 47 105 255; /* #2f69ff accent = primary, used sparingly */
-  --brand-light: 145 175 255; /* #91afff gradient tail */
-  --brand-pale: 255 255 255; /* text/icon ON a blue button */
-  --brand-chip: 74 124 255; /* #4a7cff mid blue */
-  --brand-wash: 235 241 255; /* #ebf1ff faintest blue fill */
-  --brand-strong: 23 62 168; /* #173ea8 deepest blue */
+  /* Brand — the ink that fills the signature pill (PRIMARY) */
+  --brand: 0 0 0; /* #000000 */
+  --brand-hover: 38 38 38; /* #262626 */
+  --brand-deep: 0 0 0; /* heading ink */
+  --brand-accent: 130 255 170; /* #82ffaa mint — only on ink surfaces */
+  --brand-light: 148 148 148; /* mid grey, hover edges */
+  --brand-pale: 255 255 255; /* text/icon ON the ink pill */
+  --brand-chip: 38 38 38;
+  --brand-wash: 244 244 244; /* faintest neutral fill */
+  --brand-strong: 0 0 0;
+
+  /*
+   * Accents. Mint is legible against ink but washes out on paper, so it is
+   * restricted to ink surfaces; `--accent-ink` is the darkened mint used when
+   * the accent has to carry text or a stroke on a light surface. Amber marks
+   * "needs attention" — pending approvals, overdue records — and nothing else.
+   */
+  --accent: 130 255 170; /* #82ffaa */
+  --accent-ink: 11 122 75; /* #0b7a4b legible mint */
+  --accent-on-brand: 130 255 170; /* mint sitting ON the ink pill */
+  --attention: 251 237 29; /* #fbed1d */
+  --attention-ink: 138 109 0; /* #8a6d00 legible amber */
 
   /* Paper — the off-white chrome for auth / marketing surfaces */
-  --paper: 250 250 250; /* #fafafa */
-  --paper-dim: 245 245 245; /* #f5f5f5 */
-  --paper-edge: 232 232 232; /* #e8e8e8 */
+  --paper: 255 255 255; /* #ffffff */
+  --paper-dim: 250 250 250; /* #fafafa */
+  --paper-edge: 226 226 226; /* #e2e2e2 */
 
   /* Ink — body text */
-  --ink: 61 61 61; /* #3d3d3d soft charcoal */
-  --ink-soft: 124 124 124; /* #7c7c7c secondary text */
+  --ink: 26 26 26; /* #1a1a1a */
+  --ink-soft: 92 92 92; /* #5c5c5c secondary text */
+  --ink-faint: 128 128 128; /* #808080 micro labels */
 
-  /* Surface scale — the app workspace */
-  --surface: 245 245 245; /* #f5f5f5 page background */
-  --surface-card: 255 255 255; /* cards, tables, inputs */
-  --surface-hover: 250 250 250; /* #fafafa row hover */
-  --surface-thead: 250 250 250; /* #fafafa table header */
-  --surface-chip-active: 238 243 255; /* #eef3ff active filter chip */
+  /* Surface scale — the page is paper, the card is one step down */
+  --surface: 255 255 255; /* #ffffff page background */
+  --surface-card: 250 250 250; /* #fafafa cards, tables, inputs */
+  --surface-hover: 244 244 244; /* #f4f4f4 row hover */
+  --surface-thead: 255 255 255; /* table header reads as page, not card */
+  --surface-chip-active: 240 240 240; /* #f0f0f0 active filter chip */
 
-  /* Edges / borders */
-  --edge-soft: 235 235 235; /* #ebebeb subtle dividers */
-  --edge-chip: 224 224 224; /* #e0e0e0 visible input/btn borders */
-  --edge-focus: 47 105 255; /* #2f69ff blue focus ring */
+  /* Edges — hairlines carry every division; nothing is separated by shadow */
+  --edge-soft: 224 224 224; /* #e0e0e0 dividers */
+  --edge-chip: 204 204 204; /* #cccccc input/button borders */
+  --edge-focus: 0 0 0; /* focus ring = ink */
 
   /* Status dots */
-  --dot-done: 34 160 107; /* #22a06b */
-  --dot-progress: 245 184 0; /* #f5b800 */
-  --dot-pending: 180 180 180; /* #b4b4b4 */
-  --dot-failed: 229 72 77; /* #e5484d */
+  --dot-done: 11 122 75;
+  --dot-progress: 138 109 0;
+  --dot-pending: 168 168 168;
+  --dot-failed: 197 40 45;
 
   /*
    * Shipment-stage hues — one per order status, shared by the status badge
    * (.status-chip) and the dashboard's stacked status bar so the two can't
-   * drift. Cool blues while the load is arranged, amber in motion, rose at the
-   * border, green once it lands. The hue is information: a table can be
-   * scanned without reading the labels.
+   * drift. Neutral while the load is arranged, amber in motion, rose at the
+   * border, green once it lands. In a monochrome interface the hue survives
+   * only as a 6px dot, so these are the saturated ends of each family.
    */
-  --status-created: 32 73 196;
+  --status-created: 82 82 82;
   --status-operations: 68 54 184;
   --status-booked: 15 95 128;
-  --status-in_transit: 138 90 6;
+  --status-in_transit: 168 124 0;
   /* Retired stages — kept because the history tab still renders them as old values. */
   --status-waiting_pickup: 77 85 102;
   --status-received: 68 54 184;
   --status-internal_transit: 15 95 128;
   --status-loaded: 18 119 90;
-  --status-transit: 138 90 6;
+  --status-transit: 168 124 0;
   --status-at_border: 154 68 25;
   --status-at_customs: 150 48 90;
   --status-arrived: 61 107 22;
-  --status-delivered: 18 119 90;
-  --status-closed: 92 92 92;
+  --status-delivered: 11 122 75;
+  --status-closed: 148 148 148;
 
   /*
    * Request-stage hues — the commercial lifecycle, which runs before an order
@@ -97,46 +114,46 @@
    * then a hard green/red/grey split on the decision, so a won request never
    * reads like a cargo milestone.
    */
-  --status-new: 77 85 102;
-  --status-in_progress: 32 73 196;
+  --status-new: 148 148 148;
+  --status-in_progress: 40 40 40;
   --status-quotation: 68 54 184;
   --status-quotation_sent: 96 48 168;
-  --status-waiting_client: 138 90 6;
-  --status-won: 18 119 90;
+  --status-waiting_client: 168 124 0;
+  --status-won: 11 122 75;
   --status-lost: 176 42 55;
-  --status-cancelled: 110 110 110;
+  --status-cancelled: 168 168 168;
 
   /*
    * Chart series, in fixed assignment order (revenue / cost / profit). Not
-   * cycled: a fourth measure gets its own chart, not a generated hue. Both
-   * themes are validated for colorblind separation, chroma and contrast
-   * against their own surface — re-run the check before changing a value.
+   * cycled: a fourth measure gets its own chart, not a generated hue. One
+   * achromatic, one orange, one mint — separable under deuteranopia and
+   * protanopia by hue and by luminance both. Re-check before changing a value.
    */
-  --chart-1: 47 105 255; /* #2f69ff revenue / money in */
-  --chart-2: 234 88 12; /* #ea580c cost / money out */
-  --chart-3: 5 150 105; /* #059669 profit */
+  --chart-1: 23 23 23; /* #171717 revenue / money in */
+  --chart-2: 217 102 42; /* #d9662a cost / money out */
+  --chart-3: 11 122 75; /* #0b7a4b profit */
 
   /* Approval / workflow states (bg / fg / edge) */
-  --approval-pending-bg: 255 250 235;
-  --approval-pending-fg: 158 100 8;
-  --approval-pending-edge: 250 224 160;
-  --approval-approved-bg: 236 250 244;
-  --approval-approved-fg: 20 122 82;
-  --approval-approved-edge: 176 232 210;
-  --approval-rejected-bg: 254 242 242;
-  --approval-rejected-fg: 185 42 47;
-  --approval-rejected-edge: 246 200 200;
+  --approval-pending-bg: 253 250 232;
+  --approval-pending-fg: 122 96 0;
+  --approval-pending-edge: 232 222 160;
+  --approval-approved-bg: 238 250 244;
+  --approval-approved-fg: 11 122 75;
+  --approval-approved-edge: 186 228 210;
+  --approval-rejected-bg: 253 242 242;
+  --approval-rejected-fg: 176 42 55;
+  --approval-rejected-edge: 240 202 202;
 
   /* Destructive chrome */
-  --danger-bg: 254 242 242;
-  --danger-fg: 229 72 77;
-  --danger-edge: 246 200 200;
+  --danger-bg: 253 242 242;
+  --danger-fg: 197 40 45;
+  --danger-edge: 240 202 202;
 
-  /* Sidebar — white rail, blue pill for the active route */
-  --sidebar-bg: 255 255 255;
-  --sidebar-fg: 45 45 45; /* #2d2d2d active nav text */
-  --sidebar-fg-soft: 124 124 124; /* #7c7c7c inactive nav text */
-  --sidebar-chip: 47 105 255; /* #2f69ff active pill */
+  /* Sidebar — a paper rail, ink pill for the active route */
+  --sidebar-bg: 250 250 250;
+  --sidebar-fg: 0 0 0;
+  --sidebar-fg-soft: 92 92 92;
+  --sidebar-chip: 0 0 0;
 }
 
 /*
@@ -148,100 +165,113 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  /* Brand — lifted so it reads on dark; --brand-pale inverts to dark ink
-     because it is the text ON a blue button. */
-  --brand: 122 162 255; /* #7aa2ff */
-  --brand-hover: 154 185 255; /* #9ab9ff */
-  --brand-deep: 236 239 244; /* heading ink → near-white */
-  --brand-accent: 122 162 255;
-  --brand-light: 64 100 186; /* gradient tail / hover edge */
-  --brand-pale: 12 18 30; /* text/icon ON a blue button */
-  --brand-chip: 74 124 255;
-  --brand-wash: 26 38 66;
-  --brand-strong: 176 199 255;
+  /* Brand — the pill inverts to paper; --brand-pale becomes the ink on it. */
+  --brand: 255 255 255;
+  --brand-hover: 230 230 230;
+  --brand-deep: 255 255 255;
+  --brand-accent: 130 255 170;
+  --brand-light: 122 122 122;
+  --brand-pale: 26 26 26; /* text/icon ON the paper pill */
+  --brand-chip: 230 230 230;
+  --brand-wash: 51 51 51;
+  --brand-strong: 255 255 255;
 
-  --paper: 20 25 33;
-  --paper-dim: 15 19 26;
-  --paper-edge: 42 50 62;
+  /* Mint carries directly on dark, so accent and accent-ink converge. */
+  --accent: 130 255 170;
+  --accent-ink: 130 255 170;
+  --accent-on-brand: 11 122 75; /* the pill is paper here, so mint darkens */
+  --attention: 251 237 29;
+  --attention-ink: 251 237 29;
 
-  --ink: 226 230 237;
-  --ink-soft: 150 158 172;
+  --paper: 41 41 41;
+  --paper-dim: 33 33 33;
+  --paper-edge: 58 58 58;
 
-  --surface: 14 18 24;
-  --surface-card: 22 28 36;
-  --surface-hover: 30 37 47;
-  --surface-thead: 26 32 41;
-  --surface-chip-active: 30 46 82;
+  --ink: 245 245 245;
+  --ink-soft: 204 204 204;
+  --ink-faint: 184 184 184;
 
-  --edge-soft: 38 45 56;
-  --edge-chip: 62 72 88;
-  --edge-focus: 122 162 255;
+  --surface: 41 41 41; /* #292929 page */
+  --surface-card: 33 33 33; /* #212121 card, one step down */
+  --surface-hover: 45 45 45;
+  --surface-thead: 33 33 33;
+  --surface-chip-active: 54 54 54;
 
-  --dot-done: 74 200 148;
-  --dot-progress: 245 196 68;
-  --dot-pending: 130 138 152;
+  --edge-soft: 56 56 56;
+  --edge-chip: 74 74 74;
+  --edge-focus: 255 255 255;
+
+  --dot-done: 130 255 170;
+  --dot-progress: 251 237 29;
+  --dot-pending: 130 130 130;
   --dot-failed: 240 122 126;
 
-  /* Stage hues lighten so they carry on dark surfaces. */
-  --status-created: 145 175 255;
+  /* Stage hues lighten so they carry as dots on a dark surface. */
+  --status-created: 176 176 176;
   --status-operations: 169 156 240;
   --status-booked: 125 196 227;
-  --status-in_transit: 245 195 68;
+  --status-in_transit: 251 237 29;
   --status-waiting_pickup: 176 184 198;
   --status-received: 169 156 240;
   --status-internal_transit: 125 196 227;
-  --status-loaded: 108 201 165;
-  --status-transit: 245 195 68;
+  --status-loaded: 130 255 170;
+  --status-transit: 251 237 29;
   --status-at_border: 240 163 122;
   --status-at_customs: 231 143 177;
   --status-arrived: 168 207 114;
-  --status-delivered: 74 200 148;
-  --status-closed: 168 172 180;
+  --status-delivered: 130 255 170;
+  --status-closed: 138 138 138;
 
-  --status-new: 176 184 198;
-  --status-in_progress: 145 175 255;
+  --status-new: 138 138 138;
+  --status-in_progress: 232 232 232;
   --status-quotation: 169 156 240;
   --status-quotation_sent: 196 152 240;
-  --status-waiting_client: 245 195 68;
-  --status-won: 74 200 148;
+  --status-waiting_client: 251 237 29;
+  --status-won: 130 255 170;
   --status-lost: 240 132 138;
-  --status-cancelled: 152 156 164;
+  --status-cancelled: 122 122 122;
 
-  /* Own steps, not a flip of the light values — validated on #161c24. */
-  --chart-1: 77 139 255; /* #4d8bff */
-  --chart-2: 217 102 42; /* #d9662a */
-  --chart-3: 15 157 112; /* #0f9d70 */
+  /* Own steps, not a flip of the light values — validated on #212121. */
+  --chart-1: 235 235 235; /* revenue */
+  --chart-2: 232 124 62; /* cost */
+  --chart-3: 130 255 170; /* profit */
 
-  --approval-pending-bg: 52 42 16;
-  --approval-pending-fg: 244 208 130;
-  --approval-pending-edge: 104 82 32;
-  --approval-approved-bg: 20 46 34;
-  --approval-approved-fg: 138 216 178;
+  --approval-pending-bg: 46 42 16;
+  --approval-pending-fg: 251 237 29;
+  --approval-pending-edge: 96 88 30;
+  --approval-approved-bg: 20 44 33;
+  --approval-approved-fg: 130 255 170;
   --approval-approved-edge: 44 88 66;
-  --approval-rejected-bg: 62 26 28;
+  --approval-rejected-bg: 58 26 28;
   --approval-rejected-fg: 246 156 158;
-  --approval-rejected-edge: 116 52 54;
+  --approval-rejected-edge: 108 52 54;
 
-  --danger-bg: 62 26 28;
+  --danger-bg: 58 26 28;
   --danger-fg: 246 156 158;
-  --danger-edge: 116 52 54;
+  --danger-edge: 108 52 54;
 
-  /* Sidebar — a shade darker than the page, blue pill unchanged */
-  --sidebar-bg: 18 23 30;
-  --sidebar-fg: 232 236 242;
-  --sidebar-fg-soft: 150 158 172;
-  --sidebar-chip: 47 105 255;
+  /* Sidebar — the darkest plane, paper pill for the active route */
+  --sidebar-bg: 26 26 26;
+  --sidebar-fg: 255 255 255;
+  --sidebar-fg-soft: 204 204 204;
+  --sidebar-chip: 255 255 255;
 }
 
 @theme inline {
-  /* Typefaces — Geist (display) + Inter (UI/body) + Geist Mono (record data),
-     all wired in layout.tsx via next/font. */
+  /* Typefaces — Manrope (display / nav / numbers) + Inter (body, forms) +
+     Geist Mono (record data), all wired in layout.tsx via next/font. */
   --font-sans: var(--font-inter), "Segoe UI", Helvetica, Arial, sans-serif;
-  --font-display: var(--font-geist), var(--font-inter), sans-serif;
+  --font-display: var(--font-manrope), var(--font-inter), sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
     monospace;
 
-  /* Near-white base */
+  /* Shape — one radius per role, so nothing improvises. Containers are 18px,
+     the controls inside them 10px, anything pill-shaped 100px. */
+  --radius-card: 18px;
+  --radius-control: 10px;
+  --radius-chip: 5px;
+
+  /* Paper base */
   --color-background: rgb(var(--surface));
   --color-surface: rgb(var(--surface-card));
 
@@ -254,12 +284,19 @@
   --color-brand-pale: rgb(var(--brand-pale));
   --color-brand-chip: rgb(var(--brand-chip));
 
+  --color-accent: rgb(var(--accent));
+  --color-accent-ink: rgb(var(--accent-ink));
+  --color-accent-on-brand: rgb(var(--accent-on-brand));
+  --color-attention: rgb(var(--attention));
+  --color-attention-ink: rgb(var(--attention-ink));
+
   --color-paper: rgb(var(--paper));
   --color-paper-dim: rgb(var(--paper-dim));
   --color-paper-edge: rgb(var(--paper-edge));
 
   --color-ink: rgb(var(--ink));
   --color-ink-soft: rgb(var(--ink-soft));
+  --color-ink-faint: rgb(var(--ink-faint));
 
   --color-surface-card: rgb(var(--surface-card));
   --color-surface-hover: rgb(var(--surface-hover));
@@ -280,16 +317,16 @@
   --color-sidebar-fg-soft: rgb(var(--sidebar-fg-soft));
   --color-sidebar-chip: rgb(var(--sidebar-chip));
 
-  /* ----- Remap Tailwind's default scales onto the signal palette so the
-     long tail of indigo/violet/slate/emerald/rose utilities re-skins for free. */
+  /* ----- Remap Tailwind's default scales onto the ledger palette so the long
+     tail of indigo/violet/slate/emerald/rose utilities re-skins for free. */
 
-  /* indigo + violet → signal blue (primary brand family) */
+  /* indigo + violet → the ink family (primary) */
   --color-indigo-50: rgb(var(--surface-chip-active));
   --color-indigo-100: rgb(var(--brand-wash));
-  --color-indigo-200: rgb(var(--brand-light));
+  --color-indigo-200: rgb(var(--edge-chip));
   --color-indigo-300: rgb(var(--brand-light));
-  --color-indigo-400: rgb(var(--brand-chip));
-  --color-indigo-500: rgb(var(--brand-chip));
+  --color-indigo-400: rgb(var(--ink-soft));
+  --color-indigo-500: rgb(var(--ink-soft));
   --color-indigo-600: rgb(var(--brand));
   --color-indigo-700: rgb(var(--brand-hover));
   --color-indigo-800: rgb(var(--brand-strong));
@@ -297,32 +334,40 @@
 
   --color-violet-50: rgb(var(--surface-chip-active));
   --color-violet-100: rgb(var(--brand-wash));
-  --color-violet-200: rgb(var(--brand-light));
+  --color-violet-200: rgb(var(--edge-chip));
   --color-violet-300: rgb(var(--brand-light));
-  --color-violet-400: rgb(var(--brand-chip));
-  --color-violet-500: rgb(var(--brand-chip));
+  --color-violet-400: rgb(var(--ink-soft));
+  --color-violet-500: rgb(var(--ink-soft));
   --color-violet-600: rgb(var(--brand));
   --color-violet-700: rgb(var(--brand-hover));
   --color-violet-800: rgb(var(--brand-strong));
   --color-violet-900: rgb(var(--brand-deep));
 
   /* slate → ink / paper / edge (chrome, text, borders) */
-  --color-slate-50: rgb(var(--surface));
+  /* slate-50 marks inset blocks, which sit *on* a card — so it has to be the
+     hover step, not the card colour, or the inset vanishes into its parent. */
+  --color-slate-50: rgb(var(--surface-hover));
   --color-slate-100: rgb(var(--edge-soft));
   --color-slate-200: rgb(var(--edge-chip));
   --color-slate-300: rgb(var(--edge-chip));
-  --color-slate-400: rgb(var(--ink-soft));
+  --color-slate-400: rgb(var(--ink-faint));
   --color-slate-500: rgb(var(--ink-soft));
   --color-slate-600: rgb(var(--ink-soft));
   --color-slate-700: rgb(var(--ink));
   --color-slate-800: rgb(var(--ink));
   --color-slate-900: rgb(var(--brand-deep));
 
-  /* emerald → positive green */
+  /* emerald → the mint family */
   --color-emerald-50: rgb(var(--approval-approved-bg));
-  --color-emerald-500: rgb(var(--dot-done));
-  --color-emerald-600: rgb(var(--dot-done));
+  --color-emerald-500: rgb(var(--accent-ink));
+  --color-emerald-600: rgb(var(--accent-ink));
   --color-emerald-700: rgb(var(--approval-approved-fg));
+
+  /* amber → the attention family */
+  --color-amber-50: rgb(var(--approval-pending-bg));
+  --color-amber-500: rgb(var(--attention-ink));
+  --color-amber-600: rgb(var(--attention-ink));
+  --color-amber-700: rgb(var(--approval-pending-fg));
 
   /* rose + red → the danger red */
   --color-rose-50: rgb(var(--danger-bg));
@@ -336,39 +381,17 @@
   --color-red-800: rgb(var(--approval-rejected-fg));
 
   /* Motion — calm product motion, never bouncy */
-  --animate-rise: riseFade 0.7s cubic-bezier(0.2, 0.65, 0.2, 1) both;
-  --animate-float1: cardFloat1 9s ease-in-out infinite;
-  --animate-float2: cardFloat2 11s ease-in-out infinite;
+  --animate-rise: riseFade 0.5s cubic-bezier(0.2, 0.65, 0.2, 1) both;
 }
 
 @keyframes riseFade {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes cardFloat1 {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-@keyframes cardFloat2 {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
   }
 }
 
@@ -379,63 +402,66 @@ body {
 }
 
 /*
- * Reusable surface + control classes — the brand's button, badge and card
- * recipes in one place. Controls are pills; the working UI stays dense.
+ * Reusable surface + control classes — the brand's button, label, badge and
+ * card recipes in one place. Controls are pills, containers are 18px, and
+ * nothing casts a shadow: every division in the interface is a hairline.
  */
 @layer components {
-  /* Primary action — signal-blue pill with a soft inner highlight */
+  /* The signature: a solid ink pill, paper label, no border and no shadow. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full
-      bg-brand px-4 py-1.5 text-[12.5px] font-semibold text-brand-pale
-      shadow-[inset_0_0_20px_rgba(142,174,255,0.55),0_1px_2px_rgba(0,46,164,0.16)]
-      transition-colors hover:bg-brand-hover focus-visible:outline-none
-      focus-visible:ring-2 focus-visible:ring-edge-focus
-      focus-visible:ring-offset-1 disabled:pointer-events-none
-      disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap
+      rounded-full bg-brand px-4 py-[7px] font-display text-[12.5px]
+      font-bold tracking-[-0.01em] text-brand-pale transition-colors
+      hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2
+      focus-visible:ring-edge-focus focus-visible:ring-offset-2
+      focus-visible:ring-offset-surface disabled:pointer-events-none
+      disabled:opacity-40;
   }
 
-  /* Secondary — white pill on a hairline border */
+  /* Secondary — the same pill, drawn instead of filled. Fills on hover. */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full
-      border border-edge-chip bg-surface-card px-4 py-1.5 text-[12.5px]
-      font-medium text-ink shadow-[0_1px_1px_rgba(0,0,0,0.06)]
-      transition-colors hover:bg-surface-chip-active hover:text-brand
+    @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap
+      rounded-full border border-edge-chip bg-transparent px-4 py-[7px]
+      font-display text-[12.5px] font-semibold tracking-[-0.01em] text-ink
+      transition-colors hover:border-brand hover:bg-brand hover:text-brand-pale
       focus-visible:outline-none focus-visible:ring-2
-      focus-visible:ring-edge-focus focus-visible:ring-offset-1
-      disabled:pointer-events-none disabled:opacity-50;
-  }
-
-  /* The signature label treatment: white pill, blue dot, blue label. */
-  .eyebrow {
-    @apply inline-flex items-center gap-1.5 rounded-full border
-      border-edge-soft bg-surface-card px-2.5 py-1 text-[11px] font-medium
-      text-brand shadow-[0_1px_1px_rgba(0,0,0,0.04)];
-  }
-  .eyebrow::before {
-    content: "";
-    @apply h-[5px] w-[5px] shrink-0 rounded-full bg-brand;
+      focus-visible:ring-edge-focus focus-visible:ring-offset-2
+      focus-visible:ring-offset-surface disabled:pointer-events-none
+      disabled:opacity-40;
   }
 
   /*
-   * Shipment-stage pill. The caller passes the stage hue as `--status-hue`
-   * (see StatusBadge); fill and label are mixed from it against the current
-   * surface and ink, so one hue per stage per theme is all that's needed.
+   * Micro label — the uppercase, wide-tracked caption that titles every
+   * region: sidebar sections, table headers, field labels, section rules.
+   * It is the only place the interface shouts, and it never shouts in colour.
    */
-  .status-chip {
-    @apply inline-block whitespace-nowrap rounded-full px-2.5 py-0.5
-      text-[11px] font-medium;
-    background: color-mix(
-      in oklab,
-      rgb(var(--status-hue)) 14%,
-      rgb(var(--surface-card))
-    );
-    color: color-mix(in oklab, rgb(var(--status-hue)) 90%, rgb(var(--ink)));
+  .eyebrow {
+    @apply inline-flex items-center gap-1.5 text-[10.5px] font-semibold
+      uppercase leading-none tracking-[0.14em] text-ink-faint;
   }
 
-  /* Blue-gradient display text, for hero headlines only. */
-  .text-gradient {
-    @apply bg-gradient-to-b from-brand to-brand-light bg-clip-text
-      text-transparent;
+  /*
+   * Stage pill. The caller passes the stage hue as `--status-hue` (see
+   * StatusBadge); the chip itself stays monochrome and the hue survives as a
+   * single dot, so a status column reads as texture rather than as confetti.
+   */
+  .status-chip {
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full
+      border border-edge-chip px-2.5 py-[3px] text-[11px] font-medium text-ink;
+  }
+  .status-chip::before {
+    content: "";
+    background: rgb(var(--status-hue));
+    @apply h-[6px] w-[6px] shrink-0 rounded-full;
+  }
+
+  /* Hairline meta row: grey label, ink value, rule above. */
+  .meta-row {
+    @apply flex items-center justify-between gap-3 border-t border-edge-soft
+      pt-2.5 text-[12px] text-ink-soft;
+  }
+  .meta-row > strong {
+    @apply font-display font-bold text-ink;
   }
 }
 
@@ -447,40 +473,26 @@ body {
   animation-delay: 0s;
 }
 .stagger > *:nth-child(2) {
-  animation-delay: 0.05s;
+  animation-delay: 0.04s;
 }
 .stagger > *:nth-child(3) {
-  animation-delay: 0.1s;
+  animation-delay: 0.08s;
 }
 .stagger > *:nth-child(4) {
-  animation-delay: 0.15s;
+  animation-delay: 0.12s;
 }
 .stagger > *:nth-child(5) {
-  animation-delay: 0.2s;
+  animation-delay: 0.16s;
 }
 .stagger > *:nth-child(6) {
-  animation-delay: 0.25s;
+  animation-delay: 0.2s;
 }
 .stagger > *:nth-child(7) {
-  animation-delay: 0.3s;
-}
-
-/* Graph-paper grid — dashed 120px guides behind hero/auth surfaces. The stroke
-   can't be a token (it lives inside a data URL), so dark gets its own copy. */
-.bg-grid {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg stroke='%233d3d3d' stroke-opacity='0.14' stroke-dasharray='5 6'%3E%3Cpath d='M0 0.5H120'/%3E%3Cpath d='M0.5 0V120'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 120px 120px;
-}
-
-:root[data-theme="dark"] .bg-grid {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg stroke='%23e2e6ed' stroke-opacity='0.12' stroke-dasharray='5 6'%3E%3Cpath d='M0 0.5H120'/%3E%3Cpath d='M0.5 0V120'/%3E%3C/g%3E%3C/svg%3E");
-  background-size: 120px 120px;
+  animation-delay: 0.24s;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .stagger > *,
-  .animate-float1,
-  .animate-float2,
   .animate-rise {
     animation: none !important;
   }

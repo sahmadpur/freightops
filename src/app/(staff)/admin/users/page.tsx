@@ -23,7 +23,7 @@ export default async function UsersPage() {
       <h1 className="text-lg font-semibold text-slate-900">{t("usersTitle")}</h1>
 
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("inviteUser")}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("inviteUser")}</span></CardHeader>
         <CardBody><InviteUserForm accounts={accounts} /></CardBody>
       </Card>
 
@@ -34,7 +34,7 @@ export default async function UsersPage() {
       )}
 
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("pendingInvitations")}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("pendingInvitations")}</span></CardHeader>
         <CardBody>
           {invites.length === 0 ? (
             <p className="text-sm text-slate-400">{t("noInvitations")}</p>

@@ -28,7 +28,7 @@ export default async function AuditPage({
         <select
           name="entityType"
           defaultValue={sp.entityType ?? ""}
-          className="rounded-[10px] border border-edge-chip bg-surface-card px-3 py-2 text-sm text-ink outline-none focus:border-edge-focus"
+          className="rounded-control border border-edge-chip bg-surface-card px-3 py-2 text-sm text-ink outline-none focus:border-edge-focus"
         >
           <option value="">{t("allTypes")}</option>
           {types.map((ty) => (
@@ -41,7 +41,7 @@ export default async function AuditPage({
           name="q"
           defaultValue={sp.q ?? ""}
           placeholder={t("search")}
-          className="rounded-[10px] border border-edge-chip bg-surface-card px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-soft/55 focus:border-edge-focus"
+          className="rounded-control border border-edge-chip bg-surface-card px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-soft/55 focus:border-edge-focus"
         />
         <button type="submit" className="btn-primary">
           {t("filter")}

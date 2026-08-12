@@ -61,7 +61,7 @@ export function CommentsTab({
             return (
               <li key={c.id} className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
                 <div
-                  className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
+                  className={`max-w-[80%] rounded-card px-3 py-2 text-sm ${
                     mine ? "bg-indigo-600 text-brand-pale" : "bg-slate-100 text-slate-800"
                   }`}
                 >
@@ -88,7 +88,7 @@ export function CommentsTab({
           onChange={(e) => setBody(e.target.value)}
           placeholder={t("placeholder")}
           rows={2}
-          className="flex-1 resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none"
+          className="flex-1 resize-none rounded-control border border-slate-200 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none"
         />
         <button
           type="button"

@@ -22,7 +22,7 @@ import { getRequest } from "@/modules/requests/queries";
 import { RequestDetailTabs } from "@/modules/requests/request-detail-tabs";
 import { RequestStatusControl } from "@/modules/requests/request-status-control";
 import { ConvertControl } from "@/modules/requests/convert-control";
-import { carrierPickerOptions } from "@/modules/carriers/queries";
+import { accountPickerOptions } from "@/modules/accounts/queries";
 
 const POINT_LABELS: Record<PointKind, { origin: string; destination: string }> = {
   port: { origin: "portOfLoading", destination: "portOfDischarge" },
@@ -49,7 +49,7 @@ export default async function RequestDetailPage({
   const [documents, quotations, carrierOpts, messages] = await Promise.all([
     listRequestDocuments(id),
     listQuotations(id),
-    carrierPickerOptions(),
+    accountPickerOptions("carrier"),
     listRequestMessages(id),
   ]);
   // A decided request keeps its commercial record, but read-only: the numbers

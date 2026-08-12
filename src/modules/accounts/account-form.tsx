@@ -7,6 +7,7 @@ import { Field, inputCls, SubmitRow } from "@/components/ui/form";
 import { Card, CardBody } from "@/components/ui/card";
 import { Combobox, MultiCombobox } from "@/components/ui/combobox";
 import { ContactsEditor, type EditableContact } from "@/components/contacts-editor";
+import { COMPANY_ROLES } from "@/lib/company-roles";
 import { countryOptions } from "@/lib/countries";
 import { createAccount, updateAccount } from "./actions";
 import type { ActionResult } from "./schema";
@@ -14,6 +15,7 @@ import type { ActionResult } from "./schema";
 export type AccountFormInitial = {
   id?: string;
   title: string;
+  roles: string[];
   taxId: string;
   address: string;
   country: string;
@@ -29,6 +31,7 @@ export function AccountForm({ initial }: { initial: AccountFormInitial }) {
   const locale = useLocale();
   const router = useRouter();
   const [title, setTitle] = useState(initial.title);
+  const [roles, setRoles] = useState<string[]>(initial.roles);
   const [taxId, setTaxId] = useState(initial.taxId);
   const [address, setAddress] = useState(initial.address);
   const [country, setCountry] = useState(initial.country);
@@ -45,7 +48,7 @@ export function AccountForm({ initial }: { initial: AccountFormInitial }) {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
-    const payload = { title, taxId, address, country, city, phones, emailDomains, notes, contacts };
+    const payload = { title, roles, taxId, address, country, city, phones, emailDomains, notes, contacts };
     const r = initial.id ? await updateAccount(initial.id, payload) : await createAccount(payload);
     setPending(false);
     setResult(r);
@@ -62,6 +65,22 @@ export function AccountForm({ initial }: { initial: AccountFormInitial }) {
         <CardBody>
       <Field label={t("fields.companyTitle")} htmlFor="title" error={fieldErrors.title}>
         <input id="title" required className={inputCls} value={title} onChange={(e) => setTitle(e.target.value)} />
+      </Field>
+      <Field label={t("fields.roles")} error={fieldErrors.roles}>
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 py-1">
+          {COMPANY_ROLES.map((role) => (
+            <label key={role} className="flex items-center gap-1.5 text-sm">
+              <input
+                type="checkbox"
+                checked={roles.includes(role)}
+                onChange={(e) =>
+                  setRoles(e.target.checked ? [...roles, role] : roles.filter((r) => r !== role))
+                }
+              />
+              {t(`companyRoles.${role}`)}
+            </label>
+          ))}
+        </div>
       </Field>
       <Field label={t("fields.taxId")} htmlFor="taxId" error={fieldErrors.taxId}>
         <input id="taxId" className={inputCls} value={taxId} onChange={(e) => setTaxId(e.target.value)} />

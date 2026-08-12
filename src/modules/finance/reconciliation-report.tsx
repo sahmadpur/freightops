@@ -28,7 +28,7 @@ export function ReconciliationReport({ rows }: { rows: ReconciliationRow[] }) {
 
   return (
     <Card>
-      <CardHeader><span className="text-sm font-semibold">{t("finance.reportOfAccounts")}</span></CardHeader>
+      <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("finance.reportOfAccounts")}</span></CardHeader>
       <CardBody>
         <div className="mb-3 flex flex-wrap items-center gap-1.5">
           <span className="mr-1 text-xs text-ink-soft">{t("finance.filterByStatus")}:</span>
@@ -147,7 +147,7 @@ function InlineStatus({ orderId, current, status }: { orderId: string; current: 
         value={current}
         disabled={pending}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-[10px] border border-edge-chip bg-surface-card px-1.5 py-0.5 text-xs text-ink outline-none focus:border-edge-focus"
+        className="rounded-control border border-edge-chip bg-surface-card px-1.5 py-0.5 text-xs text-ink outline-none focus:border-edge-focus"
       >
         {STATUSES.map((s) => (<option key={s} value={s}>{t(`status.${s}`)}</option>))}
       </select>

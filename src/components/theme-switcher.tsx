@@ -33,7 +33,7 @@ export function ThemeSwitcher({ theme }: { theme: Theme }) {
   }
 
   return (
-    <div className="inline-flex items-center rounded-full border border-edge-chip bg-surface-card p-[2px]">
+    <div className="inline-flex items-center rounded-full border border-edge-chip p-[2px]">
       {THEMES.map((option) => (
         <button
           key={option}
@@ -44,7 +44,7 @@ export function ThemeSwitcher({ theme }: { theme: Theme }) {
           className={`flex h-[22px] w-[26px] items-center justify-center rounded-full transition-colors ${
             option === current
               ? "bg-brand text-brand-pale"
-              : "text-ink-soft hover:text-brand"
+              : "text-ink-faint hover:text-ink"
           }`}
         >
           {ICONS[option]}

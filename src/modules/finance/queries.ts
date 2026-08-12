@@ -1,7 +1,10 @@
 import { and, asc, desc, eq, gte, isNotNull, isNull, lt, sql } from "drizzle-orm";
-import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import { alias, type AnyPgColumn } from "drizzle-orm/pg-core";
 import { db } from "@/db";
-import { accounts, carriers, orderFinanceLines, orders, payments, user } from "@/db/schema";
+import { accounts, orderFinanceLines, orders, payments, user } from "@/db/schema";
+
+// The carrier is an account too (role "carrier"); alias for joins next to the client.
+const carrierAccounts = alias(accounts, "carrier_accounts");
 import {
   balance,
   bucketAging,
@@ -571,7 +574,7 @@ export async function reconciliationRows(): Promise<ReconciliationRow[]> {
       title: orders.title,
       status: orders.status,
       accountTitle: accounts.title,
-      carrierTitle: carriers.title,
+      carrierTitle: carrierAccounts.title,
       currency: orders.currency,
       exchangeRate: orders.exchangeRate,
       amountReceivable: orders.amountReceivable,
@@ -584,7 +587,7 @@ export async function reconciliationRows(): Promise<ReconciliationRow[]> {
     })
     .from(orders)
     .innerJoin(accounts, eq(orders.accountId, accounts.id))
-    .leftJoin(carriers, eq(orders.carrierId, carriers.id))
+    .leftJoin(carrierAccounts, eq(orders.carrierId, carrierAccounts.id))
     .where(isNull(orders.deletedAt))
     .orderBy(desc(orders.createdAt));
 

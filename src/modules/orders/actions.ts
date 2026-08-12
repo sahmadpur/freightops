@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { orderFinanceLines, orders } from "@/db/schema";
 import { auditDiff, recordAudit } from "@/lib/audit";
-import { nextRecordNumber } from "@/lib/record-number";
+import { nextAnnualNumber } from "@/lib/record-number";
 import { requireArea } from "@/lib/session";
 import { missingFinancials } from "@/lib/order-financials";
 import { orderInputSchema, statusChangeSchema, type OrderInput } from "./schema";
@@ -56,7 +56,7 @@ export async function createOrder(input: unknown): Promise<ActionResult> {
 
   const id = await db.transaction(async (tx) => {
     const now = new Date();
-    const number = await nextRecordNumber(tx, "order", now.getFullYear(), now.getMonth() + 1);
+    const number = await nextAnnualNumber(tx, "order", now.getFullYear());
     const [row] = await tx
       .insert(orders)
       .values({

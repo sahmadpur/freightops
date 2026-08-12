@@ -7,23 +7,22 @@ type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 /**
  * Monthly counter kinds. The prefix is what the number is rendered with.
  *
- * `order` is legacy: orders issued before the CRM spec landed carry `ALL2607001`
- * and keep it forever. New orders are numbered by the annual family below.
+ * Orders issued before the CRM spec landed carry legacy `ALL2607001` numbers
+ * and keep them forever; all new orders are numbered by the annual family below.
  */
 export const RECORD_PREFIX = {
-  order: "ALL",
   customs: "CC",
 } as const;
 
 export type RecordKind = keyof typeof RECORD_PREFIX;
 
 /**
- * `ALL2607001` — prefix, 2-digit year, 2-digit month, 3-digit sequence.
+ * `CC2607001` — prefix, 2-digit year, 2-digit month, 3-digit sequence.
  * The sequence restarts every month, so it is only unique within its month;
  * the year/month segment is what makes the whole number unique.
  *
  * `seq` is left-padded to 3 digits and never truncated: a 4-digit month would
- * render as `ALL26071000` rather than silently colliding.
+ * render as `CC26071000` rather than silently colliding.
  */
 export function formatRecordNumber(
   kind: RecordKind,

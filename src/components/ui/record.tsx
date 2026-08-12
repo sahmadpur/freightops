@@ -1,16 +1,13 @@
 /**
  * Record primitives — flat, border-defined sections for detail and form pages
- * (no boxed cards). A section rule carries a blue dot and a Geist label; the
- * definition rows fall back to an em-dash.
+ * (no boxed cards). A section rule is a hairline with an uppercase micro label
+ * sitting on it; the definition rows fall back to an em-dash.
  */
 
 export function SectionRule({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-4 flex items-center gap-2 border-b border-edge-soft pb-2">
-      <span className="h-[5px] w-[5px] rounded-full bg-brand" aria-hidden="true" />
-      <span className="font-display text-[13px] font-medium tracking-[-0.01em] text-brand-deep">
-        {children}
-      </span>
+    <div className="mb-4 flex items-center gap-3 border-b border-edge-chip pb-2.5">
+      <span className="eyebrow text-ink">{children}</span>
     </div>
   );
 }
@@ -26,10 +23,8 @@ export function DefRow({
 }) {
   return (
     <div className={className}>
-      <dt className="text-[11.5px] font-medium text-ink-soft">
-        {label}
-      </dt>
-      <dd className="mt-1 text-[13px] text-ink">
+      <dt className="text-[11px] font-medium text-ink-faint">{label}</dt>
+      <dd className="mt-1 font-display text-[13px] font-semibold tracking-[-0.01em] text-ink">
         {value === null || value === undefined || value === "" ? "—" : value}
       </dd>
     </div>

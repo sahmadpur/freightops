@@ -88,7 +88,7 @@ export function RequestFilters({
       </div>
 
       {open && (
-        <form action="/requests" className="mt-3 rounded-[10px] border border-edge-soft bg-surface-card p-4">
+        <form action="/requests" className="mt-3 rounded-control border border-edge-soft bg-surface-card p-4">
           {q && <input type="hidden" name="q" value={q} />}
           {status && <input type="hidden" name="status" value={status} />}
           {archived && <input type="hidden" name="archived" value="1" />}

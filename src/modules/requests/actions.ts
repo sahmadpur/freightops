@@ -1,8 +1,8 @@
 "use server";
 
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { accounts, orderFinanceLines, orders, quotations, requests } from "@/db/schema";
+import { accounts, documents, orderFinanceLines, orders, quotations, requests } from "@/db/schema";
 import { auditDiff, recordAudit } from "@/lib/audit";
 import { requireArea } from "@/lib/session";
 import { nextAnnualNumber } from "@/lib/record-number";
@@ -17,6 +17,7 @@ import { orderCreatedEmail } from "@/modules/notifications/templates";
 import {
   convertToOrderSchema,
   missingForStatus,
+  orderSourceFields,
   requestInputSchema,
   requestStatusChangeSchema,
   type ActionResult,
@@ -357,6 +358,7 @@ export async function convertToOrder(requestId: string, input: unknown): Promise
         weightKg: cargo?.grossWeightKg ?? null,
         volumeM3: cargo?.volumeM3 ?? null,
         incoterms: request.incoterms,
+        ...orderSourceFields(request, quotation?.id ?? null),
         currency: quotation?.currency ?? DEFAULT_CURRENCY,
         clientCharge: quotation?.sellingPrice ?? null,
         createdBy: session.user.id,
@@ -366,6 +368,22 @@ export async function convertToOrder(requestId: string, input: unknown): Promise
     // Route, transport detail and cargo move across as rows, so nothing is
     // re-keyed by hand (§28).
     await copyShipment(tx, { parentType: "request", parentId: requestId }, { parentType: "order", parentId: order.id });
+
+    // Request documents follow the order as new rows pointing at the same S3
+    // objects — a link copy, never a re-upload. The request keeps its own rows.
+    const requestDocs = await tx
+      .select()
+      .from(documents)
+      .where(and(eq(documents.parentType, "request"), eq(documents.parentId, requestId)));
+    if (requestDocs.length > 0) {
+      await tx.insert(documents).values(
+        requestDocs.map(({ id: _id, createdAt: _createdAt, ...doc }) => ({
+          ...doc,
+          parentType: "order" as const,
+          parentId: order.id,
+        })),
+      );
+    }
 
     // Seed the Finance tab from the accepted offer so the rollup and the lines
     // start consistent, exactly as createOrder does.

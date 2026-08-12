@@ -11,6 +11,7 @@ import {
   index,
   uniqueIndex,
   primaryKey,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { userRoleEnum } from "./enums";
@@ -80,6 +81,8 @@ export const docTypeEnum = pgEnum("doc_type", [
   "cargo_photos",
   "other",
 ]);
+// "carrier" is dead since carriers merged into accounts (migration 0019), but
+// stays in the pg enum: dropping an enum value requires a full type rewrite.
 export const contactParentEnum = pgEnum("contact_parent", ["account", "carrier"]);
 // "transport_mode" is retired but kept in the enum: dropping a value requires a
 // full type rewrite and no rows reference it any more.
@@ -132,6 +135,12 @@ const createdBy = () => text("created_by").references(() => user.id);
 export const accounts = pgTable("accounts", {
   id: id(),
   title: text("title").notNull(),
+  /**
+   * Which hats this company wears — client / agent / carrier / supplier /
+   * customs_broker / other (src/lib/company-roles.ts), several at once. A
+   * text[] on the row rather than a join table: the spec's "flexible model".
+   */
+  roles: text("roles").array().notNull().default(sql`'{client}'::text[]`),
   taxId: text("tax_id"),
   address: text("address"),
   // ISO 3166-1 alpha-2, same convention as the route columns.
@@ -146,17 +155,6 @@ export const accounts = pgTable("accounts", {
   emailDomains: jsonb("email_domains").$type<string[]>().notNull().default(sql`'[]'::jsonb`),
   notes: text("notes"),
   // Soft delete: archived rows are hidden from lists but retained (recoverable).
-  deletedAt: timestamp("deleted_at", { withTimezone: true }),
-  createdAt: createdAt(),
-  updatedAt: updatedAt(),
-  createdBy: createdBy(),
-});
-
-export const carriers = pgTable("carriers", {
-  id: id(),
-  title: text("title").notNull(),
-  address: text("address"),
-  notes: text("notes"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -198,7 +196,17 @@ export const orders = pgTable(
     accountId: text("account_id")
       .notNull()
       .references(() => accounts.id),
-    carrierId: text("carrier_id").references(() => carriers.id),
+    // The column keeps its name; since 0019 it points at accounts (role "carrier").
+    carrierId: text("carrier_id").references(() => accounts.id),
+    // Where the order came from (§26). Null on manually created orders. The
+    // callbacks are annotated because requests/quotations are declared below.
+    requestId: text("request_id").references((): AnyPgColumn => requests.id),
+    quotationId: text("quotation_id").references((): AnyPgColumn => quotations.id),
+    contactId: text("contact_id").references(() => contacts.id),
+    responsibleUserId: text("responsible_user_id").references(() => user.id),
+    cargoReadyDate: date("cargo_ready_date"),
+    requestedDeliveryDate: date("requested_delivery_date"),
+    specialInstructions: text("special_instructions"),
     transportType: modeTypeEnum("transport_type"),
     // Route is structured: ISO 3166-1 alpha-2 country codes, rendered with flags.
     // The authoritative route is the order's `transport_legs`; these stay as the

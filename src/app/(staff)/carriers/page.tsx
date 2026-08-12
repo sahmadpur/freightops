@@ -2,9 +2,10 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/ui/page-header";
 import { Paginator } from "@/components/ui/paginator";
-import { CarriersTable } from "@/modules/carriers/carriers-table";
-import { listCarriers } from "@/modules/carriers/queries";
+import { AccountsTable } from "@/modules/accounts/accounts-table";
+import { listAccounts } from "@/modules/accounts/queries";
 
+/** Filtered view over accounts: companies holding the "carrier" role. */
 export default async function CarriersPage({
   searchParams,
 }: {
@@ -15,14 +16,14 @@ export default async function CarriersPage({
   const page = Number(sp.page) || 1;
   const archived = sp.archived === "1";
   const t = await getTranslations();
-  const { rows, total } = await listCarriers({ q, page, archived });
+  const { rows, total } = await listAccounts({ q, page, archived, role: "carrier" });
 
   return (
     <div>
       <PageHeader
         title={t("nav.carriers")}
         action={
-          <Link href="/carriers/new" className="btn-primary">
+          <Link href="/accounts/new?role=carrier" className="btn-primary">
             + {t("carriers.newCarrier")}
           </Link>
         }
@@ -33,7 +34,7 @@ export default async function CarriersPage({
             name="q"
             defaultValue={q}
             placeholder={t("carriers.searchPlaceholder")}
-            className="w-72 rounded-[10px] border border-edge-chip bg-surface-card px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-soft/55 focus:border-edge-focus"
+            className="w-72 rounded-control border border-edge-chip bg-surface-card px-3 py-2 text-sm text-ink outline-none placeholder:text-ink-soft/55 focus:border-edge-focus"
           />
         </form>
         <Link
@@ -43,7 +44,7 @@ export default async function CarriersPage({
           {archived ? t("actions.showActive") : t("actions.showArchived")}
         </Link>
       </div>
-      <CarriersTable rows={rows} />
+      <AccountsTable rows={rows} />
       <Paginator page={page} total={total} basePath="/carriers" params={q ? { q } : {}} />
     </div>
   );

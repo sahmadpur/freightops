@@ -17,6 +17,7 @@ export default async function EditAccountPage({ params }: { params: Promise<{ id
         initial={{
           id: data.account.id,
           title: data.account.title,
+          roles: data.account.roles,
           taxId: data.account.taxId ?? "",
           address: data.account.address ?? "",
           country: data.account.country ?? "",

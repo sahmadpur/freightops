@@ -276,3 +276,29 @@ export const convertToOrderSchema = z.object({
 });
 
 export type ConvertToOrderInput = z.infer<typeof convertToOrderSchema>;
+
+/**
+ * The source-reference columns conversion carries from the request onto the
+ * order (§26), so nothing the desk already typed is lost.
+ */
+export function orderSourceFields(
+  request: {
+    id: string;
+    contactId: string | null;
+    responsibleUserId: string;
+    cargoReadyDate: string | null;
+    requestedDeliveryDate: string | null;
+    specialInstructions: string | null;
+  },
+  quotationId: string | null,
+) {
+  return {
+    requestId: request.id,
+    quotationId,
+    contactId: request.contactId,
+    responsibleUserId: request.responsibleUserId,
+    cargoReadyDate: request.cargoReadyDate,
+    requestedDeliveryDate: request.requestedDeliveryDate,
+    specialInstructions: request.specialInstructions,
+  };
+}

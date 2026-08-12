@@ -74,10 +74,10 @@ export function DocumentsTab({
 
   return (
     <Card>
-      <CardHeader><span className="text-sm font-semibold">{t("tab")}</span></CardHeader>
+      <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("tab")}</span></CardHeader>
       <CardBody>
         {documents.length === 0 ? (
-          <p className="mb-4 text-sm text-slate-400">{t("noDocuments")}</p>
+          <p className="mb-4 text-sm text-ink-soft">{t("noDocuments")}</p>
         ) : (
           <ul className="mb-4 space-y-1.5">
             {documents.map((d) => (
@@ -86,9 +86,9 @@ export function DocumentsTab({
           </ul>
         )}
 
-        <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-2 border-t border-slate-100 pt-3">
+        <form onSubmit={onSubmit} className="flex flex-wrap items-end gap-2 border-t border-edge-soft pt-3">
           <div className="w-full">
-            <label className="mb-1 block text-xs text-slate-500" htmlFor="file">{t("fileLabel")}</label>
+            <label className="mb-1 block text-xs text-ink-soft" htmlFor="file">{t("fileLabel")}</label>
             <FilePicker
               id="file"
               files={files}
@@ -106,7 +106,7 @@ export function DocumentsTab({
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-slate-500" htmlFor="docType">{t("typeLabel")}</label>
+            <label className="mb-1 block text-xs text-ink-soft" htmlFor="docType">{t("typeLabel")}</label>
             <select id="docType" className={`${inputCls} w-44`} value={docType} onChange={(e) => setDocType(e.target.value)}>
               {DOC_TYPES.map((d) => (<option key={d} value={d}>{td(d)}</option>))}
             </select>

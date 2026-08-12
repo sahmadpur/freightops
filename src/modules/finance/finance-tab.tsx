@@ -53,7 +53,7 @@ export function FinanceTab({
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("expectedProfit")}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("expectedProfit")}</span></CardHeader>
         <CardBody>
           <div className="grid grid-cols-3 gap-3 text-sm">
             <Stat label={t("revenue")} value={<MoneyDual cents={finance.clientChargeCents} currency={currency} rate={rate} />} />
@@ -71,7 +71,7 @@ export function FinanceTab({
       <FinanceLines orderId={orderId} side="cost" title={t("agentExpenses")} lines={finance.costLines} totalCents={finance.carrierCostCents} rate={rate} currency={currency} />
 
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("actualProfit")}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("actualProfit")}</span></CardHeader>
         <CardBody>
           <div className="grid grid-cols-2 gap-4">
             <Field label={t("amountReceivable")} htmlFor="ar">
@@ -165,7 +165,7 @@ function CashLedger({
   return (
     <Card>
       <CardHeader>
-        <span className="text-sm font-semibold">{t("ledger")}</span>
+        <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("ledger")}</span>
         <span className="text-sm font-semibold tabular-nums">{formatMoney(net, currency)}</span>
       </CardHeader>
       <CardBody>
@@ -209,7 +209,7 @@ function CashLedger({
 
 function Stat({ label, value, positive }: { label: string; value: React.ReactNode; positive?: boolean }) {
   return (
-    <div className="rounded-[12px] bg-surface-hover px-3 py-2">
+    <div className="rounded-control bg-surface-hover px-3 py-2">
       <div className="text-[11.5px] font-medium text-ink-soft">{label}</div>
       <div className={`text-sm font-semibold tabular-nums ${positive ? "text-emerald-600" : "text-ink"}`}>{value}</div>
     </div>
@@ -265,7 +265,7 @@ function FinanceLines({
   return (
     <Card>
       <CardHeader>
-        <span className="text-sm font-semibold">{title}</span>
+        <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{title}</span>
         <span className="text-sm font-semibold tabular-nums"><MoneyDual cents={totalCents} currency={currency} rate={rate} /></span>
       </CardHeader>
       <CardBody>
@@ -388,7 +388,7 @@ function PaymentSection({
   return (
     <Card>
       <CardHeader>
-        <span className="text-sm font-semibold">{title}</span>
+        <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{title}</span>
         {status && <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${statusColor}`}>{tp(status)}</span>}
       </CardHeader>
       <CardBody>

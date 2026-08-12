@@ -15,6 +15,7 @@ export async function orderRecipients(tx: SelectExecutor, orderId: string): Prom
     .limit(1);
   if (!order) return { clientEmails: [], carrierEmails: [] };
 
+  // Both the client and the carrier are accounts; contacts hang off each.
   const ids = [order.accountId, order.carrierId].filter((v): v is string => Boolean(v));
   const rows = await tx
     .select({ parentType: contacts.parentType, parentId: contacts.parentId, emails: contacts.emails })
@@ -24,12 +25,9 @@ export async function orderRecipients(tx: SelectExecutor, orderId: string): Prom
   const client = new Set<string>();
   const carrier = new Set<string>();
   for (const r of rows) {
+    if (r.parentType !== "account") continue;
     const bucket =
-      r.parentType === "account" && r.parentId === order.accountId
-        ? client
-        : r.parentType === "carrier" && r.parentId === order.carrierId
-          ? carrier
-          : null;
+      r.parentId === order.accountId ? client : r.parentId === order.carrierId ? carrier : null;
     if (!bucket) continue;
     for (const e of r.emails ?? []) if (e) bucket.add(e);
   }

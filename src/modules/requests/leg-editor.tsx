@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Field, inputCls } from "@/components/ui/form";
 import { Combobox, type ComboOption } from "@/components/ui/combobox";
 import { countryOptions } from "@/lib/countries";
 import {
+  chargeableWeight,
+  DEFAULT_VOLUMETRIC_DIVISOR,
   legFields,
   LEG_TRANSPORT_TYPES,
   subtypesFor,
@@ -18,8 +20,15 @@ import {
   emptyLeg,
   hasEquipmentData,
   resetLegEquipment,
+  type CargoDraft,
   type LegDraft,
 } from "./request-form-initial";
+
+/** Form string → number, or null when empty/garbage. */
+const num = (s: string): number | null => {
+  const n = Number(s);
+  return s.trim() !== "" && Number.isFinite(n) ? n : null;
+};
 
 const gridCls = "grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3";
 
@@ -37,11 +46,13 @@ const POINT_LABELS: Record<PointKind, { origin: string; destination: string }> =
  */
 function LegBody({
   leg,
+  cargo,
   onChange,
   errors,
   showTypePicker,
 }: {
   leg: LegDraft;
+  cargo: CargoDraft;
   onChange: (next: LegDraft) => void;
   errors: Record<string, string[]>;
   showTypePicker: boolean;
@@ -59,6 +70,24 @@ function LegBody({
   const countries = useMemo(() => countryOptions(locale), [locale]);
   const fields = legFields(leg.transportType, leg.subtype);
   const set = (patch: Partial<LegDraft>) => onChange({ ...leg, ...patch });
+
+  /**
+   * §8.4 chargeable weight, prefilled from cargo weight/volume and the leg's
+   * divisor. Same contract as the generated title: once the user edits the
+   * field, the calculator stops overwriting it.
+   */
+  const [cwTouched, setCwTouched] = useState(leg.chargeableWeightKg.trim() !== "");
+  const autoCw = chargeableWeight(
+    num(cargo.grossWeightKg),
+    num(cargo.volumeM3),
+    num(leg.volumetricDivisor) ?? DEFAULT_VOLUMETRIC_DIVISOR,
+  );
+  const autoCwStr = autoCw === null ? "" : String(Math.round(autoCw * 100) / 100);
+  useEffect(() => {
+    if (fields.air && !cwTouched && leg.chargeableWeightKg !== autoCwStr) {
+      set({ chargeableWeightKg: autoCwStr });
+    }
+  });
 
   function changeType(next: string) {
     if (!LEG_TRANSPORT_TYPES.includes(next as LegTransportType)) return;
@@ -230,8 +259,12 @@ function LegBody({
             <Field label={t("chargeableWeight")} error={errors.chargeableWeightKg}>
               <input
                 className={inputCls}
+                placeholder={t("titleAuto")}
                 value={leg.chargeableWeightKg}
-                onChange={(e) => set({ chargeableWeightKg: e.target.value })}
+                onChange={(e) => {
+                  setCwTouched(true);
+                  set({ chargeableWeightKg: e.target.value });
+                }}
               />
             </Field>
             <Field label={t("volumetricDivisor")} error={errors.volumetricDivisor}>
@@ -268,11 +301,14 @@ function LegBody({
 export function LegEditor({
   family,
   legs,
+  cargo,
   onChange,
   errors,
 }: {
   family: string;
   legs: LegDraft[];
+  /** Read-only here — the source for the air chargeable-weight autocalc. */
+  cargo: CargoDraft;
   onChange: (next: LegDraft[]) => void;
   /** Flattened zod paths, e.g. `legs.0.subtype`. */
   errors: Record<string, string[]>;
@@ -305,7 +341,7 @@ export function LegEditor({
   if (!multimodal) {
     const leg = legs[0];
     if (!leg) return null;
-    return <LegBody leg={leg} onChange={(next) => replace(0, next)} errors={legErrors(0)} showTypePicker={false} />;
+    return <LegBody leg={leg} cargo={cargo} onChange={(next) => replace(0, next)} errors={legErrors(0)} showTypePicker={false} />;
   }
 
   return (
@@ -314,7 +350,7 @@ export function LegEditor({
       {/* Index keys: legs are reordered explicitly through `move`, which rewrites
           the whole array, and every input is controlled from the parent. */}
       {legs.map((leg, i) => (
-        <div key={i} className="rounded-[12px] border border-edge-soft bg-surface-hover p-3">
+        <div key={i} className="rounded-control border border-edge-soft bg-surface-hover p-3">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-[11.5px] font-medium text-ink-soft">
               {t("leg")} {i + 1}
@@ -331,13 +367,13 @@ export function LegEditor({
               </button>
             </div>
           </div>
-          <LegBody leg={leg} onChange={(next) => replace(i, next)} errors={legErrors(i)} showTypePicker />
+          <LegBody leg={leg} cargo={cargo} onChange={(next) => replace(i, next)} errors={legErrors(i)} showTypePicker />
         </div>
       ))}
       <button
         type="button"
         onClick={() => onChange([...legs, emptyLeg()])}
-        className="rounded-[12px] border border-dashed border-edge-chip px-3 py-2 text-sm text-ink-soft hover:bg-surface-hover"
+        className="rounded-control border border-dashed border-edge-chip px-3 py-2 text-sm text-ink-soft hover:bg-surface-hover"
       >
         + {t("addLeg")}
       </button>

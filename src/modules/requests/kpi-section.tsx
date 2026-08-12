@@ -17,9 +17,11 @@ export async function RequestKpiSection({ kpis }: { kpis: RequestKpis }) {
   const tile = (label: string, value: string | number, hint?: string) => (
     <Card interactive>
       <CardBody>
-        <div className="text-xs font-medium text-ink-soft">{label}</div>
-        <div className="mt-0.5 text-2xl font-extrabold tracking-tight text-ink">{value}</div>
-        {hint && <div className="mt-0.5 text-[11px] text-ink-soft">{hint}</div>}
+        <div className="eyebrow">{label}</div>
+        <div className="mt-2 font-display text-[30px] font-extrabold leading-none tracking-[-0.04em] text-brand-deep">
+          {value}
+        </div>
+        {hint && <div className="mt-2 text-[11px] text-ink-soft">{hint}</div>}
       </CardBody>
     </Card>
   );
@@ -54,7 +56,7 @@ export async function RequestKpiSection({ kpis }: { kpis: RequestKpis }) {
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
         <Card>
           <CardHeader>
-            <span className="text-sm font-semibold">{t("bySource")}</span>
+            <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("bySource")}</span>
           </CardHeader>
           <CardBody>
             <RankBars
@@ -66,7 +68,7 @@ export async function RequestKpiSection({ kpis }: { kpis: RequestKpis }) {
 
         <Card>
           <CardHeader>
-            <span className="text-sm font-semibold">{t("byManager")}</span>
+            <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("byManager")}</span>
           </CardHeader>
           <CardBody>
             <RankBars
@@ -83,7 +85,7 @@ export async function RequestKpiSection({ kpis }: { kpis: RequestKpis }) {
 
         <Card>
           <CardHeader>
-            <span className="text-sm font-semibold">{t("lostReasons")}</span>
+            <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("lostReasons")}</span>
           </CardHeader>
           <CardBody>
             <RankBars
@@ -95,7 +97,7 @@ export async function RequestKpiSection({ kpis }: { kpis: RequestKpis }) {
 
         <Card>
           <CardHeader>
-            <span className="text-sm font-semibold">{t("speed")}</span>
+            <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("speed")}</span>
           </CardHeader>
           <CardBody>
             {kpis.durations.map((d) => (

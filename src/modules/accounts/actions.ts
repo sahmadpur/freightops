@@ -51,6 +51,7 @@ export async function createAccount(input: unknown): Promise<ActionResult> {
       .insert(accounts)
       .values({
         title: data.title,
+        roles: data.roles,
         taxId: data.taxId || null,
         address: data.address || null,
         country: data.country || null,
@@ -88,6 +89,7 @@ export async function updateAccount(id: string, input: unknown): Promise<ActionR
 
     const after = {
       title: data.title,
+      roles: data.roles,
       taxId: data.taxId || null,
       address: data.address || null,
       country: data.country || null,

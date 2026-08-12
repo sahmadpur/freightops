@@ -2,7 +2,7 @@ import postgres from "postgres";
 
 const expected = [
   "user", "session", "account", "verification",
-  "accounts", "carriers", "contacts", "orders",
+  "accounts", "contacts", "orders",
   "payments", "order_finance_lines", "documents", "comments", "audit_log", "invitations",
   "monthly_counters", "annual_counters", "doc_counters", "notifications",
   "fx_rates", "customs_clearances", "customs_clearance_items",

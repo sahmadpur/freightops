@@ -11,7 +11,6 @@ import { sql } from "drizzle-orm";
 import { db } from "../src/db";
 import {
   accounts,
-  carriers,
   contacts,
   orders,
   payments,
@@ -64,7 +63,6 @@ async function main() {
     await db.delete(orders);
     await db.delete(contacts);
     await db.delete(accounts);
-    await db.delete(carriers);
     await db.delete(auditLog);
     await db.delete(monthlyCounters);
   }
@@ -83,18 +81,18 @@ async function main() {
     .returning({ id: accounts.id, title: accounts.title });
   const acc = Object.fromEntries(accountRows.map((a) => [a.title, a.id]));
 
-  // ---- Carriers -----------------------------------------------------------
+  // ---- Carriers: accounts with the "carrier" role -------------------------
   console.log("Seeding carriers…");
   const carrierRows = await db
-    .insert(carriers)
+    .insert(accounts)
     .values([
-      { title: "BTK Rail Cargo", address: "Baku–Tbilisi–Kars Terminal, Alyat, AZ", notes: "Rail block trains, weekly slots.", createdBy: by },
-      { title: "Caspian Shipping Co.", address: "Port of Baku, Alyat, AZ", notes: "Ro-Ro and container, Caspian crossings.", createdBy: by },
-      { title: "TransAnatolia Trucking", address: "Halkalı Lojistik Merkezi, Istanbul, TR", notes: "FTL/LTL road, TIR carnet.", createdBy: by },
-      { title: "Lufthansa Cargo", address: "Frankfurt Airport, DE", notes: "Air freight, temperature-controlled available.", createdBy: by },
-      { title: "Black Sea Lines", address: "Port of Poti, GE", notes: null, createdBy: by },
+      { title: "BTK Rail Cargo", roles: ["carrier"], address: "Baku–Tbilisi–Kars Terminal, Alyat, AZ", notes: "Rail block trains, weekly slots.", createdBy: by },
+      { title: "Caspian Shipping Co.", roles: ["carrier"], address: "Port of Baku, Alyat, AZ", notes: "Ro-Ro and container, Caspian crossings.", createdBy: by },
+      { title: "TransAnatolia Trucking", roles: ["carrier"], address: "Halkalı Lojistik Merkezi, Istanbul, TR", notes: "FTL/LTL road, TIR carnet.", createdBy: by },
+      { title: "Lufthansa Cargo", roles: ["carrier"], address: "Frankfurt Airport, DE", notes: "Air freight, temperature-controlled available.", createdBy: by },
+      { title: "Black Sea Lines", roles: ["carrier"], address: "Port of Poti, GE", notes: null, createdBy: by },
     ])
-    .returning({ id: carriers.id, title: carriers.title });
+    .returning({ id: accounts.id, title: accounts.title });
   const car = Object.fromEntries(carrierRows.map((c) => [c.title, c.id]));
 
   // ---- Contacts (a couple per client/carrier) ----------------------------
@@ -104,8 +102,8 @@ async function main() {
     { parentType: "account", parentId: acc["Silk Road Imports"], name: "Nino Beridze", phones: ["+995 599 11 22 33"], emails: ["nino@silkroad.ge"] },
     { parentType: "account", parentId: acc["Anatolia Logistics A.Ş."], name: "Mehmet Yılmaz", phones: ["+90 532 444 55 66"], emails: ["mehmet@anatolialog.com.tr"] },
     { parentType: "account", parentId: acc["Hanseatic GmbH"], name: "Klaus Brandt", phones: ["+49 40 998877"], emails: ["k.brandt@hanseatic.de"] },
-    { parentType: "carrier", parentId: car["TransAnatolia Trucking"], name: "Ahmet Demir", phones: ["+90 533 222 11 00"], emails: ["dispatch@transanatolia.com.tr"] },
-    { parentType: "carrier", parentId: car["Caspian Shipping Co."], name: "Elnur Mammadov", phones: ["+994 12 404 50 50"], emails: ["ops@caspianshipping.az"] },
+    { parentType: "account", parentId: car["TransAnatolia Trucking"], name: "Ahmet Demir", phones: ["+90 533 222 11 00"], emails: ["dispatch@transanatolia.com.tr"] },
+    { parentType: "account", parentId: car["Caspian Shipping Co."], name: "Elnur Mammadov", phones: ["+994 12 404 50 50"], emails: ["ops@caspianshipping.az"] },
   ]);
 
   // ---- Orders -------------------------------------------------------------

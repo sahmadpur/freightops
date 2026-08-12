@@ -31,26 +31,19 @@ export default async function DashboardPage({
   ]);
   const year = d.year;
 
-  const metric = (
-    label: string,
-    value: string | number,
-    icon: React.ReactNode,
-    accent: "indigo" | "violet",
-  ) => (
+  // Outlined glyph, micro label, then the number set large in Manrope — the
+  // number is the point of the tile, so nothing above it is filled or coloured.
+  const metric = (label: string, value: string | number, icon: React.ReactNode) => (
     <Card interactive>
       <CardBody>
         <span
-          className={`flex h-10 w-10 items-center justify-center rounded-xl ${
-            accent === "indigo"
-              ? "bg-indigo-50 text-indigo-600"
-              : "bg-violet-50 text-violet-600"
-          }`}
+          className="flex h-9 w-9 items-center justify-center rounded-control border border-edge-chip text-ink-soft"
           aria-hidden="true"
         >
           {icon}
         </span>
-        <div className="mt-3 text-xs font-medium text-slate-500">{label}</div>
-        <div className="mt-0.5 text-2xl font-extrabold tracking-tight text-slate-900">
+        <div className="eyebrow mt-4">{label}</div>
+        <div className="mt-1.5 font-display text-[30px] font-extrabold leading-none tracking-[-0.04em] text-brand-deep">
           {value}
         </div>
       </CardBody>
@@ -58,22 +51,22 @@ export default async function DashboardPage({
   );
 
   const stat = (label: string, value: string) => (
-    <div className="flex items-center justify-between border-b border-slate-100 py-2 text-sm last:border-0">
-      <span className="text-slate-600">{label}</span>
-      <span className="font-semibold tabular-nums text-slate-900">{value}</span>
+    <div className="flex items-center justify-between border-b border-edge-soft py-2 text-sm last:border-0">
+      <span className="text-ink-soft">{label}</span>
+      <span className="font-semibold tabular-nums text-ink">{value}</span>
     </div>
   );
 
   const fin = (label: string, cents: number, tone?: "pos" | "neg") => (
-    <div className="flex items-center justify-between border-b border-slate-100 py-2 text-sm last:border-0">
-      <span className="text-slate-600">{label}</span>
+    <div className="flex items-center justify-between border-b border-edge-soft py-2 text-sm last:border-0">
+      <span className="text-ink-soft">{label}</span>
       <span
         className={`font-semibold tabular-nums ${
           tone === "pos"
             ? "text-emerald-600"
             : tone === "neg"
               ? "text-rose-600"
-              : "text-slate-900"
+              : "text-ink"
         }`}
       >
         {formatMoneyAzn(cents)}
@@ -93,18 +86,18 @@ export default async function DashboardPage({
 
       <div className="mb-2.5"><span className="eyebrow">{t("operationalOverview")}</span></div>
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
-        {metric(t("activeShipments"), d.operational.activeShipments, <IconTruck />, "indigo")}
-        {metric(t("inOperations"), d.operational.inOperations, <IconClipboard />, "violet")}
-        {metric(t("cargoInTransit"), d.operational.cargoInTransit, <IconRoute />, "violet")}
-        {metric(t("bookedWithCarrier"), d.operational.bookedWithCarrier, <IconStamp />, "indigo")}
-        {metric(t("unfinishedOrders"), d.operational.unfinishedOrders, <IconClipboard />, "violet")}
+        {metric(t("activeShipments"), d.operational.activeShipments, <IconTruck />)}
+        {metric(t("inOperations"), d.operational.inOperations, <IconClipboard />)}
+        {metric(t("cargoInTransit"), d.operational.cargoInTransit, <IconRoute />)}
+        {metric(t("bookedWithCarrier"), d.operational.bookedWithCarrier, <IconStamp />)}
+        {metric(t("unfinishedOrders"), d.operational.unfinishedOrders, <IconClipboard />)}
       </div>
 
       <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader>
-            <span className="text-sm font-semibold">{t("periodResults", { month: d.month })}</span>
-            <span className="text-xs text-slate-500">{t("ordersCount", { count: d.period.orders })}</span>
+            <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("periodResults", { month: d.month })}</span>
+            <span className="text-xs text-ink-soft">{t("ordersCount", { count: d.period.orders })}</span>
           </CardHeader>
           <CardBody>
             {fin(t("revenue"), d.period.revenueCents, "pos")}
@@ -119,7 +112,7 @@ export default async function DashboardPage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("financialOverview")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("financialOverview")}</span></CardHeader>
           <CardBody>
             {fin(t("revenue"), d.financial.ytd.revenueCents, "pos")}
             {fin(t("carrierCosts"), -d.financial.ytd.carrierCostsCents, "neg")}
@@ -128,7 +121,7 @@ export default async function DashboardPage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("balancesOverview")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("balancesOverview")}</span></CardHeader>
           <CardBody>
             {fin(t("accountsReceivable"), d.financial.clients.outstandingCents)}
             {fin(t("owedToCarriers"), d.financial.carriers.outstandingCents, "neg")}
@@ -138,7 +131,7 @@ export default async function DashboardPage({
 
       <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{tt("fields.transportType")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{tt("fields.transportType")}</span></CardHeader>
           <CardBody>
             <RankBars
               empty={t("noData")}
@@ -151,7 +144,7 @@ export default async function DashboardPage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("topRoutes")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("topRoutes")}</span></CardHeader>
           <CardBody>
             <RankBars
               empty={t("noData")}
@@ -164,7 +157,7 @@ export default async function DashboardPage({
           </CardBody>
         </Card>
         <Card>
-          <CardHeader><span className="text-sm font-semibold">{t("topClients")}</span></CardHeader>
+          <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("topClients")}</span></CardHeader>
           <CardBody>
             <RankBars
               empty={t("noData")}
@@ -179,7 +172,7 @@ export default async function DashboardPage({
         </Card>
         <Card>
           <CardHeader>
-            <span className="text-sm font-semibold">{tt("nav.customs")}</span>
+            <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{tt("nav.customs")}</span>
             <Link href="/customs" className="text-xs text-brand hover:underline">
               {tt("actions.view")}
             </Link>
@@ -194,7 +187,7 @@ export default async function DashboardPage({
       </div>
 
       <Card className="mb-4">
-        <CardHeader><span className="text-sm font-semibold">{t("ordersByStatus")}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("ordersByStatus")}</span></CardHeader>
         <CardBody><StatusBar counts={d.statusCounts} /></CardBody>
       </Card>
 
@@ -203,15 +196,15 @@ export default async function DashboardPage({
       </div>
 
       <Card>
-        <CardHeader><span className="text-sm font-semibold">{t("monthlyResults", { year })}</span></CardHeader>
+        <CardHeader><span className="font-display text-[13px] font-bold tracking-[-0.01em] text-ink">{t("monthlyResults", { year })}</span></CardHeader>
         <CardBody>
           {d.monthly.length === 0 ? (
-            <p className="text-sm text-slate-400">{t("noData")}</p>
+            <p className="text-sm text-ink-soft">{t("noData")}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-slate-500">
+                  <tr className="text-left text-xs text-ink-soft">
                     <th className="py-2 pr-4 font-semibold">{t("month")}</th>
                     <th className="py-2 pr-4 font-semibold">{t("revenue")}</th>
                     <th className="py-2 pr-4 font-semibold">{t("carrierCosts")}</th>
@@ -221,7 +214,7 @@ export default async function DashboardPage({
                 </thead>
                 <tbody>
                   {d.monthly.map((m) => (
-                    <tr key={m.month} className="border-t border-slate-100">
+                    <tr key={m.month} className="border-t border-edge-soft">
                       <td className="py-2 pr-4 font-medium">{m.month}</td>
                       <td className="py-2 pr-4">{formatMoneyAzn(m.revenueCents)}</td>
                       <td className="py-2 pr-4">{formatMoneyAzn(m.carrierCostCents)}</td>
@@ -241,7 +234,7 @@ export default async function DashboardPage({
 
 /* --- Operational metric glyphs (inline so no icon dependency is needed) --- */
 
-const svg = "h-5 w-5";
+const svg = "h-[17px] w-[17px]";
 const svgProps = {
   viewBox: "0 0 24 24",
   fill: "none",
