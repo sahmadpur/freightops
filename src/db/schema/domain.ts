@@ -23,6 +23,7 @@ import { TRANSPORT_TYPES } from "../../lib/transport-types";
 import { REQUEST_STATUSES } from "../../lib/request-status";
 import { LOST_REASONS } from "../../lib/lost-reason";
 import { LEAD_SOURCES } from "../../lib/lead-source";
+import { TASK_TYPES } from "../../lib/task-types";
 import { INCOTERMS } from "../../lib/incoterms";
 import {
   CONTAINER_TYPES,
@@ -796,6 +797,41 @@ export const emailAttachments = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index("email_attachments_message_idx").on(t.messageId)],
+);
+
+// --- Tasks (specification §19) -------------------------------------------
+
+export const taskTypeEnum = pgEnum("task_type", TASK_TYPES);
+/**
+ * A task hangs off whichever record the work belongs to. Same polymorphic
+ * pattern as `documents` — no DB-level FK, application-level cascade.
+ */
+export const taskParentEnum = pgEnum("task_parent", ["request", "order"]);
+
+export const tasks = pgTable(
+  "tasks",
+  {
+    id: id(),
+    parentType: taskParentEnum("parent_type").notNull(),
+    parentId: text("parent_id").notNull(),
+    type: taskTypeEnum("type").notNull().default("other"),
+    title: text("title").notNull(),
+    notes: text("notes"),
+    /** Who owes the work. Null while nobody has picked it up. */
+    assigneeUserId: text("assignee_user_id").references(() => user.id),
+    /** A date, not a timestamp: the desk works in days, not appointments. */
+    dueDate: date("due_date"),
+    /** Set when the task is ticked off; null means still open. */
+    doneAt: timestamp("done_at", { withTimezone: true }),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    createdBy: createdBy(),
+  },
+  (t) => [
+    index("tasks_parent_idx").on(t.parentType, t.parentId),
+    // The open-work views ("what is due", "what is mine") both filter on these.
+    index("tasks_due_idx").on(t.dueDate),
+  ],
 );
 
 export const notifications = pgTable(

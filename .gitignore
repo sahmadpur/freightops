@@ -50,3 +50,8 @@ next-env.d.ts
 
 # one-off scratch scripts
 /temp
+
+# Playwright
+/test-results/
+/playwright-report/
+/tests/e2e/.auth/

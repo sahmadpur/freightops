@@ -4,9 +4,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { requireArea } from "@/lib/session";
 import { toLocalInput } from "@/lib/datetime";
 import { RequestForm } from "@/modules/requests/request-form";
-import { emptyCargo, type LegDraft } from "@/modules/requests/request-form-initial";
 import { contactOptions, getRequest, requestFormData } from "@/modules/requests/queries";
-import type { LegTransportType } from "@/lib/transport-matrix";
+import { cargoDraft, legDrafts } from "@/modules/requests/shipment-drafts";
 
 /** "" for every nullable column — the form holds strings throughout. */
 const s = (v: string | null | undefined) => v ?? "";
@@ -24,57 +23,8 @@ export default async function EditRequestPage({ params }: { params: Promise<{ id
   const r = data.request;
   const contactOpts = r.accountId ? await contactOptions(r.accountId) : [];
 
-  const legs: LegDraft[] = data.legs.map((l) => ({
-    transportType: l.transportType as LegTransportType,
-    subtype: s(l.subtype),
-    originCountry: s(l.originCountry),
-    originCity: s(l.originCity),
-    originPoint: s(l.originPoint),
-    destinationCountry: s(l.destinationCountry),
-    destinationCity: s(l.destinationCity),
-    destinationPoint: s(l.destinationPoint),
-    vehicleType: s(l.vehicleType),
-    vehicleCount: l.vehicleCount === null ? "" : String(l.vehicleCount),
-    containerType: s(l.containerType),
-    containerCount: l.containerCount === null ? "" : String(l.containerCount),
-    wagonType: s(l.wagonType),
-    wagonCount: l.wagonCount === null ? "" : String(l.wagonCount),
-    equipmentDescription: s(l.equipmentDescription),
-    equipmentCount: l.equipmentCount === null ? "" : String(l.equipmentCount),
-    chargeableWeightKg: s(l.chargeableWeightKg),
-    volumetricDivisor: l.volumetricDivisor === null ? "" : String(l.volumetricDivisor),
-    routingPreference: s(l.routingPreference),
-    notes: s(l.notes),
-  }));
-
-  const c = data.cargo;
-  const cargo = c
-    ? {
-        description: s(c.description),
-        hsCodes: c.hsCodes,
-        packages: c.packages === null ? "" : String(c.packages),
-        grossWeightKg: s(c.grossWeightKg),
-        volumeM3: s(c.volumeM3),
-        dimensions: c.dimensions.map((d) => ({
-          lengthCm: String(d.lengthCm),
-          widthCm: String(d.widthCm),
-          heightCm: String(d.heightCm),
-          quantity: String(d.quantity),
-        })),
-        cargoValue: s(c.cargoValue),
-        cargoCurrency: s(c.cargoCurrency),
-        stackable: s(c.stackable),
-        dangerousGoods: c.dangerousGoods,
-        dgClass: s(c.dgClass),
-        unNumber: s(c.unNumber),
-        dgNotes: s(c.dgNotes),
-        temperatureControlled: c.temperatureControlled,
-        tempMinC: s(c.tempMinC),
-        tempMaxC: s(c.tempMaxC),
-        oversized: c.oversized,
-        oversizedNotes: s(c.oversizedNotes),
-      }
-    : emptyCargo();
+  const legs = legDrafts(data.legs);
+  const cargo = cargoDraft(data.cargo);
 
   return (
     <div>

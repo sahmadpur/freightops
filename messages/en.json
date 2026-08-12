@@ -16,7 +16,7 @@
   "nav": {
     "orders": "Orders",
     "dashboard": "Dashboard",
-    "accounts": "Accounts",
+    "accounts": "Companies",
     "carriers": "Carriers",
     "finance": "Finance",
     "documents": "Documents",
@@ -190,7 +190,7 @@
     "fromCountry": "From",
     "toCountry": "To",
     "lastModified": "Last modified",
-    "selectAccount": "Select account…",
+    "selectAccount": "Select company…",
     "selectCarrier": "Select carrier…",
     "actNumber": "ACT number",
     "actDate": "ACT date",
@@ -306,11 +306,11 @@
     "other": "Other"
   },
   "accounts": {
-    "newAccount": "New account",
-    "editAccount": "Edit account",
-    "notFound": "Account not found",
-    "searchPlaceholder": "Search accounts...",
-    "empty": "No accounts yet — create the first one."
+    "newAccount": "New company",
+    "editAccount": "Edit company",
+    "notFound": "Company not found",
+    "searchPlaceholder": "Search companies...",
+    "empty": "No companies yet — create the first one."
   },
   "carriers": {
     "newCarrier": "New carrier",
@@ -355,7 +355,6 @@
     "sectionTerms": "Shipment terms",
     "tabOverview": "Overview",
     "tabQuotation": "Quotation",
-    "tabEmails": "Emails",
     "tabDocuments": "Documents",
     "tabHistory": "History",
     "updateStatus": "Update status",
@@ -380,7 +379,8 @@
     "newClient": "New client",
     "newClientName": "Company name",
     "reeferSuggest": "Refrigerated equipment selected — is the cargo temperature controlled?",
-    "reeferSuggestApply": "Set temperature controlled"
+    "reeferSuggestApply": "Set temperature controlled",
+    "tabTasks": "Tasks"
   },
   "search": {
     "title": "Search",
@@ -633,8 +633,8 @@
     "email": "Email",
     "name": "Name",
     "role": "Role",
-    "account": "Account",
-    "selectAccount": "Select account…",
+    "account": "Company",
+    "selectAccount": "Select company…",
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
@@ -732,23 +732,6 @@
     "bank_fee": "Bank fee",
     "other": "Other"
   },
-  "cargoTypes": {
-    "generalCargo": "General cargo",
-    "machinery": "Machinery & equipment",
-    "spareParts": "Spare parts",
-    "constructionMaterials": "Construction materials",
-    "chemicals": "Chemicals",
-    "foodstuffs": "Foodstuffs",
-    "textiles": "Textiles & apparel",
-    "electronics": "Electronics",
-    "furniture": "Furniture",
-    "pharmaceuticals": "Pharmaceuticals",
-    "automotive": "Automotive",
-    "packagingMaterials": "Packaging materials",
-    "frozenGoods": "Frozen / chilled goods",
-    "dangerousGoods": "Dangerous goods (ADR)",
-    "personalEffects": "Personal effects"
-  },
   "auditAction": {
     "created": "created the order",
     "updated": "updated",
@@ -773,16 +756,45 @@
     "order_created": "created the order from this request",
     "message_logged": "logged a communication",
     "email_linked": "linked an email",
-    "email_unlinked": "unlinked an email"
+    "email_unlinked": "unlinked an email",
+    "task_created": "added a task",
+    "task_updated": "changed a task",
+    "task_completed": "completed a task",
+    "task_reopened": "reopened a task",
+    "task_removed": "removed a task"
   },
   "entityType": {
     "order": "Order",
-    "account": "Client",
+    "account": "Company",
     "carrier": "Carrier",
     "customs_clearance": "Customs clearance",
     "user": "User",
     "transport_mode": "Transport (retired)",
     "request": "Request",
     "quotation": "Quotation"
+  },
+  "tasks": {
+    "tab": "Tasks",
+    "empty": "No tasks yet.",
+    "newTask": "New task",
+    "titlePlaceholder": "What has to be done?",
+    "addTask": "Add task",
+    "type": "Type",
+    "dueDate": "Due date",
+    "assignee": "Assignee",
+    "unassigned": "Unassigned",
+    "notes": "Notes",
+    "due": "due",
+    "markDone": "Mark done"
+  },
+  "taskType": {
+    "call": "Call",
+    "email": "Email",
+    "meeting": "Meeting",
+    "document": "Document",
+    "quotation": "Quotation",
+    "booking": "Booking",
+    "follow_up": "Follow-up",
+    "other": "Other"
   }
 }

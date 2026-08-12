@@ -1,38 +1,9 @@
+// Field lives in its own client module (it uses useId); re-exported here so the
+// twenty-odd call sites keep importing it from "@/components/ui/form".
+export { Field } from "./field";
+
 export const inputCls =
   "w-full rounded-control border border-edge-chip bg-transparent px-3 py-2 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-brand";
-
-export function Field({
-  label,
-  htmlFor,
-  error,
-  children,
-  className = "",
-}: {
-  label: string;
-  htmlFor?: string;
-  error?: string[];
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`mb-4 ${className}`}>
-      {/* Sentence case, not the uppercase micro label: a long form has forty of
-          these, and shouting forty times is not emphasis. */}
-      <label
-        htmlFor={htmlFor}
-        className="mb-1.5 block text-[12px] font-medium text-ink-soft"
-      >
-        {label}
-      </label>
-      {children}
-      {error && error.length > 0 && (
-        <p className="mt-1 text-[11.5px] text-[rgb(var(--danger-fg))]">
-          {error[0]}
-        </p>
-      )}
-    </div>
-  );
-}
 
 export function SubmitRow({
   pending,

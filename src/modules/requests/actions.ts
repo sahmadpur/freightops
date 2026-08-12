@@ -6,7 +6,6 @@ import { accounts, documents, orderFinanceLines, orders, quotations, requests } 
 import { auditDiff, recordAudit } from "@/lib/audit";
 import { requireArea } from "@/lib/session";
 import { nextAnnualNumber } from "@/lib/record-number";
-import { legacyModeFor } from "@/lib/transport-matrix";
 import { DEFAULT_CURRENCY } from "@/lib/fx";
 import { buildRequestTitle } from "@/lib/request-title";
 import { timestampFor, type RequestStatus } from "@/lib/request-status";
@@ -24,7 +23,9 @@ import {
   type RequestInput,
 } from "./schema";
 import { contactOptions } from "./queries";
+import { shipmentColumns } from "@/modules/orders/shipment-columns";
 import { copyShipment, deleteShipment, readCargo, readLegs, writeCargo, writeLegs } from "./shipment";
+import { deleteTasksFor } from "@/modules/tasks/cascade";
 
 /**
  * Fields whose changes are worth a history entry. Timestamps are excluded: they
@@ -278,6 +279,7 @@ export async function deleteRequestDraft(id: string): Promise<ActionResult> {
     if (!row) return "not_found" as const;
     if (row.status !== "new" || row.orderId) return "not_allowed" as const;
     await deleteShipment(tx, "request", id);
+    await deleteTasksFor(tx, "request", id);
     await tx.delete(requests).where(eq(requests.id, id));
     await recordAudit(tx, { userId: session.user.id, entityType: "request", entityId: id, action: "deleted" });
     return "ok" as const;
@@ -336,8 +338,6 @@ export async function convertToOrder(requestId: string, input: unknown): Promise
 
     const now = new Date();
     const number = await nextAnnualNumber(tx, "order", now.getFullYear());
-    const first = legs[0];
-    const last = legs[legs.length - 1];
 
     const [order] = await tx
       .insert(orders)
@@ -348,15 +348,7 @@ export async function convertToOrder(requestId: string, input: unknown): Promise
         carrierId: carrierId || null,
         // The legs are authoritative; these denormalized fields keep the order
         // list, filters and dashboard working unchanged.
-        transportType: legacyModeFor(request.transportFamily, first?.transportType ?? null),
-        fromCountry: first?.originCountry ?? null,
-        fromCity: first?.originCity ?? null,
-        toCountry: last?.destinationCountry ?? null,
-        toCity: last?.destinationCity ?? null,
-        cargoItems: cargo?.description ? [cargo.description] : [],
-        packages: cargo?.packages ?? null,
-        weightKg: cargo?.grossWeightKg ?? null,
-        volumeM3: cargo?.volumeM3 ?? null,
+        ...shipmentColumns(legs, cargo),
         incoterms: request.incoterms,
         ...orderSourceFields(request, quotation?.id ?? null),
         currency: quotation?.currency ?? DEFAULT_CURRENCY,

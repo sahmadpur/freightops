@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-type Tab = "overview" | "quotation" | "emails" | "documents" | "history";
+type Tab = "overview" | "quotation" | "emails" | "documents" | "tasks" | "history";
 
-const TABS: readonly Tab[] = ["overview", "quotation", "emails", "documents", "history"];
+const TABS: readonly Tab[] = ["overview", "quotation", "emails", "documents", "tasks", "history"];
 
 /**
  * Presentational shell only: every panel is rendered on the server and handed
@@ -17,6 +17,7 @@ export function RequestDetailTabs({
   quotation,
   emails,
   documents,
+  tasks,
   history,
   initialTab,
 }: {
@@ -24,10 +25,12 @@ export function RequestDetailTabs({
   quotation: React.ReactNode;
   emails: React.ReactNode;
   documents: React.ReactNode;
+  tasks: React.ReactNode;
   history: React.ReactNode;
   initialTab?: string;
 }) {
   const t = useTranslations("requests");
+  const tc = useTranslations("communications");
   const [tab, setTab] = useState<Tab>(TABS.includes(initialTab as Tab) ? (initialTab as Tab) : "overview");
 
   const tabCls = (active: boolean) =>
@@ -38,12 +41,14 @@ export function RequestDetailTabs({
   const label: Record<Tab, string> = {
     overview: t("tabOverview"),
     quotation: t("tabQuotation"),
-    emails: t("tabEmails"),
+    // Calls and WhatsApp notes live here too, not only mail (§17.5, §18).
+    emails: tc("tab"),
     documents: t("tabDocuments"),
+    tasks: t("tabTasks"),
     history: t("tabHistory"),
   };
 
-  const panel: Record<Tab, React.ReactNode> = { overview, quotation, emails, documents, history };
+  const panel: Record<Tab, React.ReactNode> = { overview, quotation, emails, documents, tasks, history };
 
   return (
     <div>

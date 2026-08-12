@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-type Tab = "info" | "finance" | "documents" | "comments" | "history";
-
-const TABS: readonly Tab[] = ["info", "finance", "documents", "comments", "history"];
+type Tab = "info" | "finance" | "documents" | "emails" | "tasks" | "comments" | "history";
 
 export function OrderDetailTabs({
   info,
   finance,
   documents,
+  emails,
+  tasks,
   comments,
   history,
   initialTab,
@@ -18,6 +18,9 @@ export function OrderDetailTabs({
   info: React.ReactNode;
   finance: React.ReactNode;
   documents: React.ReactNode;
+  /** The source request's thread. Absent on an order that was never a request. */
+  emails?: React.ReactNode;
+  tasks: React.ReactNode;
   comments: React.ReactNode;
   history: React.ReactNode;
   /** Lets a link (e.g. the invoice-required banner) open a specific tab. */
@@ -26,9 +29,22 @@ export function OrderDetailTabs({
   const t = useTranslations("orders");
   const tf = useTranslations("finance");
   const tdoc = useTranslations("documents");
+  const tcomm = useTranslations("communications");
+  const ttask = useTranslations("tasks");
   const tc = useTranslations("comments");
+
+  const panels: { key: Tab; label: string; node: React.ReactNode }[] = [
+    { key: "info", label: t("tabInfo"), node: info },
+    { key: "finance", label: tf("tab"), node: finance },
+    { key: "documents", label: tdoc("tab"), node: documents },
+    ...(emails ? [{ key: "emails" as const, label: tcomm("tab"), node: emails }] : []),
+    { key: "tasks", label: ttask("tab"), node: tasks },
+    { key: "comments", label: tc("tab"), node: comments },
+    { key: "history", label: t("tabHistory"), node: history },
+  ];
+
   const [tab, setTab] = useState<Tab>(
-    TABS.includes(initialTab as Tab) ? (initialTab as Tab) : "info",
+    panels.some((p) => p.key === initialTab) ? (initialTab as Tab) : "info",
   );
 
   const tabCls = (active: boolean) =>
@@ -39,13 +55,13 @@ export function OrderDetailTabs({
   return (
     <div>
       <div className="mb-5 flex gap-1 border-b border-edge-soft">
-        <button type="button" className={tabCls(tab === "info")} onClick={() => setTab("info")}>{t("tabInfo")}</button>
-        <button type="button" className={tabCls(tab === "finance")} onClick={() => setTab("finance")}>{tf("tab")}</button>
-        <button type="button" className={tabCls(tab === "documents")} onClick={() => setTab("documents")}>{tdoc("tab")}</button>
-        <button type="button" className={tabCls(tab === "comments")} onClick={() => setTab("comments")}>{tc("tab")}</button>
-        <button type="button" className={tabCls(tab === "history")} onClick={() => setTab("history")}>{t("tabHistory")}</button>
+        {panels.map((p) => (
+          <button key={p.key} type="button" className={tabCls(tab === p.key)} onClick={() => setTab(p.key)}>
+            {p.label}
+          </button>
+        ))}
       </div>
-      {tab === "info" ? info : tab === "finance" ? finance : tab === "documents" ? documents : tab === "comments" ? comments : history}
+      {panels.find((p) => p.key === tab)?.node}
     </div>
   );
 }

@@ -8,6 +8,8 @@ import { nextAnnualNumber } from "@/lib/record-number";
 import { requireArea } from "@/lib/session";
 import { missingFinancials } from "@/lib/order-financials";
 import { orderInputSchema, statusChangeSchema, type OrderInput } from "./schema";
+import { shipmentColumns } from "./shipment-columns";
+import { writeCargo, writeLegs } from "@/modules/requests/shipment";
 import type { ActionResult } from "@/lib/forms";
 import { orderRecipients, staffRecipientsForOrder } from "@/modules/notifications/recipients";
 import { enqueueMany } from "@/modules/notifications/enqueue";
@@ -25,23 +27,21 @@ const AUDITED_FIELDS = [
   "incoterms", "deliveryFormat", "currency", "exchangeRate",
 ];
 
+/**
+ * The order row as the form submits it. Route, transport and cargo are NOT
+ * typed in: they are derived from the legs and cargo the form edits, so the
+ * flat columns and the structured rows can never drift apart.
+ */
 function toRow(data: OrderInput) {
   return {
     title: data.title,
     rollbackNumber: data.rollbackNumber || null,
     accountId: data.accountId,
     carrierId: data.carrierId || null,
-    transportType: data.transportType || null,
-    fromCountry: data.fromCountry || null,
-    toCountry: data.toCountry || null,
-    cargoItems: data.cargoItems,
-    packages: data.packages ? Number(data.packages) : null,
-    weightKg: data.weightKg || null,
-    volumeM3: data.volumeM3 || null,
     incoterms: data.incoterms || null,
-    deliveryFormat: data.deliveryFormat || null,
     currency: data.currency,
     exchangeRate: data.exchangeRate || null,
+    ...shipmentColumns(data.legs, data.cargo),
   };
 }
 
@@ -68,6 +68,8 @@ export async function createOrder(input: unknown): Promise<ActionResult> {
         createdBy: session.user.id,
       })
       .returning({ id: orders.id });
+    await writeLegs(tx, "order", row.id, data.legs);
+    await writeCargo(tx, "order", row.id, data.cargo);
     // Seed the itemized Finance tab so it starts consistent with the rollups.
     const seedLines = [];
     if (data.clientCharge)
@@ -149,6 +151,8 @@ export async function updateOrder(id: string, input: unknown): Promise<ActionRes
     if (!before) return "not_found" as const;
     const after = toRow(data);
     await tx.update(orders).set(after).where(eq(orders.id, id));
+    await writeLegs(tx, "order", id, data.legs);
+    await writeCargo(tx, "order", id, data.cargo);
     const changes = auditDiff(before, after, AUDITED_FIELDS);
     if (changes.length > 0) {
       await recordAudit(tx, {

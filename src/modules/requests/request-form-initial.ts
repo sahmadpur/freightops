@@ -1,4 +1,4 @@
-import type { LegTransportType } from "@/lib/transport-matrix";
+import { isLegTransportType, type LegTransportType } from "@/lib/transport-matrix";
 
 /** One leg as the form holds it — every value a string, matching the house style. */
 export type LegDraft = {
@@ -187,4 +187,29 @@ export function blankRequestInitial(responsibleUserId: string, receivedAt: strin
     legs: [],
     cargo: emptyCargo(),
   };
+}
+
+/**
+ * Choosing the transport type seeds the legs: one for a single-mode shipment,
+ * two to start with for multimodal. Switching between single modes rewrites the
+ * one leg's type rather than adding another, keeping the route already typed.
+ */
+export function seedLegsForFamily(family: string, legs: LegDraft[]): LegDraft[] {
+  if (family === "multimodal") {
+    return legs.length >= 2 ? legs : [legs[0] ?? emptyLeg(), emptyLeg()];
+  }
+  if (!isLegTransportType(family)) return [];
+  const type = family as LegTransportType;
+  const first = legs[0];
+  return [
+    first
+      ? {
+          ...emptyLeg(type),
+          originCountry: first.originCountry,
+          originCity: first.originCity,
+          destinationCountry: first.destinationCountry,
+          destinationCity: first.destinationCity,
+        }
+      : emptyLeg(type),
+  ];
 }

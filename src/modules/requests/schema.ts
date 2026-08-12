@@ -129,14 +129,19 @@ export type CargoInput = z.infer<typeof cargoInputSchema>;
 export type DimensionInput = z.infer<typeof dimensionSchema>;
 
 /**
- * The cross-field rules of §8, §9 and §24.
+ * The cross-field rules of §8 and §9, shared by requests and orders — the two
+ * carry the same shipment payload, so the same combinations are nonsense on
+ * both (§14 copies one into the other).
  *
- * These run on every save, including a draft: an incomplete request is allowed
+ * These run on every save, including a draft: an incomplete shipment is allowed
  * (Save Draft must work with almost nothing filled in), but an *inconsistent*
  * one is not. So "no legs yet" passes and "a sea leg with a wagon type" does
- * not. The stage gates that demand completeness live in `stageRequirements`.
+ * not. The stage gates that demand completeness live in `missingForStatus`.
  */
-export const requestInputSchema = baseRequestSchema.superRefine((v, ctx) => {
+export function refineShipment(
+  v: { transportFamily?: string; legs: LegInput[]; cargo: CargoInput },
+  ctx: z.RefinementCtx,
+): void {
   const family = v.transportFamily;
 
   if (family === "multimodal") {
@@ -207,6 +212,10 @@ export const requestInputSchema = baseRequestSchema.superRefine((v, ctx) => {
   if (c.oversized && c.dimensions.length === 0) {
     ctx.addIssue({ code: "custom", path: ["cargo", "dimensions"], message: "Required for oversized cargo" });
   }
+}
+
+export const requestInputSchema = baseRequestSchema.superRefine((v, ctx) => {
+  refineShipment(v, ctx);
   if (v.incotermPlace && !v.incoterms) {
     ctx.addIssue({ code: "custom", path: ["incoterms"], message: "Choose an incoterm first" });
   }

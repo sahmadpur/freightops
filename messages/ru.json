@@ -16,7 +16,7 @@
   "nav": {
     "orders": "Заказы",
     "dashboard": "Дашборд",
-    "accounts": "Клиенты",
+    "accounts": "Компании",
     "carriers": "Перевозчики",
     "finance": "Финансы",
     "documents": "Документы",
@@ -190,7 +190,7 @@
     "fromCountry": "Откуда",
     "toCountry": "Куда",
     "lastModified": "Изменено",
-    "selectAccount": "Выберите клиента…",
+    "selectAccount": "Выберите компанию…",
     "selectCarrier": "Выберите перевозчика…",
     "actNumber": "Номер акта",
     "actDate": "Дата акта",
@@ -306,11 +306,11 @@
     "other": "Другое"
   },
   "accounts": {
-    "newAccount": "Новый клиент",
-    "editAccount": "Изменить клиента",
-    "notFound": "Клиент не найден",
-    "searchPlaceholder": "Поиск клиентов...",
-    "empty": "Клиентов пока нет — создайте первого."
+    "newAccount": "Новая компания",
+    "editAccount": "Изменить компанию",
+    "notFound": "Компания не найдена",
+    "searchPlaceholder": "Поиск компаний...",
+    "empty": "Компаний пока нет — создайте первую."
   },
   "carriers": {
     "newCarrier": "Новый перевозчик",
@@ -355,7 +355,6 @@
     "sectionTerms": "Условия перевозки",
     "tabOverview": "Обзор",
     "tabQuotation": "Предложение",
-    "tabEmails": "Письма",
     "tabDocuments": "Документы",
     "tabHistory": "История",
     "updateStatus": "Изменить статус",
@@ -380,7 +379,8 @@
     "newClient": "Новый клиент",
     "newClientName": "Название компании",
     "reeferSuggest": "Выбрано рефрижераторное оборудование — груз с температурным режимом?",
-    "reeferSuggestApply": "Включить температурный режим"
+    "reeferSuggestApply": "Включить температурный режим",
+    "tabTasks": "Задачи"
   },
   "search": {
     "title": "Поиск",
@@ -633,8 +633,8 @@
     "email": "Эл. почта",
     "name": "Имя",
     "role": "Роль",
-    "account": "Клиент",
-    "selectAccount": "Выберите клиента…",
+    "account": "Компания",
+    "selectAccount": "Выберите компанию…",
     "status": "Статус",
     "active": "Активен",
     "inactive": "Неактивен",
@@ -732,23 +732,6 @@
     "bank_fee": "Банковская комиссия",
     "other": "Прочее"
   },
-  "cargoTypes": {
-    "generalCargo": "Генеральный груз",
-    "machinery": "Машины и оборудование",
-    "spareParts": "Запасные части",
-    "constructionMaterials": "Строительные материалы",
-    "chemicals": "Химикаты",
-    "foodstuffs": "Продукты питания",
-    "textiles": "Текстиль и одежда",
-    "electronics": "Электроника",
-    "furniture": "Мебель",
-    "pharmaceuticals": "Фармацевтика",
-    "automotive": "Автомобильные товары",
-    "packagingMaterials": "Упаковочные материалы",
-    "frozenGoods": "Замороженные / охлаждённые товары",
-    "dangerousGoods": "Опасные грузы (ADR)",
-    "personalEffects": "Личные вещи"
-  },
   "auditAction": {
     "created": "создание заказа",
     "updated": "изменение",
@@ -773,16 +756,45 @@
     "order_created": "создал заказ по этому запросу",
     "message_logged": "записал коммуникацию",
     "email_linked": "привязал письмо",
-    "email_unlinked": "отвязал письмо"
+    "email_unlinked": "отвязал письмо",
+    "task_created": "добавил задачу",
+    "task_updated": "изменил задачу",
+    "task_completed": "выполнил задачу",
+    "task_reopened": "вернул задачу в работу",
+    "task_removed": "удалил задачу"
   },
   "entityType": {
     "order": "Заказ",
-    "account": "Клиент",
+    "account": "Компания",
     "carrier": "Перевозчик",
     "customs_clearance": "Таможенное оформление",
     "user": "Пользователь",
     "transport_mode": "Транспорт (упразднён)",
     "request": "Запрос",
     "quotation": "Предложение"
+  },
+  "tasks": {
+    "tab": "Задачи",
+    "empty": "Задач пока нет.",
+    "newTask": "Новая задача",
+    "titlePlaceholder": "Что нужно сделать?",
+    "addTask": "Добавить задачу",
+    "type": "Тип",
+    "dueDate": "Срок",
+    "assignee": "Ответственный",
+    "unassigned": "Не назначен",
+    "notes": "Заметки",
+    "due": "срок",
+    "markDone": "Отметить выполненной"
+  },
+  "taskType": {
+    "call": "Звонок",
+    "email": "Письмо",
+    "meeting": "Встреча",
+    "document": "Документ",
+    "quotation": "Предложение",
+    "booking": "Букинг",
+    "follow_up": "Напоминание",
+    "other": "Другое"
   }
 }

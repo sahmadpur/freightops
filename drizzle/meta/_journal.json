@@ -141,6 +141,13 @@
       "when": 1786519155547,
       "tag": "0019_company_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1786523498094,
+      "tag": "0020_tasks",
+      "breakpoints": true
     }
   ]
 }

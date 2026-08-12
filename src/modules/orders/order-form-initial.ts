@@ -1,4 +1,5 @@
 import { DEFAULT_CURRENCY } from "@/lib/fx";
+import { emptyCargo, type CargoDraft, type LegDraft } from "@/modules/requests/request-form-initial";
 
 /** One agent-expense row as the form holds it (all strings). */
 export type CostLineDraft = {
@@ -9,18 +10,18 @@ export type CostLineDraft = {
 
 export type OrderFormInitial = {
   id?: string;
-  transportType: string;
   accountId: string;
   carrierId: string;
-  fromCountry: string;
-  toCountry: string;
   title: string;
   rollbackNumber: string;
-  deliveryFormat: string;
-  cargoItems: string[];
-  packages: string;
-  weightKg: string;
-  volumeM3: string;
+  /**
+   * The structured shipment, identical to a request's (§26). The flat
+   * `orders` columns — route, transport type, delivery format, cargo totals —
+   * are derived from it server-side, so they are not edited here.
+   */
+  transportFamily: string;
+  legs: LegDraft[];
+  cargo: CargoDraft;
   incoterms: string;
   currency: string;
   exchangeRate: string;
@@ -36,18 +37,13 @@ export function emptyCostLine(): CostLineDraft {
 /** Blank initial values for the create form. */
 export function blankOrderInitial(): OrderFormInitial {
   return {
-    transportType: "",
     accountId: "",
     carrierId: "",
-    fromCountry: "",
-    toCountry: "",
     title: "",
     rollbackNumber: "",
-    deliveryFormat: "",
-    cargoItems: [],
-    packages: "",
-    weightKg: "",
-    volumeM3: "",
+    transportFamily: "",
+    legs: [],
+    cargo: emptyCargo(),
     incoterms: "",
     currency: DEFAULT_CURRENCY,
     exchangeRate: "",

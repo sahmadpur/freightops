@@ -13,10 +13,18 @@ export type ComboOption = {
 /** Cap on rendered rows so a 250-country list stays cheap; typing narrows it. */
 const MAX_VISIBLE = 100;
 
+/**
+ * Case- and accent-insensitive, so "Turk" finds "Türkiye" and "Azer" finds
+ * "Azərbaycan". Decomposing first turns "ü" into "u"+◌̈, and the mark is then
+ * dropped; letters that are not decomposable (ə, ı) still match themselves.
+ */
+const fold = (s: string) =>
+  s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+
 function matches(option: ComboOption, query: string): boolean {
   if (!query) return true;
-  const q = query.toLowerCase();
-  return option.label.toLowerCase().includes(q) || option.value.toLowerCase().includes(q);
+  const q = fold(query);
+  return fold(option.label).includes(q) || fold(option.value).includes(q);
 }
 
 const listCls =

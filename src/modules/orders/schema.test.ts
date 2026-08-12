@@ -1,19 +1,25 @@
 import { describe, expect, it } from "vitest";
 import { orderInputSchema, statusChangeSchema } from "./schema";
 
+const leg = {
+  transportType: "road",
+  subtype: "ftl",
+  originCountry: "TR",
+  originCity: "Istanbul",
+  destinationCountry: "AZ",
+  destinationCity: "Baku",
+  vehicleType: "curtainsider",
+  vehicleCount: "2",
+};
+
 const base = {
-  transportType: "truck",
   accountId: "acc-123",
   carrierId: "",
-  fromCountry: "TR",
-  toCountry: "AZ",
   title: "Steel pipes",
   rollbackNumber: "",
-  deliveryFormat: "FTL",
-  cargoItems: ["Construction materials"],
-  packages: "24",
-  weightKg: "8400",
-  volumeM3: "24",
+  transportFamily: "road",
+  legs: [leg],
+  cargo: { description: "Construction materials", packages: "24", grossWeightKg: "8400", volumeM3: "24" },
   incoterms: "CIP",
   currency: "USD",
   exchangeRate: "1.7000",
@@ -29,17 +35,19 @@ describe("orderInputSchema", () => {
     expect(orderInputSchema.safeParse({ ...base, title: " " }).success).toBe(false);
     expect(orderInputSchema.safeParse({ ...base, accountId: "" }).success).toBe(false);
   });
-  it("rejects unknown incoterms, delivery format and transport type", () => {
+  it("rejects unknown incoterms and transport types", () => {
     expect(orderInputSchema.safeParse({ ...base, incoterms: "ZZZ" }).success).toBe(false);
-    expect(orderInputSchema.safeParse({ ...base, deliveryFormat: "BULK" }).success).toBe(false);
-    expect(orderInputSchema.safeParse({ ...base, transportType: "camel" }).success).toBe(false);
+    expect(orderInputSchema.safeParse({ ...base, transportFamily: "camel" }).success).toBe(false);
+    expect(
+      orderInputSchema.safeParse({ ...base, legs: [{ ...leg, transportType: "camel" }] }).success,
+    ).toBe(false);
   });
   it("allows empty optional enums", () => {
     const r = orderInputSchema.safeParse({
       ...base,
       incoterms: "",
-      deliveryFormat: "",
-      transportType: "",
+      transportFamily: "",
+      legs: [],
     });
     expect(r.success).toBe(true);
   });
@@ -49,16 +57,24 @@ describe("orderInputSchema", () => {
 
   describe("route countries", () => {
     it("accepts known ISO alpha-2 codes and empties", () => {
-      expect(orderInputSchema.safeParse({ ...base, fromCountry: "", toCountry: "" }).success).toBe(true);
+      const r = orderInputSchema.safeParse({
+        ...base,
+        legs: [{ ...leg, originCountry: "", destinationCountry: "" }],
+      });
+      expect(r.success).toBe(true);
     });
     it("upper-cases a lowercase code", () => {
-      const r = orderInputSchema.safeParse({ ...base, fromCountry: "de" });
+      const r = orderInputSchema.safeParse({ ...base, legs: [{ ...leg, originCountry: "de" }] });
       expect(r.success).toBe(true);
-      expect(r.success && r.data.fromCountry).toBe("DE");
+      expect(r.success && r.data.legs[0].originCountry).toBe("DE");
     });
     it("rejects free text and unknown codes", () => {
-      expect(orderInputSchema.safeParse({ ...base, fromCountry: "Istanbul" }).success).toBe(false);
-      expect(orderInputSchema.safeParse({ ...base, toCountry: "ZZ" }).success).toBe(false);
+      expect(
+        orderInputSchema.safeParse({ ...base, legs: [{ ...leg, originCountry: "Istanbul" }] }).success,
+      ).toBe(false);
+      expect(
+        orderInputSchema.safeParse({ ...base, legs: [{ ...leg, destinationCountry: "ZZ" }] }).success,
+      ).toBe(false);
     });
   });
 
@@ -75,15 +91,24 @@ describe("orderInputSchema", () => {
     });
   });
 
-  describe("cargo items", () => {
-    it("defaults to an empty list", () => {
-      const { cargoItems, ...withoutCargo } = base;
-      void cargoItems;
-      const r = orderInputSchema.safeParse(withoutCargo);
-      expect(r.success && r.data.cargoItems).toEqual([]);
+  describe("shipment consistency", () => {
+    it("rejects equipment that belongs to another transport type", () => {
+      expect(
+        orderInputSchema.safeParse({ ...base, legs: [{ ...leg, wagonType: "platform" }] }).success,
+      ).toBe(false);
     });
-    it("rejects blank entries", () => {
-      expect(orderInputSchema.safeParse({ ...base, cargoItems: [""] }).success).toBe(false);
+    it("rejects several legs unless the shipment is multimodal", () => {
+      expect(orderInputSchema.safeParse({ ...base, legs: [leg, leg] }).success).toBe(false);
+      expect(
+        orderInputSchema.safeParse({ ...base, transportFamily: "multimodal", legs: [leg, leg] }).success,
+      ).toBe(true);
+    });
+    it("requires the dangerous-goods detail its flag promises", () => {
+      const r = orderInputSchema.safeParse({
+        ...base,
+        cargo: { ...base.cargo, dangerousGoods: true },
+      });
+      expect(r.success).toBe(false);
     });
   });
 

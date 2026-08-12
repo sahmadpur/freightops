@@ -7,19 +7,16 @@ import { Field, inputCls, SubmitRow } from "@/components/ui/form";
 import { Combobox, type ComboOption } from "@/components/ui/combobox";
 import { SectionRule } from "@/components/ui/record";
 import { fromLocalInput } from "@/lib/datetime";
+import { nestedErrors } from "@/lib/forms";
 import { buildRequestTitle } from "@/lib/request-title";
 import { LEAD_SOURCES, hasEmailSubject, hasSourceAgent, needsSourceNote } from "@/lib/lead-source";
-import {
-  TRANSPORT_FAMILIES,
-  isLegTransportType,
-  type LegTransportType,
-} from "@/lib/transport-matrix";
+import { TRANSPORT_FAMILIES } from "@/lib/transport-matrix";
 import { INCOTERMS } from "@/lib/incoterms";
 import { createAccount } from "@/modules/accounts/actions";
 import { createRequest, fetchContactOptions, updateRequest } from "./actions";
 import { CargoEditor } from "./cargo-editor";
 import { LegEditor } from "./leg-editor";
-import { emptyLeg, type LegDraft, type RequestFormInitial } from "./request-form-initial";
+import { seedLegsForFamily, type RequestFormInitial } from "./request-form-initial";
 import type { ActionResult } from "./schema";
 
 const gridCls = "grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-3";
@@ -100,29 +97,9 @@ export function RequestForm({
 
   const source = v.leadSource as (typeof LEAD_SOURCES)[number];
 
-  /**
-   * Choosing the transport type seeds the legs: one for a single-mode shipment,
-   * two to start with for multimodal. Switching between single modes rewrites
-   * the one leg's type rather than adding another.
-   */
   function changeFamily(next: string) {
     if (next === v.transportFamily) return;
-    let legs: LegDraft[] = v.legs;
-    if (next === "multimodal") {
-      legs = v.legs.length >= 2 ? v.legs : [...v.legs, emptyLeg()].slice(0, 2);
-      if (legs.length < 2) legs = [emptyLeg(), emptyLeg()];
-    } else if (isLegTransportType(next)) {
-      const type = next as LegTransportType;
-      const first = v.legs[0];
-      legs = [
-        first
-          ? { ...emptyLeg(type), originCountry: first.originCountry, originCity: first.originCity, destinationCountry: first.destinationCountry, destinationCity: first.destinationCity }
-          : emptyLeg(type),
-      ];
-    } else {
-      legs = [];
-    }
-    set({ transportFamily: next, legs });
+    set({ transportFamily: next, legs: seedLegsForFamily(next, v.legs) });
   }
 
   /**
@@ -176,13 +153,7 @@ export function RequestForm({
   }
 
   const fe = result && !result.ok ? (result.fieldErrors ?? {}) : {};
-  /** Nested zod paths arrive flattened as `legs.0.subtype`; the editors slice them apart. */
-  const nested = (prefix: string): Record<string, string[]> =>
-    Object.fromEntries(
-      Object.entries(fe)
-        .filter(([k]) => k.startsWith(`${prefix}.`))
-        .map(([k, val]) => [k.slice(prefix.length + 1), val]),
-    );
+  const nested = (prefix: string) => nestedErrors(fe, prefix);
 
   const opt = (values: readonly string[], label: (v: string) => string): ComboOption[] =>
     values.map((value) => ({ value, label: label(value) }));

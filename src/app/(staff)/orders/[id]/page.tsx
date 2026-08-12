@@ -9,6 +9,13 @@ import { StatusControl } from "@/modules/orders/status-control";
 import { ArchiveButton } from "@/components/ui/archive-button";
 import { archiveOrder, restoreOrder } from "@/modules/orders/actions";
 import { getOrder } from "@/modules/orders/queries";
+import { readCargo, readLegs } from "@/modules/requests/shipment";
+import { CommunicationTab } from "@/modules/communications/communication-tab";
+import { TasksTab } from "@/modules/tasks/tasks-tab";
+import { listTasks, taskAssigneeOptions } from "@/modules/tasks/queries";
+import { listRequestMessages } from "@/modules/communications/queries";
+import { ShipmentView } from "@/modules/requests/shipment-view";
+import { db } from "@/db";
 import { orderFinance } from "@/modules/finance/queries";
 import { FinanceTab } from "@/modules/finance/finance-tab";
 import { listOrderDocuments } from "@/modules/documents/queries";
@@ -40,13 +47,32 @@ export default async function OrderDetailPage({
   if (!data) notFound();
   // Independent of each other — fetch in parallel.
   const currentYear = new Date().getFullYear();
-  const [finance, orderDocuments, orderComments, nextInvoiceSeq, nextActSeq] =
+  const [
+    finance,
+    orderDocuments,
+    orderComments,
+    nextInvoiceSeq,
+    nextActSeq,
+    legs,
+    cargo,
+    requestMessages,
+    orderTasks,
+    assigneeOpts,
+  ] =
     await Promise.all([
       orderFinance(id),
       listOrderDocuments(id),
       listOrderComments(id),
       peekNextDocSeq("invoice", currentYear),
       peekNextDocSeq("act", currentYear),
+      // Present on any order converted from a request (§14), and on any order
+      // whose transport was edited here. Orders typed in before that show the
+      // denormalized route/cargo columns instead.
+      readLegs(db, "order", id),
+      readCargo(db, "order", id),
+      data.sourceRequestId ? listRequestMessages(data.sourceRequestId) : Promise.resolve([]),
+      listTasks("order", id),
+      taskAssigneeOptions(),
     ]);
   const { order, accountTitle, carrierTitle, history, sourceRequestId, sourceRequestNumber, sourceQuotationVersion } = data;
   const route = routeLabel(order.fromCountry, order.toCountry, locale);
@@ -65,27 +91,35 @@ export default async function OrderDetailPage({
           <DefRow label={t("fields.client")} value={accountTitle} />
           <DefRow label={t("fields.rollbackNumber")} value={order.rollbackNumber} />
           <DefRow label={t("fields.carrier")} value={carrierTitle} />
-          <DefRow label={t("fields.route")} value={route} />
-          <DefRow
-            label={t("fields.transportType")}
-            value={order.transportType ? t(`transportTypes.${order.transportType}`) : null}
-          />
+          {legs.length === 0 && (
+            <>
+              <DefRow label={t("fields.route")} value={route} />
+              <DefRow
+                label={t("fields.transportType")}
+                value={order.transportType ? t(`transportTypes.${order.transportType}`) : null}
+              />
+            </>
+          )}
           <DefRow label={t("fields.incoterms")} value={order.incoterms} />
         </dl>
       </section>
-      <section>
-        <SectionRule>{t("orders.sectionCargo")}</SectionRule>
-        <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
-          <DefRow
-            label={t("fields.cargoDescription")}
-            value={order.cargoItems.length ? order.cargoItems.join(", ") : null}
-            className="sm:col-span-3"
-          />
-          <DefRow label={t("fields.packages")} value={order.packages != null ? String(order.packages) : null} />
-          <DefRow label={t("fields.weightKg")} value={order.weightKg} />
-          <DefRow label={t("fields.volumeM3")} value={order.volumeM3} />
-        </dl>
-      </section>
+      {legs.length > 0 ? (
+        <ShipmentView legs={legs} cargo={cargo} />
+      ) : (
+        <section>
+          <SectionRule>{t("orders.sectionCargo")}</SectionRule>
+          <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
+            <DefRow
+              label={t("fields.cargoDescription")}
+              value={order.cargoItems.length ? order.cargoItems.join(", ") : null}
+              className="sm:col-span-3"
+            />
+            <DefRow label={t("fields.packages")} value={order.packages != null ? String(order.packages) : null} />
+            <DefRow label={t("fields.weightKg")} value={order.weightKg} />
+            <DefRow label={t("fields.volumeM3")} value={order.volumeM3} />
+          </dl>
+        </section>
+      )}
       <section>
         <SectionRule>{t("orders.sectionBilling")}</SectionRule>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
@@ -219,6 +253,17 @@ export default async function OrderDetailPage({
                   nextSeqs={{ invoice: nextInvoiceSeq, act: nextActSeq }}
                 />
               </div>
+            }
+            emails={
+              // §14: the communication links come with the order. The thread
+              // belongs to the enquiry, so the order shows the request's own
+              // tab rather than a second copy of the same messages.
+              sourceRequestId ? (
+                <CommunicationTab requestId={sourceRequestId} messages={requestMessages} />
+              ) : undefined
+            }
+            tasks={
+              <TasksTab parentType="order" parentId={id} tasks={orderTasks} assigneeOpts={assigneeOpts} />
             }
             comments={
               <CommentsTab

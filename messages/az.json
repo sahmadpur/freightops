@@ -16,7 +16,7 @@
   "nav": {
     "orders": "Sifarişlər",
     "dashboard": "İdarə paneli",
-    "accounts": "Müştərilər",
+    "accounts": "Şirkətlər",
     "carriers": "Daşıyıcılar",
     "finance": "Maliyyə",
     "documents": "Sənədlər",
@@ -190,7 +190,7 @@
     "fromCountry": "Haradan",
     "toCountry": "Haraya",
     "lastModified": "Dəyişdirilib",
-    "selectAccount": "Müştəri seçin…",
+    "selectAccount": "Şirkət seçin…",
     "selectCarrier": "Daşıyıcı seçin…",
     "actNumber": "Akt nömrəsi",
     "actDate": "Akt tarixi",
@@ -306,11 +306,11 @@
     "other": "Digər"
   },
   "accounts": {
-    "newAccount": "Yeni müştəri",
-    "editAccount": "Müştərini redaktə et",
-    "notFound": "Müştəri tapılmadı",
-    "searchPlaceholder": "Müştəri axtar...",
-    "empty": "Hələ müştəri yoxdur — birincisini yaradın."
+    "newAccount": "Yeni şirkət",
+    "editAccount": "Şirkəti redaktə et",
+    "notFound": "Şirkət tapılmadı",
+    "searchPlaceholder": "Şirkət axtar...",
+    "empty": "Hələ şirkət yoxdur — birincisini yaradın."
   },
   "carriers": {
     "newCarrier": "Yeni daşıyıcı",
@@ -355,7 +355,6 @@
     "sectionTerms": "Daşınma şərtləri",
     "tabOverview": "İcmal",
     "tabQuotation": "Təklif",
-    "tabEmails": "Məktublar",
     "tabDocuments": "Sənədlər",
     "tabHistory": "Tarixçə",
     "updateStatus": "Statusu dəyiş",
@@ -380,7 +379,8 @@
     "newClient": "Yeni müştəri",
     "newClientName": "Şirkət adı",
     "reeferSuggest": "Refrijerator avadanlığı seçilib — yük temperatur rejimlidirmi?",
-    "reeferSuggestApply": "Temperatur rejimini aktivləşdir"
+    "reeferSuggestApply": "Temperatur rejimini aktivləşdir",
+    "tabTasks": "Tapşırıqlar"
   },
   "search": {
     "title": "Axtarış",
@@ -633,8 +633,8 @@
     "email": "E-poçt",
     "name": "Ad",
     "role": "Rol",
-    "account": "Müştəri",
-    "selectAccount": "Müştəri seçin…",
+    "account": "Şirkət",
+    "selectAccount": "Şirkət seçin…",
     "status": "Status",
     "active": "Aktiv",
     "inactive": "Qeyri-aktiv",
@@ -732,23 +732,6 @@
     "bank_fee": "Bank komissiyası",
     "other": "Digər"
   },
-  "cargoTypes": {
-    "generalCargo": "Ümumi yük",
-    "machinery": "Maşın və avadanlıq",
-    "spareParts": "Ehtiyat hissələri",
-    "constructionMaterials": "Tikinti materialları",
-    "chemicals": "Kimyəvi mallar",
-    "foodstuffs": "Ərzaq məhsulları",
-    "textiles": "Tekstil və geyim",
-    "electronics": "Elektronika",
-    "furniture": "Mebel",
-    "pharmaceuticals": "Farmasevtika",
-    "automotive": "Avtomobil malları",
-    "packagingMaterials": "Qablaşdırma materialları",
-    "frozenGoods": "Dondurulmuş / soyudulmuş mallar",
-    "dangerousGoods": "Təhlükəli yüklər (ADR)",
-    "personalEffects": "Şəxsi əşyalar"
-  },
   "auditAction": {
     "created": "sifarişi yaratdı",
     "updated": "dəyişdirdi",
@@ -773,16 +756,45 @@
     "order_created": "bu sorğu üzrə sifariş yaratdı",
     "message_logged": "kommunikasiya qeyd etdi",
     "email_linked": "məktubu bağladı",
-    "email_unlinked": "məktubu ayırdı"
+    "email_unlinked": "məktubu ayırdı",
+    "task_created": "tapşırıq əlavə etdi",
+    "task_updated": "tapşırığı dəyişdi",
+    "task_completed": "tapşırığı tamamladı",
+    "task_reopened": "tapşırığı yenidən açdı",
+    "task_removed": "tapşırığı sildi"
   },
   "entityType": {
     "order": "Sifariş",
-    "account": "Müştəri",
+    "account": "Şirkət",
     "carrier": "Daşıyıcı",
     "customs_clearance": "Gömrük rəsmiləşdirilməsi",
     "user": "İstifadəçi",
     "transport_mode": "Nəqliyyat (ləğv edilib)",
     "request": "Sorğu",
     "quotation": "Təklif"
+  },
+  "tasks": {
+    "tab": "Tapşırıqlar",
+    "empty": "Hələ tapşırıq yoxdur.",
+    "newTask": "Yeni tapşırıq",
+    "titlePlaceholder": "Nə edilməlidir?",
+    "addTask": "Tapşırıq əlavə et",
+    "type": "Növ",
+    "dueDate": "Son tarix",
+    "assignee": "Məsul",
+    "unassigned": "Təyin edilməyib",
+    "notes": "Qeydlər",
+    "due": "son tarix",
+    "markDone": "Tamamlandı kimi işarələ"
+  },
+  "taskType": {
+    "call": "Zəng",
+    "email": "E-poçt",
+    "meeting": "Görüş",
+    "document": "Sənəd",
+    "quotation": "Təklif",
+    "booking": "Bronlaşdırma",
+    "follow_up": "İzləmə",
+    "other": "Digər"
   }
 }

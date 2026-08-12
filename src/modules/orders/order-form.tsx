@@ -1,26 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Field, inputCls } from "@/components/ui/form";
-import { Combobox, MultiCombobox, type ComboOption } from "@/components/ui/combobox";
+import { Combobox, type ComboOption } from "@/components/ui/combobox";
 import { FilePicker } from "@/components/ui/file-picker";
 import { SectionRule } from "@/components/ui/record";
 import { createOrder, updateOrder } from "./actions";
 import { uploadDocument } from "@/modules/documents/actions";
 import { fetchAznRate } from "@/modules/fx/actions";
-import { TRANSPORT_TYPES } from "@/lib/transport-types";
-import { countryOptions } from "@/lib/countries";
+import { TRANSPORT_FAMILIES } from "@/lib/transport-matrix";
 import { ORDER_CURRENCIES } from "@/lib/fx";
-import { CARGO_TYPES } from "@/lib/cargo-types";
 import { FINANCE_CATEGORIES } from "@/lib/finance-categories";
 import { convertToAzn, formatMoneyAzn, toCents } from "@/lib/money";
 import { INCOTERMS } from "@/lib/incoterms";
+import { CargoEditor } from "@/modules/requests/cargo-editor";
+import { LegEditor } from "@/modules/requests/leg-editor";
+import { seedLegsForFamily } from "@/modules/requests/request-form-initial";
 import { emptyCostLine, type OrderFormInitial } from "./order-form-initial";
-import type { ActionResult } from "@/lib/forms";
-
-const DELIVERY_FORMATS = ["FCL", "LCL", "FTL", "LTL"] as const;
+import { nestedErrors, type ActionResult } from "@/lib/forms";
 
 type Option = { id: string; title?: string };
 
@@ -36,7 +35,6 @@ export function OrderForm({
   carrierOpts: Option[];
 }) {
   const t = useTranslations();
-  const locale = useLocale();
   const router = useRouter();
   const [v, setV] = useState(initial);
   const [files, setFiles] = useState<File[]>([]);
@@ -45,13 +43,14 @@ export function OrderForm({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const set = (patch: Partial<OrderFormInitial>) => setV((s) => ({ ...s, ...patch }));
 
-  const countries = useMemo(() => countryOptions(locale), [locale]);
   const toOpts = (rows: Option[]): ComboOption[] =>
     rows.map((r) => ({ value: r.id, label: r.title ?? r.id }));
-  const cargoOpts: ComboOption[] = CARGO_TYPES.map((key) => ({
-    value: t(`cargoTypes.${key}`),
-    label: t(`cargoTypes.${key}`),
-  }));
+
+  /** Same seeding rule as the request form — one leg per mode, two for multimodal. */
+  function changeFamily(next: string) {
+    if (next === v.transportFamily) return;
+    set({ transportFamily: next, legs: seedLegsForFamily(next, v.legs) });
+  }
 
   // The manat rate is seeded server-side for the initial currency and refreshed
   // from the CBAR bulletin whenever the currency changes. Always overwritable —
@@ -87,18 +86,13 @@ export function OrderForm({
     setPending(true);
     setUploadError(null);
     const payload = {
-      transportType: v.transportType,
       accountId: v.accountId,
       carrierId: v.carrierId,
-      fromCountry: v.fromCountry,
-      toCountry: v.toCountry,
       title: v.title,
       rollbackNumber: v.rollbackNumber,
-      deliveryFormat: v.deliveryFormat,
-      cargoItems: v.cargoItems,
-      packages: v.packages,
-      weightKg: v.weightKg,
-      volumeM3: v.volumeM3,
+      transportFamily: v.transportFamily,
+      legs: v.legs,
+      cargo: v.cargo,
       incoterms: v.incoterms,
       currency: v.currency,
       exchangeRate: v.exchangeRate,
@@ -133,22 +127,13 @@ export function OrderForm({
   }
 
   const fe = result && !result.ok ? (result.fieldErrors ?? {}) : {};
+  const nested = (prefix: string) => nestedErrors(fe, prefix);
 
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-[1400px] pb-24">
       <section className="mb-8">
         <SectionRule>{t("orders.sectionConsignment")}</SectionRule>
         <div className={gridCls}>
-          <Field label={t("fields.transportType")} htmlFor="transportType" error={fe.transportType}>
-            <Combobox
-              id="transportType"
-              value={v.transportType}
-              onChange={(value) => set({ transportType: value })}
-              options={TRANSPORT_TYPES.map((m) => ({ value: m, label: t(`transportTypes.${m}`) }))}
-              placeholder={t("fields.selectTransportType")}
-              emptyLabel={t("common.noResults")}
-            />
-          </Field>
           <Field label={t("fields.client")} htmlFor="accountId" error={fe.accountId}>
             <Combobox
               id="accountId"
@@ -169,26 +154,6 @@ export function OrderForm({
               emptyLabel={t("common.noResults")}
             />
           </Field>
-          <Field label={t("fields.fromCountry")} htmlFor="fromCountry" error={fe.fromCountry}>
-            <Combobox
-              id="fromCountry"
-              value={v.fromCountry}
-              onChange={(value) => set({ fromCountry: value })}
-              options={countries}
-              placeholder={t("fields.selectCountry")}
-              emptyLabel={t("common.noResults")}
-            />
-          </Field>
-          <Field label={t("fields.toCountry")} htmlFor="toCountry" error={fe.toCountry}>
-            <Combobox
-              id="toCountry"
-              value={v.toCountry}
-              onChange={(value) => set({ toCountry: value })}
-              options={countries}
-              placeholder={t("fields.selectCountry")}
-              emptyLabel={t("common.noResults")}
-            />
-          </Field>
           <Field label={t("fields.orderTitle")} htmlFor="title" error={fe.title}>
             <input id="title" required className={inputCls} value={v.title} onChange={(e) => set({ title: e.target.value })} />
           </Field>
@@ -199,34 +164,39 @@ export function OrderForm({
       </section>
 
       <section className="mb-8">
-        <SectionRule>{t("orders.sectionCargo")}</SectionRule>
+        <SectionRule>{t("requests.sectionRoute")}</SectionRule>
         <div className={gridCls}>
-          <Field label={t("fields.cargoDescription")} htmlFor="cargoItems" error={fe.cargoItems} className="sm:col-span-2 lg:col-span-3">
-            <MultiCombobox
-              id="cargoItems"
-              values={v.cargoItems}
-              onChange={(values) => set({ cargoItems: values })}
-              options={cargoOpts}
-              creatable
-              placeholder={t("fields.selectCargo")}
+          <Field label={t("fields.transportType")} htmlFor="transportFamily" error={fe.transportFamily}>
+            <Combobox
+              id="transportFamily"
+              value={v.transportFamily}
+              onChange={changeFamily}
+              options={TRANSPORT_FAMILIES.map((f) => ({ value: f, label: t(`transportFamily.${f}`) }))}
+              placeholder={t("fields.selectTransportType")}
               emptyLabel={t("common.noResults")}
             />
           </Field>
-          <Field label={t("fields.deliveryFormat")} htmlFor="deliveryFormat" error={fe.deliveryFormat}>
-            <select id="deliveryFormat" className={inputCls} value={v.deliveryFormat} onChange={(e) => set({ deliveryFormat: e.target.value })}>
-              <option value="">—</option>
-              {DELIVERY_FORMATS.map((d) => (<option key={d} value={d}>{d}</option>))}
-            </select>
-          </Field>
-          <Field label={t("fields.packages")} htmlFor="packages" error={fe.packages}>
-            <input id="packages" className={inputCls} value={v.packages} onChange={(e) => set({ packages: e.target.value })} />
-          </Field>
-          <Field label={t("fields.weightKg")} htmlFor="weightKg" error={fe.weightKg}>
-            <input id="weightKg" className={inputCls} value={v.weightKg} onChange={(e) => set({ weightKg: e.target.value })} />
-          </Field>
-          <Field label={t("fields.volumeM3")} htmlFor="volumeM3" error={fe.volumeM3}>
-            <input id="volumeM3" className={inputCls} value={v.volumeM3} onChange={(e) => set({ volumeM3: e.target.value })} />
-          </Field>
+        </div>
+        <LegEditor
+          family={v.transportFamily}
+          legs={v.legs}
+          cargo={v.cargo}
+          onChange={(legs) => set({ legs })}
+          errors={{ ...nested("legs"), ...(fe.legs ? { legs: fe.legs } : {}) }}
+        />
+      </section>
+
+      <section className="mb-8">
+        <SectionRule>{t("orders.sectionCargo")}</SectionRule>
+        <CargoEditor
+          cargo={v.cargo}
+          onChange={(cargo) => set({ cargo })}
+          errors={nested("cargo")}
+          suggestTempControl={v.legs.some(
+            (l) => l.vehicleType === "reefer" || l.containerType === "20rf" || l.containerType === "40rf",
+          )}
+        />
+        <div className={`${gridCls} mt-4`}>
           <Field label={t("fields.incoterms")} htmlFor="incoterms" error={fe.incoterms}>
             <select id="incoterms" className={inputCls} value={v.incoterms} onChange={(e) => set({ incoterms: e.target.value })}>
               <option value="">—</option>
