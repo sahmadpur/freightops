@@ -91,6 +91,22 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       NODE_ENV: production
+      # Issuer requisites printed on invoices/ACTs. Unset (demo/evaluation
+      # instances) falls back to neutral placeholders — see src/modules/docgen/issuer.ts.
+      ISSUER_NAME: ${ISSUER_NAME:-}
+      ISSUER_ADDRESS: ${ISSUER_ADDRESS:-}
+      ISSUER_TAX_ID: ${ISSUER_TAX_ID:-}
+      ISSUER_BANK_NAME: ${ISSUER_BANK_NAME:-}
+      ISSUER_BANK_ACCOUNT: ${ISSUER_BANK_ACCOUNT:-}
+      ISSUER_BANK_CODE: ${ISSUER_BANK_CODE:-}
+      ISSUER_BANK_TAX_ID: ${ISSUER_BANK_TAX_ID:-}
+      ISSUER_CORRESPONDENT_ACCOUNT: ${ISSUER_CORRESPONDENT_ACCOUNT:-}
+      ISSUER_SWIFT: ${ISSUER_SWIFT:-}
+      ISSUER_PHONE: ${ISSUER_PHONE:-}
+      ISSUER_EMAIL: ${ISSUER_EMAIL:-}
+      ISSUER_SIGNATORY_NAME: ${ISSUER_SIGNATORY_NAME:-}
+      ISSUER_SIGNATORY_TITLE: ${ISSUER_SIGNATORY_TITLE:-}
+      ISSUER_LOGO_DATA_URI: ${ISSUER_LOGO_DATA_URI:-}
       # Next.js standalone server binds to $HOSTNAME, which Docker otherwise sets
       # to the container id (binds one interface). Force all-interfaces so Traefik
       # can reach it on the proxy network.
