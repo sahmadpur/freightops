@@ -91,6 +91,35 @@ docker compose -f docker-compose.prod.yml up -d --build
 The instances share nothing — deploying/stopping one never touches the other.
 Traefik picks the new router up from container labels automatically.
 
+## Evaluation instance for a third party
+
+An evaluation instance must not expose another customer's data. Deploy it as a
+parallel instance (above) and check all four:
+
+1. **Fresh stack** — a unique `STACK` gives it its own Postgres and MinIO
+   volumes. Never point a test instance at an existing `DATABASE_URL` or reuse
+   the production `S3_*` credentials.
+2. **No issuer requisites** — leave every `ISSUER_*` (and
+   `ISSUER_LOGO_DATA_URI`) unset in the instance's `.env`. Generated invoices
+   and ACTs then print neutral placeholders instead of the production
+   customer's company, VÖEN, bank account and signatory.
+3. **Own secrets** — fresh `POSTGRES_PASSWORD`, `BETTER_AUTH_SECRET`,
+   `S3_SECRET_KEY`, and seed admin credentials.
+4. **Mail stays internal** — leave `SMTP_*` on the built-in Mailpit sink so
+   invitations from the test instance are captured, not delivered.
+
+Fill it with demo content (fictional accounts, carriers, orders) instead of
+real records:
+
+```bash
+docker run --rm --network <stack>_default --env-file /home/<checkout>/.env \
+  -v /home/<checkout>:/app -w /app node:24-alpine \
+  sh -c "npm ci --no-audit --no-fund && npx tsx scripts/seed-demo.mts"
+```
+
+The production instance keeps its real requisites in its own `.env` only — see
+`deploy/issuer.prod.env` (git-ignored, copy it to the production server once).
+
 ## Email
 
 The notification worker sends to the internal **Mailpit** sink by default —

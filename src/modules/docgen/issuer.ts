@@ -1,24 +1,27 @@
 /**
  * The freight forwarder's own requisites, printed on generated invoices and
- * ACTs. Transcribed from the client's real branded invoice template
- * (RDL-AZL HF.xlsx). Promote to a settings table if these ever need to be
- * editable in the UI (multi-currency / editable requisites are out of scope
- * for v1 — see docs/2026-07-02-invoice-act-generation.md).
+ * ACTs. Read from the environment so each deployment prints its own company
+ * (a demo/test instance leaves them unset and gets the neutral placeholders
+ * below — no other tenant's requisites are baked into the image).
+ *
+ * Set ISSUER_* in .env; see .env.prod.example.
  */
+const env = (key: string, fallback: string) => process.env[key]?.trim() || fallback;
+
 export const ISSUER = {
-  name: "«Redline Supply» MMC",
-  address: "Bakı şəh., F.Bayramov küçəsi, ev 5, mən. 27",
-  taxId: "2007795241",
-  bankName: "Kapital Bank ASC, Port Baku filialı",
-  bankAccount: "AZ82AIIB400600E9445910682107",
-  bankCode: "201973",
-  bankTaxId: "9900003611",
-  correspondentAccount: "AZ37NABZ01350100000000001944",
-  swift: "AIIBAZ2XXXX",
-  phone: "+994 12 000 00 00",
-  email: "info@redline.az",
-  signatoryName: "Mehdi Orucov",
-  signatoryTitle: "Direktor",
-} as const;
+  name: env("ISSUER_NAME", "Demo Logistics LLC"),
+  address: env("ISSUER_ADDRESS", "1 Demo Street, Baku, AZ"),
+  taxId: env("ISSUER_TAX_ID", "0000000000"),
+  bankName: env("ISSUER_BANK_NAME", "Demo Bank"),
+  bankAccount: env("ISSUER_BANK_ACCOUNT", "AZ00DEMO00000000000000000000"),
+  bankCode: env("ISSUER_BANK_CODE", "000000"),
+  bankTaxId: env("ISSUER_BANK_TAX_ID", "0000000000"),
+  correspondentAccount: env("ISSUER_CORRESPONDENT_ACCOUNT", "AZ00DEMO00000000000000000001"),
+  swift: env("ISSUER_SWIFT", "DEMOAZ22XXX"),
+  phone: env("ISSUER_PHONE", "+994 12 000 00 00"),
+  email: env("ISSUER_EMAIL", "info@demo.local"),
+  signatoryName: env("ISSUER_SIGNATORY_NAME", "Demo Director"),
+  signatoryTitle: env("ISSUER_SIGNATORY_TITLE", "Direktor"),
+};
 
 export type Issuer = typeof ISSUER;
