@@ -1,3 +1,4 @@
+import { ISSUER } from "../issuer";
 import { LOGO_DATA_URI } from "./logo";
 import type { DocLanguage } from "./types";
 
@@ -74,6 +75,7 @@ export function docShell(title: string, bodyHtml: string, lang: DocLanguage): st
   table.lines td.no, table.lines th.no { width: 8mm; text-align: center; }
   .totals { text-align: right; margin-bottom: 2mm; }
   .totals .grand { font-weight: bold; font-size: 11.5pt; }
+  .doc-wordmark { font-size: 16pt; font-weight: bold; letter-spacing: 0.4mm; }
   .vat-note { text-align: right; color: #444; margin-bottom: 8mm; }
   .terms { margin-bottom: 10mm; }
   .signatures { width: 100%; border-collapse: collapse; margin-top: 12mm; page-break-inside: avoid; }
@@ -84,7 +86,7 @@ export function docShell(title: string, bodyHtml: string, lang: DocLanguage): st
 </style>
 </head>
 <body>
-<div class="doc-header"><img class="doc-logo" src="${LOGO_DATA_URI}" alt="RedLine Sourcing Logistics"></div>
+<div class="doc-header">${LOGO_DATA_URI ? `<img class="doc-logo" src="${LOGO_DATA_URI}" alt="${esc(ISSUER.name)}">` : `<span class="doc-wordmark">${esc(ISSUER.name)}</span>`}</div>
 ${bodyHtml}
 </body>
 </html>`;
