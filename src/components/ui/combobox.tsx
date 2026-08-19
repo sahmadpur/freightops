@@ -81,6 +81,8 @@ export function Combobox({
   options,
   placeholder = "",
   emptyLabel = "—",
+  /** Allow committing whatever was typed, for open-ended lists like cities. */
+  creatable = false,
   disabled = false,
   clearable = true,
 }: {
@@ -91,16 +93,28 @@ export function Combobox({
   placeholder?: string;
   /** Text shown in the empty-results row. */
   emptyLabel?: string;
+  creatable?: boolean;
   disabled?: boolean;
   clearable?: boolean;
 }) {
   const { open, setOpen, query, setQuery, active, setActive, filtered, rootRef } =
     useCombo(options);
   const listId = useId();
-  const selected = options.find((o) => o.value === value) ?? null;
+  // In creatable mode a stored free-text value still displays as itself.
+  const selected =
+    options.find((o) => o.value === value) ??
+    (creatable && value ? { value, label: value } : null);
 
   const pick = (option: ComboOption) => {
     onChange(option.value);
+    setQuery("");
+    setOpen(false);
+  };
+
+  const commitTyped = () => {
+    const raw = query.trim();
+    if (!raw) return;
+    onChange(raw);
     setQuery("");
     setOpen(false);
   };
@@ -117,6 +131,9 @@ export function Combobox({
       if (open && filtered[active]) {
         e.preventDefault();
         pick(filtered[active]);
+      } else if (creatable && query.trim()) {
+        e.preventDefault();
+        commitTyped();
       }
     } else if (e.key === "Escape") {
       setOpen(false);
@@ -144,6 +161,7 @@ export function Combobox({
           setOpen(true);
         }}
         onKeyDown={onKeyDown}
+        onBlur={() => creatable && commitTyped()}
       />
       {clearable && selected && !open && (
         <button
@@ -158,7 +176,9 @@ export function Combobox({
       {open && (
         <ul id={listId} role="listbox" className={listCls}>
           {filtered.length === 0 ? (
-            <li className="px-3 py-1.5 text-[13px] text-ink-soft">{emptyLabel}</li>
+            <li className="px-3 py-1.5 text-[13px] text-ink-soft">
+              {creatable && query.trim() ? query.trim() : emptyLabel}
+            </li>
           ) : (
             filtered.map((o, i) => (
               <li

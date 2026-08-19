@@ -94,6 +94,8 @@
   --status-created: 82 82 82;
   --status-operations: 68 54 184;
   --status-booked: 15 95 128;
+  --status-en_route: 15 95 128;
+  --status-ferry_wait: 154 68 25;
   --status-in_transit: 168 124 0;
   /* Retired stages — kept because the history tab still renders them as old values. */
   --status-waiting_pickup: 77 85 102;
@@ -210,6 +212,8 @@
   --status-created: 176 176 176;
   --status-operations: 169 156 240;
   --status-booked: 125 196 227;
+  --status-en_route: 125 196 227;
+  --status-ferry_wait: 240 163 122;
   --status-in_transit: 251 237 29;
   --status-waiting_pickup: 176 184 198;
   --status-received: 169 156 240;

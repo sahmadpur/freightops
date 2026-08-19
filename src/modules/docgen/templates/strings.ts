@@ -22,7 +22,6 @@ export type CommonStrings = {
   correspondentAccount: string;
   correspondentSwift: string;
   orderRef: string;
-  rollbackRef: string;
   route: string;
   cargo: string;
   packages: string;
@@ -88,7 +87,6 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     correspondentAccount: "Correspondent account",
     correspondentSwift: "Correspondent SWIFT",
     orderRef: "Order",
-    rollbackRef: "Rollback number",
     route: "Route",
     cargo: "Cargo",
     packages: "Packages",
@@ -122,7 +120,6 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     correspondentAccount: "Корр. счёт",
     correspondentSwift: "SWIFT корреспондента",
     orderRef: "Заказ",
-    rollbackRef: "Номер отката",
     route: "Маршрут",
     cargo: "Груз",
     packages: "Мест",
@@ -156,7 +153,6 @@ export const COMMON_STRINGS: Record<DocLanguage, CommonStrings> = {
     correspondentAccount: "Müxbir h",
     correspondentSwift: "Müxbir SWIFT",
     orderRef: "Sifariş",
-    rollbackRef: "Rollback nömrəsi",
     route: "Marşrut",
     cargo: "Yük",
     packages: "Yer sayı",

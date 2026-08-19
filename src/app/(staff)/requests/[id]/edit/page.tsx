@@ -13,7 +13,7 @@ const s = (v: string | null | undefined) => v ?? "";
 export default async function EditRequestPage({ params }: { params: Promise<{ id: string }> }) {
   await requireArea("staff");
   const { id } = await params;
-  const [t, data, { accountOpts, agentOpts, staffOpts }] = await Promise.all([
+  const [t, data, { accountOpts, agentOpts, staffOpts, cargoTypeOpts }] = await Promise.all([
     getTranslations("requests"),
     getRequest(id),
     requestFormData(),
@@ -55,6 +55,7 @@ export default async function EditRequestPage({ params }: { params: Promise<{ id
         agentOpts={agentOpts}
         staffOpts={staffOpts}
         contactOpts={contactOpts}
+        cargoTypeOpts={cargoTypeOpts}
       />
     </div>
   );

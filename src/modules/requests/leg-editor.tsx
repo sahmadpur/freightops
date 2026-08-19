@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Field, inputCls } from "@/components/ui/form";
 import { Combobox, type ComboOption } from "@/components/ui/combobox";
+import { citiesFor } from "@/lib/cities";
 import { countryOptions } from "@/lib/countries";
 import {
   chargeableWeight,
@@ -131,13 +132,19 @@ function LegBody({
         <Field label={t("originCountry")} error={errors.originCountry}>
           <Combobox
             value={leg.originCountry}
-            onChange={(v) => set({ originCountry: v })}
+            // A city belongs to its country, so changing the country resets it.
+            onChange={(v) => set({ originCountry: v, originCity: "" })}
             options={countries}
             placeholder={t("selectCountry")}
           />
         </Field>
         <Field label={t("originCity")} error={errors.originCity}>
-          <input className={inputCls} value={leg.originCity} onChange={(e) => set({ originCity: e.target.value })} />
+          <Combobox
+            value={leg.originCity}
+            onChange={(v) => set({ originCity: v })}
+            options={citiesFor(leg.originCountry).map((c) => ({ value: c, label: c }))}
+            creatable
+          />
         </Field>
         {fields.pointKind && (
           <Field label={t(POINT_LABELS[fields.pointKind].origin)} error={errors.originPoint}>
@@ -150,16 +157,17 @@ function LegBody({
         <Field label={t("destinationCountry")} error={errors.destinationCountry}>
           <Combobox
             value={leg.destinationCountry}
-            onChange={(v) => set({ destinationCountry: v })}
+            onChange={(v) => set({ destinationCountry: v, destinationCity: "" })}
             options={countries}
             placeholder={t("selectCountry")}
           />
         </Field>
         <Field label={t("destinationCity")} error={errors.destinationCity}>
-          <input
-            className={inputCls}
+          <Combobox
             value={leg.destinationCity}
-            onChange={(e) => set({ destinationCity: e.target.value })}
+            onChange={(v) => set({ destinationCity: v })}
+            options={citiesFor(leg.destinationCountry).map((c) => ({ value: c, label: c }))}
+            creatable
           />
         </Field>
         {fields.pointKind && (

@@ -8,12 +8,14 @@ import {
 import { REQUEST_STATUSES } from "./request-status";
 
 describe("ORDER_STATUSES", () => {
-  it("is the six-stage lifecycle of §15", () => {
+  it("is the eight-stage lifecycle of the corrections round", () => {
     expect([...ORDER_STATUSES]).toEqual([
       "created",
-      "operations",
-      "booked",
+      "waiting_pickup",
+      "en_route",
       "in_transit",
+      "ferry_wait",
+      "at_customs",
       "delivered",
       "closed",
     ]);
@@ -31,11 +33,12 @@ describe("ORDER_STATUSES", () => {
 });
 
 describe("ORDER_STATUS_RANK", () => {
-  it("orders the lifecycle from created (0) to closed (5)", () => {
+  it("orders the lifecycle from created (0) to closed (7)", () => {
     expect(ORDER_STATUS_RANK.created).toBe(0);
-    expect(ORDER_STATUS_RANK.closed).toBe(5);
-    expect(ORDER_STATUS_RANK.operations).toBeGreaterThan(ORDER_STATUS_RANK.created);
-    expect(ORDER_STATUS_RANK.in_transit).toBeGreaterThan(ORDER_STATUS_RANK.booked);
+    expect(ORDER_STATUS_RANK.closed).toBe(7);
+    expect(ORDER_STATUS_RANK.waiting_pickup).toBeGreaterThan(ORDER_STATUS_RANK.created);
+    expect(ORDER_STATUS_RANK.in_transit).toBeGreaterThan(ORDER_STATUS_RANK.en_route);
+    expect(ORDER_STATUS_RANK.at_customs).toBeGreaterThan(ORDER_STATUS_RANK.ferry_wait);
     expect(ORDER_STATUS_RANK.delivered).toBeGreaterThan(ORDER_STATUS_RANK.in_transit);
   });
 });
@@ -45,7 +48,7 @@ describe("leastAdvancedStatus", () => {
     expect(leastAdvancedStatus([])).toBeNull();
   });
   it("returns the least-advanced status", () => {
-    expect(leastAdvancedStatus(["in_transit", "booked", "delivered"])).toBe("booked");
+    expect(leastAdvancedStatus(["in_transit", "waiting_pickup", "delivered"])).toBe("waiting_pickup");
     expect(leastAdvancedStatus(["delivered", "closed"])).toBe("delivered");
     expect(leastAdvancedStatus(["created"])).toBe("created");
   });

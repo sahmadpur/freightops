@@ -136,7 +136,10 @@ export function DataTable<T>({
                 style={{ width: widthFor(c) }}
                 className={`group relative border-b border-edge-chip px-3 py-3 text-[10px] font-semibold uppercase leading-[1.35] tracking-[0.05em] text-ink-faint ${ALIGN[c.align ?? "left"]}`}
               >
-                {c.header}
+                {/* Block + hidden overflow: long headers wrap inside the fixed
+                    cell instead of painting under the neighbour or the resize
+                    handle (pr keeps clear of the 4px handle). */}
+                <span className="block overflow-hidden break-words pr-1.5">{c.header}</span>
                 {resizable && (
                   <span
                     onMouseDown={(e) => startDrag(e, c.key)}
@@ -188,7 +191,7 @@ export function DataTable<T>({
                   <td
                     key={c.key}
                     style={{ width: widthFor(c) }}
-                    className={`border-b border-edge-soft px-3 py-3 align-middle text-[12.5px] text-ink ${ALIGN[c.align ?? "left"]}`}
+                    className={`overflow-hidden break-words border-b border-edge-soft px-3 py-3 align-middle text-[12.5px] text-ink ${ALIGN[c.align ?? "left"]}`}
                   >
                     {c.render(row)}
                   </td>

@@ -43,6 +43,7 @@ export function cargoDraft(c: CargoRow | null): CargoDraft {
     description: s(c.description),
     hsCodes: c.hsCodes,
     packages: n(c.packages),
+    packagingType: s(c.packagingType),
     grossWeightKg: s(c.grossWeightKg),
     volumeM3: s(c.volumeM3),
     dimensions: c.dimensions.map((d) => ({

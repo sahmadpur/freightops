@@ -14,3 +14,5 @@ export const inviteSchema = z
 export type InviteInput = z.infer<typeof inviteSchema>;
 
 export const roleSchema = z.object({ role: z.enum(userRoleEnum.enumValues) });
+
+export const cargoTypeSchema = z.object({ title: z.string().trim().min(1).max(200) });

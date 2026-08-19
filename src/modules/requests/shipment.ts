@@ -70,6 +70,7 @@ export async function writeCargo(
     description: t(cargo.description),
     hsCodes: cargo.hsCodes,
     packages: i(cargo.packages),
+    packagingType: (t(cargo.packagingType) ?? null) as (typeof cargoDetails.$inferInsert)["packagingType"],
     grossWeightKg: n(cargo.grossWeightKg),
     volumeM3: n(cargo.volumeM3),
     dimensions: cargo.dimensions

@@ -18,7 +18,6 @@ function sampleData(overrides: Partial<DocData> = {}): DocData {
     currency: "AZN",
     order: {
       number: "ALL2607041",
-      rollbackNumber: "RB-991",
       route: "Istanbul — Baku",
       cargoDescription: "Industrial spare parts",
       packages: 12,

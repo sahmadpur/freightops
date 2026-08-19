@@ -10,10 +10,17 @@ export type CostLineDraft = {
 
 export type OrderFormInitial = {
   id?: string;
+  /** ORD № — assigned by the server on create, shown read-only on edit. */
+  number?: string;
   accountId: string;
+  contactId: string;
+  responsibleUserId: string;
   carrierId: string;
   title: string;
-  rollbackNumber: string;
+  /** EX1 export declaration. The cost itself is a cost line (category "ex1"). */
+  ex1Required: boolean;
+  ex1Cost: string;
+  ex1Currency: string;
   /**
    * The structured shipment, identical to a request's (§26). The flat
    * `orders` columns — route, transport type, delivery format, cargo totals —
@@ -38,9 +45,13 @@ export function emptyCostLine(): CostLineDraft {
 export function blankOrderInitial(): OrderFormInitial {
   return {
     accountId: "",
+    contactId: "",
+    responsibleUserId: "",
     carrierId: "",
     title: "",
-    rollbackNumber: "",
+    ex1Required: false,
+    ex1Cost: "",
+    ex1Currency: DEFAULT_CURRENCY,
     transportFamily: "",
     legs: [],
     cargo: emptyCargo(),

@@ -6,7 +6,9 @@
     "save": "Сохранить",
     "cancel": "Отмена",
     "search": "Поиск",
-    "noResults": "Ничего не найдено"
+    "noResults": "Ничего не найдено",
+    "yes": "Да",
+    "no": "Нет"
   },
   "theme": {
     "light": "Светлая",
@@ -26,7 +28,8 @@
     "sectionLibrary": "Библиотека",
     "sectionManage": "Управление",
     "customs": "Таможня",
-    "requests": "Запросы"
+    "requests": "Запросы",
+    "cargoTypes": "Виды грузов"
   },
   "status": {
     "created": "Создан",
@@ -35,11 +38,11 @@
     "loaded": "Погружен",
     "transit": "В пути",
     "at_border": "На границе",
-    "at_customs": "На таможне",
+    "at_customs": "В процессе растаможки",
     "arrived": "Прибыл",
     "delivered": "Доставлен",
     "closed": "Закрыт",
-    "waiting_pickup": "Ожидает забора груза",
+    "waiting_pickup": "Запланирован забор груза",
     "new": "Новый",
     "in_progress": "В работе",
     "quotation": "Расчёт предложения",
@@ -50,7 +53,9 @@
     "cancelled": "Отменено",
     "operations": "Операции",
     "booked": "Подтверждено перевозчиком",
-    "in_transit": "В пути"
+    "in_transit": "В транзите",
+    "en_route": "В пути",
+    "ferry_wait": "В ожидании парома"
   },
   "preferredChannel": {
     "email": "Эл. почта",
@@ -176,7 +181,7 @@
     "carrier": "Перевозчик",
     "route": "Маршрут",
     "cargoDescription": "Описание груза",
-    "packages": "Места / единицы",
+    "packages": "Количество мест",
     "weightKg": "Вес (кг)",
     "volumeM3": "Объём (м³)",
     "incoterms": "Условия поставки (Инкотермс 2020)",
@@ -201,7 +206,6 @@
     "carrierInvoiceDate": "Дата счёта перевозчика",
     "exchangeRate": "Курс (AZN)",
     "transportType": "Тип транспорта",
-    "rollbackNumber": "Номер Rollback",
     "currency": "Валюта",
     "selectTransportType": "Выберите тип транспорта",
     "selectCountry": "Выберите страну",
@@ -295,7 +299,14 @@
     "selectContact": "Выберите контакт…",
     "selectManager": "Выберите менеджера…",
     "noContacts": "У этой компании ещё нет контактов",
-    "titleAuto": "Генерируется автоматически — можно изменить"
+    "titleAuto": "Генерируется автоматически — можно изменить",
+    "packagingType": "Тип упаковки",
+    "ex1Required": "EX1 требуется",
+    "ex1Cost": "Стоимость EX1",
+    "ex1Document": "Документ EX1",
+    "ex1Converted": "При сохранении конвертируется в {currency} по курсу ЦБАР",
+    "ex1FinanceHint": "Стоимость EX1 ведётся как строка расходов во вкладке «Финансы».",
+    "ex1RateMissing": "Нет курса для конвертации стоимости EX1"
   },
   "companyRoles": {
     "client": "Клиент",
@@ -334,7 +345,7 @@
     "updateStatus": "Изменить статус",
     "deliveryHistory": "История доставки",
     "noHistory": "Истории пока нет",
-    "sectionConsignment": "Отправление",
+    "sectionConsignment": "Основная информация",
     "sectionCargo": "Груз",
     "sectionBilling": "Счёт",
     "invoiceRequired": "Заказ прибыл, но счёт ещё не создан.",
@@ -484,7 +495,6 @@
     "financialOverview": "Финансовый обзор",
     "activeShipments": "Активные отгрузки",
     "cargoInTransit": "Груз в пути",
-    "bookedWithCarrier": "Подтверждено перевозчиком",
     "unfinishedOrders": "Незавершённые заказы",
     "revenue": "Выручка",
     "carrierCosts": "Расходы агента",
@@ -504,7 +514,7 @@
     "topRoutes": "Основные маршруты",
     "topClients": "Основные клиенты",
     "clearances": "Оформления",
-    "inOperations": "В работе (операции)"
+    "pickupPlanned": "Запланирован забор"
   },
   "requestKpi": {
     "title": "Коммерческая воронка",
@@ -664,7 +674,13 @@
     "search": "Поиск",
     "filter": "Фильтр",
     "noAuditEntries": "Нет записей аудита",
-    "roleSupervisor": "Руководитель группы"
+    "roleSupervisor": "Руководитель группы",
+    "cargoTypesTitle": "Виды грузов",
+    "cargoTypesHint": "Справочник наименований груза — варианты в поле «Описание груза»",
+    "newCargoType": "Новое наименование",
+    "cargoTypeExists": "Такое наименование уже существует",
+    "archiveCargoType": "Архивировать",
+    "restoreCargoType": "Восстановить"
   },
   "transportTypes": {
     "truck": "Грузовик",
@@ -720,17 +736,19 @@
     "delivery": "Доставка"
   },
   "financeCategory": {
-    "customs": "Таможня",
+    "customs": "Растаможка (оформление)",
     "broker": "Брокер",
     "terminal": "Терминал",
     "warehouse": "Склад",
-    "loading": "Погрузка",
+    "loading": "Погрузка/разгрузка",
     "transport": "Перевозка",
     "insurance": "Страхование",
     "certification": "Сертификация",
-    "demurrage": "Демередж",
+    "demurrage": "Демередж/детеншн",
     "bank_fee": "Банковская комиссия",
-    "other": "Прочее"
+    "other": "Прочее",
+    "ex1": "EX1",
+    "customs_duties": "Таможенные пошлины"
   },
   "auditAction": {
     "created": "создание заказа",
@@ -795,6 +813,15 @@
     "quotation": "Предложение",
     "booking": "Букинг",
     "follow_up": "Напоминание",
+    "other": "Другое"
+  },
+  "packagingType": {
+    "pallet": "Паллет",
+    "box": "Коробка",
+    "crate": "Ящик",
+    "bag": "Мешок",
+    "drum": "Бочка",
+    "roll": "Рулон",
     "other": "Другое"
   }
 }

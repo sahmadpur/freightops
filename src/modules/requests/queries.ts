@@ -3,6 +3,7 @@ import { db } from "@/db";
 import {
   accounts,
   auditLog,
+  cargoTypes,
   contacts,
   leadSourceEnum,
   orders,
@@ -245,7 +246,7 @@ export async function contactOptions(accountId: string) {
 
 /** Dropdown data for the request form. */
 export async function requestFormData() {
-  const [accountRows, staffRows] = await Promise.all([
+  const [accountRows, staffRows, cargoTypeRows] = await Promise.all([
     db
       .select({ id: accounts.id, title: accounts.title, roles: accounts.roles })
       .from(accounts)
@@ -256,13 +257,23 @@ export async function requestFormData() {
       .from(user)
       .where(and(eq(user.active, true), inArray(user.role, ["admin", "operator", "supervisor"])))
       .orderBy(asc(user.name)),
+    db
+      .select({ title: cargoTypes.title })
+      .from(cargoTypes)
+      .where(isNull(cargoTypes.deletedAt))
+      .orderBy(asc(cargoTypes.sortOrder), asc(cargoTypes.title)),
   ]);
   return {
-    accountOpts: accountRows.map((a) => ({ value: a.id, label: a.title })),
+    // Only companies holding the "client" role belong in the client select.
+    accountOpts: accountRows
+      .filter((a) => a.roles.includes("client"))
+      .map((a) => ({ value: a.id, label: a.title })),
     agentOpts: accountRows
       .filter((a) => a.roles.includes("agent"))
       .map((a) => ({ value: a.id, label: a.title })),
     staffOpts: staffRows.map((u) => ({ value: u.id, label: u.name })),
+    // The cargo description stores the text itself, so value === label.
+    cargoTypeOpts: cargoTypeRows.map((c) => ({ value: c.title, label: c.title })),
   };
 }
 

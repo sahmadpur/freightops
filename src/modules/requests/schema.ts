@@ -15,6 +15,7 @@ import {
   optText,
 } from "@/lib/validation";
 import { ORDER_CURRENCIES } from "@/lib/fx";
+import { PACKAGING_TYPES } from "@/lib/packaging-types";
 import {
   CONTAINER_TYPES,
   isLegTransportType,
@@ -73,6 +74,7 @@ export const cargoInputSchema = z.object({
   description: optText(1000),
   hsCodes: z.array(z.string().trim().min(1).max(30)).max(20).default([]),
   packages: intString,
+  packagingType: optEnum(PACKAGING_TYPES),
   grossWeightKg: numericString,
   volumeM3: numericString,
   dimensions: z.array(dimensionSchema).max(30).default([]),

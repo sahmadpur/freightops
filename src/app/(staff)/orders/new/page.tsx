@@ -12,7 +12,7 @@ export default async function NewOrderPage() {
   const today = new Date().toISOString().slice(0, 10);
   // Seed today's CBAR rate here rather than in an effect, so the form renders
   // pre-filled. The field stays editable and refetches if the currency changes.
-  const [{ accountOpts, carrierOpts }, rate] = await Promise.all([
+  const [{ accountOpts, carrierOpts, staffOpts, cargoTypeOpts }, rate] = await Promise.all([
     orderFormData(),
     getAznRate(DEFAULT_CURRENCY, today),
   ]);
@@ -21,7 +21,14 @@ export default async function NewOrderPage() {
   return (
     <div className="mx-auto max-w-[1400px]">
       <PageHeader eyebrow={tn("orders")} title={t("newOrder")} />
-      <OrderForm initial={initial} accountOpts={accountOpts} carrierOpts={carrierOpts} />
+      <OrderForm
+        initial={initial}
+        accountOpts={accountOpts}
+        carrierOpts={carrierOpts}
+        staffOpts={staffOpts}
+        contactOpts={[]}
+        cargoTypeOpts={cargoTypeOpts}
+      />
     </div>
   );
 }

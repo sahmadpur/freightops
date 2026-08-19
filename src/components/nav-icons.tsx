@@ -72,6 +72,12 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M11 7.5V11l2.5 2M16.2 16.2 21 21" />
     </>
   ),
+  cargoTypes: (
+    <>
+      <path d="M12 2.8 20.5 7v10L12 21.2 3.5 17V7Z" />
+      <path d="M3.5 7 12 11.2 20.5 7M12 11.2v10" />
+    </>
+  ),
 };
 
 export function NavIcon({

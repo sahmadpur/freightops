@@ -27,12 +27,14 @@ export function RequestForm({
   agentOpts,
   staffOpts,
   contactOpts: initialContactOpts,
+  cargoTypeOpts = [],
 }: {
   initial: RequestFormInitial;
   accountOpts: ComboOption[];
   agentOpts: ComboOption[];
   staffOpts: ComboOption[];
   contactOpts: ComboOption[];
+  cargoTypeOpts?: ComboOption[];
 }) {
   const t = useTranslations("fields");
   const ta = useTranslations("actions");
@@ -335,6 +337,7 @@ export function RequestForm({
         cargo={v.cargo}
         onChange={(cargo) => set({ cargo })}
         errors={nested("cargo")}
+        cargoTypeOpts={cargoTypeOpts}
         suggestTempControl={v.legs.some(
           (l) => l.vehicleType === "reefer" || l.containerType === "20rf" || l.containerType === "40rf",
         )}

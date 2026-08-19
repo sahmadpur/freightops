@@ -19,6 +19,7 @@ const LIBRARY_NAV = [
 
 const ADMIN_NAV = [
   { href: "/admin/users", key: "users" },
+  { href: "/admin/cargo-types", key: "cargoTypes" },
   { href: "/admin/audit", key: "audit" },
 ] as const;
 

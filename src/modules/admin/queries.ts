@@ -1,6 +1,6 @@
 import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { user, accounts, auditLog, invitations } from "@/db/schema";
+import { user, accounts, auditLog, cargoTypes, invitations } from "@/db/schema";
 import { PAGE_SIZE } from "@/components/ui/paginator";
 
 export type UserRow = {
@@ -60,6 +60,23 @@ export async function listInvitations(): Promise<InvitationRow[]> {
 /** Account id/title options for the invite form. */
 export async function accountOptions(): Promise<{ id: string; title: string }[]> {
   return db.select({ id: accounts.id, title: accounts.title }).from(accounts).orderBy(accounts.title).limit(1000);
+}
+
+export type CargoTypeRow = {
+  id: string;
+  title: string;
+  archived: boolean;
+};
+
+/** The cargo-description dictionary, archived entries last (they can be restored). */
+export async function listCargoTypes(): Promise<CargoTypeRow[]> {
+  const rows = await db
+    .select({ id: cargoTypes.id, title: cargoTypes.title, deletedAt: cargoTypes.deletedAt })
+    .from(cargoTypes)
+    .orderBy(cargoTypes.sortOrder, cargoTypes.title);
+  return rows
+    .map((r) => ({ id: r.id, title: r.title, archived: r.deletedAt !== null }))
+    .sort((a, b) => Number(a.archived) - Number(b.archived));
 }
 
 export type AuditRow = {

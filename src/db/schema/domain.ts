@@ -25,6 +25,7 @@ import { LOST_REASONS } from "../../lib/lost-reason";
 import { LEAD_SOURCES } from "../../lib/lead-source";
 import { TASK_TYPES } from "../../lib/task-types";
 import { INCOTERMS } from "../../lib/incoterms";
+import { PACKAGING_TYPES } from "../../lib/packaging-types";
 import {
   CONTAINER_TYPES,
   ROUTING_PREFERENCES,
@@ -46,7 +47,9 @@ export const paymentDirectionEnum = pgEnum("payment_direction", ["incoming", "ou
 export const financeLineSideEnum = pgEnum("finance_line_side", ["revenue", "cost"]);
 // Categories for agent-expense (cost) finance lines. Revenue lines default to "other".
 export const financeCategoryEnum = pgEnum("finance_category", [
+  "ex1",
   "customs",
+  "customs_duties",
   "broker",
   "terminal",
   "warehouse",
@@ -116,6 +119,7 @@ export const containerTypeEnum = pgEnum("container_type", CONTAINER_TYPES);
 export const wagonTypeEnum = pgEnum("wagon_type", WAGON_TYPES);
 export const routingPreferenceEnum = pgEnum("routing_preference", ROUTING_PREFERENCES);
 export const stackableEnum = pgEnum("stackable", STACKABLE_VALUES);
+export const packagingTypeEnum = pgEnum("packaging_type", PACKAGING_TYPES);
 
 /**
  * Requests and orders carry the same shipment payload, and converting a request
@@ -192,8 +196,6 @@ export const orders = pgTable(
     id: id(),
     number: text("number").notNull().unique(),
     title: text("title").notNull(),
-    /** Free-text secondary reference supplied by the desk. No logic attached. */
-    rollbackNumber: text("rollback_number"),
     accountId: text("account_id")
       .notNull()
       .references(() => accounts.id),
@@ -224,6 +226,10 @@ export const orders = pgTable(
     incoterms: incotermsEnum("incoterms"),
     deliveryFormat: deliveryFormatEnum("delivery_format"),
     status: orderStatusEnum("status").notNull().default("created"),
+    // Whether the shipment needs an EX1 export declaration. The EX1 cost itself
+    // is an order_finance_lines row (category "ex1"), so it rolls into
+    // carrierCost/margin like any other expense.
+    ex1Required: boolean("ex1_required").notNull().default(false),
     // The currency every amount on this order is denominated in (ORDER_CURRENCIES
     // in src/lib/fx.ts). Rollups of order_finance_lines, recomputed on any line
     // change: clientCharge = Σ revenue lines, carrierCost = Σ cost lines.
@@ -649,6 +655,7 @@ export const cargoDetails = pgTable(
     description: text("description"),
     hsCodes: jsonb("hs_codes").$type<string[]>().notNull().default(sql`'[]'::jsonb`),
     packages: integer("packages"),
+    packagingType: packagingTypeEnum("packaging_type"),
     grossWeightKg: numeric("gross_weight_kg", { precision: 12, scale: 2 }),
     volumeM3: numeric("volume_m3", { precision: 12, scale: 2 }),
     /** Centimetres per side, with a piece count. Several rows are the norm (§9). */
@@ -680,6 +687,19 @@ export const cargoDetails = pgTable(
   // rather than merely intended.
   (t) => [uniqueIndex("cargo_details_parent_idx").on(t.parentType, t.parentId)],
 );
+
+/**
+ * Cargo-description dictionary behind the autocomplete on the cargo editor.
+ * Admin-editable (unlike the src/lib dictionaries) because the desk adds new
+ * standard names without a deploy; free text remains allowed in the form.
+ */
+export const cargoTypes = pgTable("cargo_types", {
+  id: id(),
+  title: text("title").notNull().unique(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  createdAt: createdAt(),
+});
 
 // --- Communication (specification §17, §18) ------------------------------
 //

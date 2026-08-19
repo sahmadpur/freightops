@@ -22,7 +22,8 @@ import {
 // Money rollups (clientCharge/carrierCost) are edited via finance lines, not the
 // order form, so they're audited by the finance-line actions instead.
 const AUDITED_FIELDS = [
-  "title", "rollbackNumber", "accountId", "carrierId", "transportType",
+  "title", "accountId", "contactId", "responsibleUserId", "carrierId",
+  "ex1Required", "transportType",
   "fromCountry", "toCountry", "cargoItems", "packages", "weightKg", "volumeM3",
   "incoterms", "deliveryFormat", "currency", "exchangeRate",
 ];
@@ -35,9 +36,11 @@ const AUDITED_FIELDS = [
 function toRow(data: OrderInput) {
   return {
     title: data.title,
-    rollbackNumber: data.rollbackNumber || null,
     accountId: data.accountId,
+    contactId: data.contactId || null,
+    responsibleUserId: data.responsibleUserId || null,
     carrierId: data.carrierId || null,
+    ex1Required: data.ex1Required,
     incoterms: data.incoterms || null,
     currency: data.currency,
     exchangeRate: data.exchangeRate || null,

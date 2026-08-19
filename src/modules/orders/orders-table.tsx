@@ -52,11 +52,10 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
     { key: "accountTitle", header: t("fields.client"), render: (r) => r.accountTitle },
     { key: "title", header: t("fields.orderTitle"), render: (r) => r.title },
     {
-      key: "rollbackNumber",
-      header: t("fields.rollbackNumber"),
-      width: "120px",
-      hiddenOnMobile: true,
-      render: (r) => r.rollbackNumber ?? "—",
+      key: "status",
+      header: t("fields.status"),
+      width: "140px",
+      render: (r) => <StatusBadge status={r.status} />,
     },
     {
       key: "route",
@@ -147,12 +146,6 @@ export function OrdersTable({ rows }: { rows: OrderListRow[] }) {
       render: (r) => (
         <span className="whitespace-nowrap text-ink-soft">{formatDMY(r.createdAt)}</span>
       ),
-    },
-    {
-      key: "status",
-      header: t("fields.status"),
-      width: "140px",
-      render: (r) => <StatusBadge status={r.status} />,
     },
     {
       key: "actions",

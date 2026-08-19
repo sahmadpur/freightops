@@ -23,7 +23,6 @@ export async function getOrderForDocgen(orderId: string) {
     .select({
       id: orders.id,
       number: orders.number,
-      rollbackNumber: orders.rollbackNumber,
       fromCountry: orders.fromCountry,
       toCountry: orders.toCountry,
       cargoItems: orders.cargoItems,

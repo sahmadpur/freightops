@@ -6,7 +6,9 @@
     "save": "Yadda saxla",
     "cancel": "Ləğv et",
     "search": "Axtarış",
-    "noResults": "Nəticə yoxdur"
+    "noResults": "Nəticə yoxdur",
+    "yes": "Bəli",
+    "no": "Xeyr"
   },
   "theme": {
     "light": "İşıqlı",
@@ -26,7 +28,8 @@
     "sectionLibrary": "Kitabxana",
     "sectionManage": "İdarəetmə",
     "customs": "Gömrük",
-    "requests": "Sorğular"
+    "requests": "Sorğular",
+    "cargoTypes": "Yük növləri"
   },
   "status": {
     "created": "Yaradılıb",
@@ -35,11 +38,11 @@
     "loaded": "Yüklənib",
     "transit": "Yoldadır",
     "at_border": "Sərhəddə",
-    "at_customs": "Gömrükdə",
+    "at_customs": "Gömrük rəsmiləşdirilməsi",
     "arrived": "Çatıb",
     "delivered": "Təhvil verilib",
     "closed": "Bağlanıb",
-    "waiting_pickup": "Yükün götürülməsi gözlənilir",
+    "waiting_pickup": "Yükün götürülməsi planlaşdırılıb",
     "new": "Yeni",
     "in_progress": "İşlənir",
     "quotation": "Təklif hazırlanır",
@@ -50,7 +53,9 @@
     "cancelled": "Ləğv edildi",
     "operations": "Əməliyyatlar",
     "booked": "Daşıyıcı ilə təsdiqlənib",
-    "in_transit": "Yolda"
+    "in_transit": "Tranzitdə",
+    "en_route": "Yoldadır",
+    "ferry_wait": "Bərə gözlənilir"
   },
   "preferredChannel": {
     "email": "E-poçt",
@@ -176,7 +181,7 @@
     "carrier": "Daşıyıcı",
     "route": "Marşrut",
     "cargoDescription": "Yükün təsviri",
-    "packages": "Yerlər / vahidlər",
+    "packages": "Yerlərin sayı",
     "weightKg": "Çəki (kq)",
     "volumeM3": "Həcm (m³)",
     "incoterms": "Çatdırılma şərtləri (Incoterms 2020)",
@@ -201,7 +206,6 @@
     "carrierInvoiceDate": "Daşıyıcının hesab tarixi",
     "exchangeRate": "Məzənnə (AZN)",
     "transportType": "Nəqliyyat növü",
-    "rollbackNumber": "Rollback nömrəsi",
     "currency": "Valyuta",
     "selectTransportType": "Nəqliyyat növünü seçin",
     "selectCountry": "Ölkəni seçin",
@@ -295,7 +299,14 @@
     "selectContact": "Əlaqə seçin…",
     "selectManager": "Menecer seçin…",
     "noContacts": "Bu şirkətin hələ əlaqə şəxsi yoxdur",
-    "titleAuto": "Avtomatik yaradılır — dəyişdirilə bilər"
+    "titleAuto": "Avtomatik yaradılır — dəyişdirilə bilər",
+    "packagingType": "Qablaşdırma növü",
+    "ex1Required": "EX1 tələb olunur",
+    "ex1Cost": "EX1 dəyəri",
+    "ex1Document": "EX1 sənədi",
+    "ex1Converted": "Yadda saxlananda AMB məzənnəsi ilə {currency} valyutasına çevrilir",
+    "ex1FinanceHint": "EX1 dəyəri «Maliyyə» bölməsində xərc sətri kimi aparılır.",
+    "ex1RateMissing": "EX1 dəyərini çevirmək üçün məzənnə yoxdur"
   },
   "companyRoles": {
     "client": "Müştəri",
@@ -334,7 +345,7 @@
     "updateStatus": "Statusu dəyiş",
     "deliveryHistory": "Çatdırılma tarixçəsi",
     "noHistory": "Hələ tarixçə yoxdur",
-    "sectionConsignment": "Göndəriş",
+    "sectionConsignment": "Əsas məlumat",
     "sectionCargo": "Yük",
     "sectionBilling": "Faktura",
     "invoiceRequired": "Sifariş çatıb, lakin hesab-faktura yaradılmayıb.",
@@ -484,7 +495,6 @@
     "financialOverview": "Maliyyə icmalı",
     "activeShipments": "Aktiv daşımalar",
     "cargoInTransit": "Yoldakı yük",
-    "bookedWithCarrier": "Daşıyıcı ilə təsdiqlənib",
     "unfinishedOrders": "Tamamlanmamış sifarişlər",
     "revenue": "Gəlir",
     "carrierCosts": "Agent xərcləri",
@@ -504,7 +514,7 @@
     "topRoutes": "Əsas marşrutlar",
     "topClients": "Əsas müştərilər",
     "clearances": "Rəsmiləşdirmələr",
-    "inOperations": "Əməliyyatlarda"
+    "pickupPlanned": "Götürülmə planlaşdırılıb"
   },
   "requestKpi": {
     "title": "Kommersiya axını",
@@ -664,7 +674,13 @@
     "search": "Axtarış",
     "filter": "Filtr",
     "noAuditEntries": "Audit qeydi yoxdur",
-    "roleSupervisor": "Komanda rəhbəri"
+    "roleSupervisor": "Komanda rəhbəri",
+    "cargoTypesTitle": "Yük növləri",
+    "cargoTypesHint": "Yük təsvirləri lüğəti — «Yükün təsviri» sahəsindəki variantlar",
+    "newCargoType": "Yeni yük növü",
+    "cargoTypeExists": "Bu yük növü artıq mövcuddur",
+    "archiveCargoType": "Arxivləşdir",
+    "restoreCargoType": "Bərpa et"
   },
   "transportTypes": {
     "truck": "Yük maşını",
@@ -720,17 +736,19 @@
     "delivery": "Çatdırılma"
   },
   "financeCategory": {
-    "customs": "Gömrük",
+    "customs": "Gömrük rəsmiləşdirilməsi",
     "broker": "Broker",
     "terminal": "Terminal",
     "warehouse": "Anbar",
-    "loading": "Yükləmə",
+    "loading": "Yükləmə/boşaltma",
     "transport": "Daşınma",
     "insurance": "Sığorta",
     "certification": "Sertifikatlaşdırma",
-    "demurrage": "Demeraj",
+    "demurrage": "Demurec/detenşn",
     "bank_fee": "Bank komissiyası",
-    "other": "Digər"
+    "other": "Digər",
+    "ex1": "EX1",
+    "customs_duties": "Gömrük rüsumları"
   },
   "auditAction": {
     "created": "sifarişi yaratdı",
@@ -795,6 +813,15 @@
     "quotation": "Təklif",
     "booking": "Bronlaşdırma",
     "follow_up": "İzləmə",
+    "other": "Digər"
+  },
+  "packagingType": {
+    "pallet": "Palet",
+    "box": "Qutu",
+    "crate": "Yeşik",
+    "bag": "Kisə",
+    "drum": "Çəllək",
+    "roll": "Rulon",
     "other": "Digər"
   }
 }

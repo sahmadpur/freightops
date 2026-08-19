@@ -55,17 +55,17 @@ export function RequestsTable({ rows, empty }: { rows: RequestListRow[]; empty: 
     },
     { key: "accountTitle", header: t("client"), render: (r) => r.accountTitle ?? "—" },
     {
+      key: "status",
+      header: t("status"),
+      width: "150px",
+      render: (r) => <StatusBadge status={r.status} />,
+    },
+    {
       key: "leadSource",
       header: t("source"),
       width: "110px",
       hiddenOnMobile: true,
       render: (r) => tls(r.leadSource),
-    },
-    {
-      key: "status",
-      header: t("status"),
-      width: "150px",
-      render: (r) => <StatusBadge status={r.status} />,
     },
     {
       key: "responsible",

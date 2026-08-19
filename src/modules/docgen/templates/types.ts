@@ -11,7 +11,6 @@ export type DocParty = {
 
 export type DocOrderInfo = {
   number: string;
-  rollbackNumber: string | null;
   /** Pre-rendered "From → To" route line; the order stores country codes. */
   route: string | null;
   /** Pre-rendered cargo line; the order stores a list of items. */

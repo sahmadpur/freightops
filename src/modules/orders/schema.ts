@@ -17,10 +17,13 @@ export const orderCostLineSchema = z.object({
 
 export const orderInputSchema = z.object({
   accountId: z.string().trim().min(1),
+  contactId: optText(100),
+  responsibleUserId: optText(100),
   carrierId: optText(100),
   /** The order's subject line — "Sifariş mövzusu". */
   title: z.string().trim().min(1).max(300),
-  rollbackNumber: optText(100),
+  /** EX1 flag only; the EX1 cost arrives as a normal costLines entry. */
+  ex1Required: z.boolean().default(false),
   /**
    * Route, transport and cargo are the same structured shipment a request
    * carries (§26); the flat `orders` columns are derived from it by

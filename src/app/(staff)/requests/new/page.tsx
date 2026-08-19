@@ -8,7 +8,7 @@ import { requestFormData } from "@/modules/requests/queries";
 
 export default async function NewRequestPage() {
   const { session } = await requireArea("staff");
-  const [t, { accountOpts, agentOpts, staffOpts }] = await Promise.all([
+  const [t, { accountOpts, agentOpts, staffOpts, cargoTypeOpts }] = await Promise.all([
     getTranslations("requests"),
     requestFormData(),
   ]);
@@ -20,7 +20,7 @@ export default async function NewRequestPage() {
   return (
     <div>
       <PageHeader title={t("newRequest")} />
-      <RequestForm initial={initial} accountOpts={accountOpts} agentOpts={agentOpts} staffOpts={staffOpts} contactOpts={[]} />
+      <RequestForm initial={initial} accountOpts={accountOpts} agentOpts={agentOpts} staffOpts={staffOpts} contactOpts={[]} cargoTypeOpts={cargoTypeOpts} />
     </div>
   );
 }

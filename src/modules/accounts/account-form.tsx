@@ -7,6 +7,7 @@ import { Field, inputCls, SubmitRow } from "@/components/ui/form";
 import { Card, CardBody } from "@/components/ui/card";
 import { Combobox, MultiCombobox } from "@/components/ui/combobox";
 import { ContactsEditor, type EditableContact } from "@/components/contacts-editor";
+import { citiesFor } from "@/lib/cities";
 import { COMPANY_ROLES } from "@/lib/company-roles";
 import { countryOptions } from "@/lib/countries";
 import { createAccount, updateAccount } from "./actions";
@@ -90,10 +91,24 @@ export function AccountForm({ initial }: { initial: AccountFormInitial }) {
       </Field>
       <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
         <Field label={t("fields.country")} htmlFor="country" error={fieldErrors.country}>
-          <Combobox id="country" value={country} onChange={setCountry} options={countries} />
+          <Combobox
+            id="country"
+            value={country}
+            onChange={(v) => {
+              setCountry(v);
+              setCity("");
+            }}
+            options={countries}
+          />
         </Field>
         <Field label={t("fields.city")} htmlFor="city" error={fieldErrors.city}>
-          <input id="city" className={inputCls} value={city} onChange={(e) => setCity(e.target.value)} />
+          <Combobox
+            id="city"
+            value={city}
+            onChange={setCity}
+            options={citiesFor(country).map((c) => ({ value: c, label: c }))}
+            creatable
+          />
         </Field>
       </div>
       <Field label={t("fields.phones")} htmlFor="phones" error={fieldErrors.phones}>

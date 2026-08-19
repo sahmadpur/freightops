@@ -105,7 +105,6 @@ export async function generateOrderDocument(input: unknown): Promise<ActionResul
     currency: d.currency,
     order: {
       number: row.number,
-      rollbackNumber: row.rollbackNumber,
       // Documents are issued in one of three languages; render the route with
       // country names in that language rather than bare ISO codes.
       route: routeLabel(row.fromCountry, row.toCountry, d.language, { flags: false }),

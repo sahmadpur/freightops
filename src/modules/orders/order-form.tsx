@@ -8,6 +8,7 @@ import { Combobox, type ComboOption } from "@/components/ui/combobox";
 import { FilePicker } from "@/components/ui/file-picker";
 import { SectionRule } from "@/components/ui/record";
 import { createOrder, updateOrder } from "./actions";
+import { fetchContactOptions } from "@/modules/requests/actions";
 import { uploadDocument } from "@/modules/documents/actions";
 import { fetchAznRate } from "@/modules/fx/actions";
 import { TRANSPORT_FAMILIES } from "@/lib/transport-matrix";
@@ -29,19 +30,39 @@ export function OrderForm({
   initial,
   accountOpts,
   carrierOpts,
+  staffOpts,
+  contactOpts: initialContactOpts,
+  cargoTypeOpts = [],
 }: {
   initial: OrderFormInitial;
   accountOpts: Option[];
   carrierOpts: Option[];
+  staffOpts: Option[];
+  contactOpts: ComboOption[];
+  cargoTypeOpts?: ComboOption[];
 }) {
   const t = useTranslations();
   const router = useRouter();
   const [v, setV] = useState(initial);
   const [files, setFiles] = useState<File[]>([]);
+  const [ex1Files, setEx1Files] = useState<File[]>([]);
+  const [contactOpts, setContactOpts] = useState(initialContactOpts);
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<ActionResult | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const set = (patch: Partial<OrderFormInitial>) => setV((s) => ({ ...s, ...patch }));
+
+  /** Same rule as the request form (§5): contacts belong to the chosen client. */
+  async function changeClient(accountId: string) {
+    set({ accountId, contactId: "" });
+    if (!accountId) {
+      setContactOpts([]);
+      return;
+    }
+    const opts = await fetchContactOptions(accountId);
+    setContactOpts(opts);
+    if (opts.length === 1) set({ contactId: opts[0].value });
+  }
 
   const toOpts = (rows: Option[]): ComboOption[] =>
     rows.map((r) => ({ value: r.id, label: r.title ?? r.id }));
@@ -81,15 +102,51 @@ export function OrderForm({
       costLines: s.costLines.map((l, j) => (j === i ? { ...l, ...patch } : l)),
     }));
 
+  /**
+   * The EX1 cost as a cost line in the ORDER currency, so it rolls into the
+   * carrier-cost total and margin like any other expense. A differing EX1
+   * currency is converted via the CBAR cross-rate; the original amount stays in
+   * the note. Returns an error key when a needed rate is unavailable.
+   */
+  async function ex1CostLine(): Promise<
+    { line: OrderFormInitial["costLines"][number] | null } | { error: string }
+  > {
+    if (v.id || !v.ex1Required || v.ex1Cost.trim() === "") return { line: null };
+    let amount = v.ex1Cost.trim();
+    if (v.ex1Currency !== v.currency) {
+      const today = new Date().toISOString().slice(0, 10);
+      const ex1Azn =
+        v.ex1Currency === "AZN" ? "1" : await fetchAznRate(v.ex1Currency, today);
+      const orderAzn = v.currency === "AZN" ? "1" : v.exchangeRate;
+      if (!ex1Azn || !orderAzn || !Number(orderAzn)) return { error: "rate" };
+      amount = ((Number(amount) * Number(ex1Azn)) / Number(orderAzn)).toFixed(2);
+    }
+    return {
+      line: {
+        category: "ex1",
+        amount,
+        note: `EX1 ${v.ex1Cost.trim()} ${v.ex1Currency}`,
+      },
+    };
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setPending(true);
     setUploadError(null);
+    const ex1 = await ex1CostLine();
+    if ("error" in ex1) {
+      setPending(false);
+      setResult({ ok: false, fieldErrors: { ex1Cost: [t("fields.ex1RateMissing")] } });
+      return;
+    }
     const payload = {
       accountId: v.accountId,
+      contactId: v.contactId,
+      responsibleUserId: v.responsibleUserId,
       carrierId: v.carrierId,
       title: v.title,
-      rollbackNumber: v.rollbackNumber,
+      ex1Required: v.ex1Required,
       transportFamily: v.transportFamily,
       legs: v.legs,
       cargo: v.cargo,
@@ -97,7 +154,10 @@ export function OrderForm({
       currency: v.currency,
       exchangeRate: v.exchangeRate,
       clientCharge: v.clientCharge,
-      costLines: v.costLines.filter((l) => l.amount.trim() !== ""),
+      costLines: [
+        ...v.costLines.filter((l) => l.amount.trim() !== ""),
+        ...(ex1.line ? [ex1.line] : []),
+      ],
     };
     const r = v.id ? await updateOrder(v.id, payload) : await createOrder(payload);
     if (!r.ok) {
@@ -108,7 +168,7 @@ export function OrderForm({
     // Documents can only be attached once the order exists, so upload after the
     // create succeeds. A failure here does NOT undo the order — say so plainly.
     const failed: string[] = [];
-    for (const file of files) {
+    for (const file of [...files, ...ex1Files]) {
       const fd = new FormData();
       fd.set("file", file);
       fd.set("parentType", "order");
@@ -131,6 +191,7 @@ export function OrderForm({
 
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-[1400px] pb-24">
+      {/* Who ordered → who runs it → what the order is; how it moves comes next. */}
       <section className="mb-8">
         <SectionRule>{t("orders.sectionConsignment")}</SectionRule>
         <div className={gridCls}>
@@ -138,12 +199,46 @@ export function OrderForm({
             <Combobox
               id="accountId"
               value={v.accountId}
-              onChange={(value) => set({ accountId: value })}
+              onChange={changeClient}
               options={toOpts(accountOpts)}
               placeholder={t("fields.selectAccount")}
               emptyLabel={t("common.noResults")}
             />
           </Field>
+          <Field label={t("fields.contactPerson")} htmlFor="contactId" error={fe.contactId}>
+            <Combobox
+              id="contactId"
+              value={v.contactId}
+              onChange={(value) => set({ contactId: value })}
+              options={contactOpts}
+              placeholder={t("fields.selectContact")}
+              emptyLabel={t("fields.noContacts")}
+              disabled={!v.accountId}
+            />
+          </Field>
+          <Field label={t("fields.responsibleManager")} htmlFor="responsibleUserId" error={fe.responsibleUserId}>
+            <Combobox
+              id="responsibleUserId"
+              value={v.responsibleUserId}
+              onChange={(value) => set({ responsibleUserId: value })}
+              options={toOpts(staffOpts)}
+              placeholder={t("fields.selectManager")}
+            />
+          </Field>
+          <Field label={t("fields.orderTitle")} htmlFor="title" error={fe.title}>
+            <input id="title" required className={inputCls} value={v.title} onChange={(e) => set({ title: e.target.value })} />
+          </Field>
+          {v.number && (
+            <Field label={t("fields.orderId")} htmlFor="orderNumber">
+              <input id="orderNumber" className={inputCls} value={v.number} readOnly disabled />
+            </Field>
+          )}
+        </div>
+      </section>
+
+      <section className="mb-8">
+        <SectionRule>{t("requests.sectionRoute")}</SectionRule>
+        <div className={gridCls}>
           <Field label={t("fields.carrier")} htmlFor="carrierId" error={fe.carrierId}>
             <Combobox
               id="carrierId"
@@ -154,18 +249,6 @@ export function OrderForm({
               emptyLabel={t("common.noResults")}
             />
           </Field>
-          <Field label={t("fields.orderTitle")} htmlFor="title" error={fe.title}>
-            <input id="title" required className={inputCls} value={v.title} onChange={(e) => set({ title: e.target.value })} />
-          </Field>
-          <Field label={t("fields.rollbackNumber")} htmlFor="rollbackNumber" error={fe.rollbackNumber}>
-            <input id="rollbackNumber" className={inputCls} value={v.rollbackNumber} onChange={(e) => set({ rollbackNumber: e.target.value })} />
-          </Field>
-        </div>
-      </section>
-
-      <section className="mb-8">
-        <SectionRule>{t("requests.sectionRoute")}</SectionRule>
-        <div className={gridCls}>
           <Field label={t("fields.transportType")} htmlFor="transportFamily" error={fe.transportFamily}>
             <Combobox
               id="transportFamily"
@@ -192,6 +275,7 @@ export function OrderForm({
           cargo={v.cargo}
           onChange={(cargo) => set({ cargo })}
           errors={nested("cargo")}
+          cargoTypeOpts={cargoTypeOpts}
           suggestTempControl={v.legs.some(
             (l) => l.vehicleType === "reefer" || l.containerType === "20rf" || l.containerType === "40rf",
           )}
@@ -235,6 +319,65 @@ export function OrderForm({
                 </p>
               )}
             </Field>
+          )}
+        </div>
+
+        {/* EX1 export declaration. The flag persists on the order; the cost
+            becomes a cost line (category "ex1") on create, and afterwards is
+            managed in the Finance tab like every other expense. */}
+        <div className="mt-4">
+          <label className="flex items-center gap-2 text-[12.5px] text-ink">
+            <input
+              type="checkbox"
+              checked={v.ex1Required}
+              onChange={(e) => set({ ex1Required: e.target.checked })}
+            />
+            {t("fields.ex1Required")}
+          </label>
+          {v.ex1Required && !v.id && (
+            <div className={`${gridCls} mt-3`}>
+              <Field label={t("fields.ex1Cost")} htmlFor="ex1Cost" error={fe.ex1Cost}>
+                <input
+                  id="ex1Cost"
+                  className={inputCls}
+                  placeholder="0.00"
+                  value={v.ex1Cost}
+                  onChange={(e) => set({ ex1Cost: e.target.value })}
+                />
+                {v.ex1Currency !== v.currency && v.ex1Cost.trim() !== "" && (
+                  <p className="mt-1 text-[11px] text-ink-soft">{t("fields.ex1Converted", { currency: v.currency })}</p>
+                )}
+              </Field>
+              <Field label={t("fields.currency")} htmlFor="ex1Currency">
+                <select
+                  id="ex1Currency"
+                  className={inputCls}
+                  value={v.ex1Currency}
+                  onChange={(e) => set({ ex1Currency: e.target.value })}
+                >
+                  {ORDER_CURRENCIES.map((c) => (<option key={c} value={c}>{c}</option>))}
+                </select>
+              </Field>
+              <Field label={t("fields.ex1Document")} htmlFor="ex1Files">
+                <FilePicker
+                  id="ex1Files"
+                  files={ex1Files}
+                  onChange={setEx1Files}
+                  addLabel={t("documents.addFiles")}
+                  emptyLabel={t("documents.noFilesSelected")}
+                  removeLabel={t("fields.remove")}
+                  errorLabels={{
+                    tooLarge: t("documents.tooLarge"),
+                    badType: t("documents.badType"),
+                    emptyFile: t("documents.emptyFile"),
+                  }}
+                  onReject={setUploadError}
+                />
+              </Field>
+            </div>
+          )}
+          {v.ex1Required && v.id && (
+            <p className="mt-1 text-[11.5px] text-ink-soft">{t("fields.ex1FinanceHint")}</p>
           )}
         </div>
 

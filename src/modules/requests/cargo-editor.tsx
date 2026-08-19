@@ -2,8 +2,9 @@
 
 import { useTranslations } from "next-intl";
 import { Field, inputCls } from "@/components/ui/form";
-import { Combobox, MultiCombobox } from "@/components/ui/combobox";
+import { Combobox, MultiCombobox, type ComboOption } from "@/components/ui/combobox";
 import { ORDER_CURRENCIES } from "@/lib/fx";
+import { PACKAGING_TYPES } from "@/lib/packaging-types";
 import { STACKABLE_VALUES } from "@/lib/transport-matrix";
 import { emptyDimension, type CargoDraft, type DimensionDraft } from "./request-form-initial";
 
@@ -42,16 +43,20 @@ export function CargoEditor({
   onChange,
   errors,
   suggestTempControl = false,
+  cargoTypeOpts = [],
 }: {
   cargo: CargoDraft;
   onChange: (next: CargoDraft) => void;
   errors: Record<string, string[]>;
   /** §8: reefer equipment on a leg suggests — never forces — temperature control. */
   suggestTempControl?: boolean;
+  /** The admin-managed cargo-description dictionary; free text stays allowed. */
+  cargoTypeOpts?: ComboOption[];
 }) {
   const t = useTranslations("fields");
   const tr = useTranslations("requests");
   const tst = useTranslations("stackable");
+  const tpk = useTranslations("packagingType");
   const set = (patch: Partial<CargoDraft>) => onChange({ ...cargo, ...patch });
 
   const setDim = (i: number, patch: Partial<DimensionDraft>) =>
@@ -60,10 +65,11 @@ export function CargoEditor({
   return (
     <>
       <Field label={t("cargoDescription")} error={errors.description}>
-        <input
-          className={inputCls}
+        <Combobox
           value={cargo.description}
-          onChange={(e) => set({ description: e.target.value })}
+          onChange={(v) => set({ description: v })}
+          options={cargoTypeOpts}
+          creatable
         />
       </Field>
 
@@ -78,6 +84,13 @@ export function CargoEditor({
             className={inputCls}
             value={cargo.packages}
             onChange={(e) => set({ packages: e.target.value })}
+          />
+        </Field>
+        <Field label={t("packagingType")} error={errors.packagingType}>
+          <Combobox
+            value={cargo.packagingType}
+            onChange={(v) => set({ packagingType: v })}
+            options={PACKAGING_TYPES.map((p) => ({ value: p, label: tpk(p) }))}
           />
         </Field>
         <Field label={t("grossWeight")} error={errors.grossWeightKg}>

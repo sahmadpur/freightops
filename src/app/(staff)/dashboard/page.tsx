@@ -85,11 +85,10 @@ export default async function DashboardPage({
       <RequestKpiSection kpis={kpis} />
 
       <div className="mb-2.5"><span className="eyebrow">{t("operationalOverview")}</span></div>
-      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {metric(t("activeShipments"), d.operational.activeShipments, <IconTruck />)}
-        {metric(t("inOperations"), d.operational.inOperations, <IconClipboard />)}
+        {metric(t("pickupPlanned"), d.operational.pickupPlanned, <IconStamp />)}
         {metric(t("cargoInTransit"), d.operational.cargoInTransit, <IconRoute />)}
-        {metric(t("bookedWithCarrier"), d.operational.bookedWithCarrier, <IconStamp />)}
         {metric(t("unfinishedOrders"), d.operational.unfinishedOrders, <IconClipboard />)}
       </div>
 

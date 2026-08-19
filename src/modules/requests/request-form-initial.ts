@@ -35,6 +35,7 @@ export type CargoDraft = {
   description: string;
   hsCodes: string[];
   packages: string;
+  packagingType: string;
   grossWeightKg: string;
   volumeM3: string;
   dimensions: DimensionDraft[];
@@ -145,6 +146,7 @@ export function emptyCargo(): CargoDraft {
     description: "",
     hsCodes: [],
     packages: "",
+    packagingType: "",
     grossWeightKg: "",
     volumeM3: "",
     dimensions: [],

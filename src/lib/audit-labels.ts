@@ -9,7 +9,6 @@
  */
 export const AUDIT_FIELD_LABELS: Record<string, string> = {
   title: "orderTitle",
-  rollbackNumber: "rollbackNumber",
   accountId: "client",
   carrierId: "carrier",
   transportType: "transportType",

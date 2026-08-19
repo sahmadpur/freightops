@@ -16,7 +16,6 @@ const base = {
   accountId: "acc-123",
   carrierId: "",
   title: "Steel pipes",
-  rollbackNumber: "",
   transportFamily: "road",
   legs: [leg],
   cargo: { description: "Construction materials", packages: "24", grossWeightKg: "8400", volumeM3: "24" },
@@ -138,14 +137,23 @@ describe("orderInputSchema", () => {
 });
 
 describe("statusChangeSchema", () => {
-  it("accepts every stage of the §15 lifecycle", () => {
-    for (const status of ["created", "operations", "booked", "in_transit", "delivered", "closed"]) {
+  it("accepts every stage of the lifecycle", () => {
+    for (const status of [
+      "created",
+      "waiting_pickup",
+      "en_route",
+      "in_transit",
+      "ferry_wait",
+      "at_customs",
+      "delivered",
+      "closed",
+    ]) {
       expect(statusChangeSchema.safeParse({ status }).success).toBe(true);
     }
   });
-  it("rejects the stages retired when the lifecycle was reduced", () => {
-    expect(statusChangeSchema.safeParse({ status: "at_customs" }).success).toBe(false);
-    expect(statusChangeSchema.safeParse({ status: "waiting_pickup" }).success).toBe(false);
+  it("rejects the retired stages", () => {
+    expect(statusChangeSchema.safeParse({ status: "operations" }).success).toBe(false);
+    expect(statusChangeSchema.safeParse({ status: "booked" }).success).toBe(false);
   });
   it("rejects a request status — the two lifecycles are separate", () => {
     expect(statusChangeSchema.safeParse({ status: "lost" }).success).toBe(false);

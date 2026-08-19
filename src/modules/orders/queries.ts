@@ -1,5 +1,5 @@
 import {
-  and, arrayContains, asc, desc, eq, gte, ilike, isNotNull, isNull, lte, or, sql,
+  and, arrayContains, asc, desc, eq, gte, ilike, inArray, isNotNull, isNull, lte, or, sql,
   type SQL, type SQLWrapper,
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -8,6 +8,8 @@ import {
   orders,
   accounts,
   auditLog,
+  cargoTypes,
+  contacts,
   orderStatusEnum,
   modeTypeEnum,
   payments,
@@ -24,6 +26,8 @@ import type { TransportType } from "@/lib/transport-types";
 
 // The carrier is an account too (role "carrier"); alias for joins next to the client.
 const carrierAccounts = alias(accounts, "carrier_accounts");
+// The audit-history join already uses `user`; the responsible manager needs its own.
+const responsibleUsers = alias(user, "responsible_users");
 
 const carrierOptsQuery = () =>
   db
@@ -33,12 +37,20 @@ const carrierOptsQuery = () =>
     .orderBy(accounts.title)
     .limit(1000);
 
+// The client select mirrors the carrier one: only accounts holding the role.
+const clientOptsQuery = () =>
+  db
+    .select({ id: accounts.id, title: accounts.title })
+    .from(accounts)
+    .where(and(isNull(accounts.deletedAt), arrayContains(accounts.roles, ["client"])))
+    .orderBy(accounts.title)
+    .limit(1000);
+
 export type OrderListRow = {
   id: string;
   number: string;
   title: string;
   accountTitle: string;
-  rollbackNumber: string | null;
   fromCountry: string | null;
   toCountry: string | null;
   transportType: TransportType | null;
@@ -105,7 +117,6 @@ function buildConditions(opts: OrderFilters): SQL[] {
       or(
         ilike(orders.number, like),
         ilike(orders.title, like),
-        ilike(orders.rollbackNumber, like),
         ilike(orders.fromCountry, like),
         ilike(orders.toCountry, like),
         ilike(accounts.title, like),
@@ -145,7 +156,6 @@ export async function listOrders(opts: OrderFilters) {
       number: orders.number,
       title: orders.title,
       accountTitle: accounts.title,
-      rollbackNumber: orders.rollbackNumber,
       fromCountry: orders.fromCountry,
       toCountry: orders.toCountry,
       transportType: orders.transportType,
@@ -176,7 +186,6 @@ export async function listOrders(opts: OrderFilters) {
     number: r.number,
     title: r.title,
     accountTitle: r.accountTitle,
-    rollbackNumber: r.rollbackNumber,
     fromCountry: r.fromCountry,
     toCountry: r.toCountry,
     transportType: r.transportType,
@@ -220,6 +229,8 @@ export async function getOrder(id: string) {
       order: orders,
       accountTitle: accounts.title,
       carrierTitle: carrierAccounts.title,
+      contactName: contacts.name,
+      responsibleName: responsibleUsers.name,
       // Joined via requests.orderId so orders converted before orders.request_id
       // existed still show their source request.
       sourceRequestId: requests.id,
@@ -229,6 +240,8 @@ export async function getOrder(id: string) {
     .from(orders)
     .innerJoin(accounts, eq(orders.accountId, accounts.id))
     .leftJoin(carrierAccounts, eq(orders.carrierId, carrierAccounts.id))
+    .leftJoin(contacts, eq(orders.contactId, contacts.id))
+    .leftJoin(responsibleUsers, eq(orders.responsibleUserId, responsibleUsers.id))
     .leftJoin(requests, eq(requests.orderId, orders.id))
     .leftJoin(quotations, eq(orders.quotationId, quotations.id))
     .where(eq(orders.id, id))
@@ -255,17 +268,33 @@ export async function getOrder(id: string) {
 
 /** Dropdown data for the order form. */
 export async function orderFormData() {
-  const [accountOpts, carrierOpts] = await Promise.all([
-    db.select({ id: accounts.id, title: accounts.title }).from(accounts).where(isNull(accounts.deletedAt)).orderBy(accounts.title).limit(1000),
+  const [accountOpts, carrierOpts, staffRows, cargoTypeRows] = await Promise.all([
+    clientOptsQuery(),
     carrierOptsQuery(),
+    db
+      .select({ id: user.id, name: user.name })
+      .from(user)
+      .where(and(eq(user.active, true), inArray(user.role, ["admin", "operator", "supervisor"])))
+      .orderBy(asc(user.name)),
+    db
+      .select({ title: cargoTypes.title })
+      .from(cargoTypes)
+      .where(isNull(cargoTypes.deletedAt))
+      .orderBy(asc(cargoTypes.sortOrder), asc(cargoTypes.title)),
   ]);
-  return { accountOpts, carrierOpts };
+  return {
+    accountOpts,
+    carrierOpts,
+    staffOpts: staffRows.map((u) => ({ id: u.id, title: u.name })),
+    // The description column stores the text itself, so value === label.
+    cargoTypeOpts: cargoTypeRows.map((c) => ({ value: c.title, label: c.title })),
+  };
 }
 
 /** Option lists for the orders-list filter bar. Countries are those actually in use. */
 export async function orderFilterData() {
   const [accountOpts, carrierOpts, countryRows] = await Promise.all([
-    db.select({ id: accounts.id, title: accounts.title }).from(accounts).where(isNull(accounts.deletedAt)).orderBy(accounts.title).limit(1000),
+    clientOptsQuery(),
     carrierOptsQuery(),
     db
       .select({ code: sql<string>`c` })

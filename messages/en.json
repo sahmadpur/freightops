@@ -6,7 +6,9 @@
     "save": "Save",
     "cancel": "Cancel",
     "search": "Search",
-    "noResults": "No matches"
+    "noResults": "No matches",
+    "yes": "Yes",
+    "no": "No"
   },
   "theme": {
     "light": "Light",
@@ -26,7 +28,8 @@
     "sectionLibrary": "Library",
     "sectionManage": "Manage",
     "customs": "Customs",
-    "requests": "Requests"
+    "requests": "Requests",
+    "cargoTypes": "Cargo types"
   },
   "status": {
     "created": "Created",
@@ -35,11 +38,11 @@
     "loaded": "Loaded",
     "transit": "Transit",
     "at_border": "At the border",
-    "at_customs": "At customs",
+    "at_customs": "Customs clearance",
     "arrived": "Arrived",
     "delivered": "Delivered",
     "closed": "Closed",
-    "waiting_pickup": "Waiting for cargo pickup",
+    "waiting_pickup": "Pickup planned",
     "new": "New",
     "in_progress": "In progress",
     "quotation": "Quotation",
@@ -50,7 +53,9 @@
     "cancelled": "Cancelled",
     "operations": "Operations",
     "booked": "Booked with carrier",
-    "in_transit": "In transit"
+    "in_transit": "In transit",
+    "en_route": "En route",
+    "ferry_wait": "Awaiting ferry"
   },
   "preferredChannel": {
     "email": "Email",
@@ -176,7 +181,7 @@
     "carrier": "Carrier",
     "route": "Route",
     "cargoDescription": "Cargo description",
-    "packages": "Packages / units",
+    "packages": "Number of packages",
     "weightKg": "Weight (kg)",
     "volumeM3": "Volume (m³)",
     "incoterms": "Delivery terms (Incoterms 2020)",
@@ -201,7 +206,6 @@
     "carrierInvoiceDate": "Carrier invoice date",
     "exchangeRate": "Exchange rate (AZN)",
     "transportType": "Transport type",
-    "rollbackNumber": "Rollback number",
     "currency": "Currency",
     "selectTransportType": "Select transport type",
     "selectCountry": "Select country",
@@ -295,7 +299,14 @@
     "selectContact": "Select contact…",
     "selectManager": "Select manager…",
     "noContacts": "This company has no contacts yet",
-    "titleAuto": "Generated automatically — editable"
+    "titleAuto": "Generated automatically — editable",
+    "packagingType": "Packaging type",
+    "ex1Required": "EX1 required",
+    "ex1Cost": "EX1 cost",
+    "ex1Document": "EX1 document",
+    "ex1Converted": "Converted to {currency} at the CBAR rate on save",
+    "ex1FinanceHint": "The EX1 cost is managed as an expense line in the Finance tab.",
+    "ex1RateMissing": "No exchange rate available to convert the EX1 cost"
   },
   "companyRoles": {
     "client": "Client",
@@ -334,7 +345,7 @@
     "updateStatus": "Update status",
     "deliveryHistory": "Delivery history",
     "noHistory": "No history yet",
-    "sectionConsignment": "Consignment",
+    "sectionConsignment": "Basic information",
     "sectionCargo": "Cargo",
     "sectionBilling": "Billing",
     "invoiceRequired": "This order has arrived and has no invoice yet.",
@@ -484,7 +495,6 @@
     "financialOverview": "Financial overview",
     "activeShipments": "Active shipments",
     "cargoInTransit": "Cargo in transit",
-    "bookedWithCarrier": "Booked with carrier",
     "unfinishedOrders": "Unfinished orders",
     "revenue": "Revenue",
     "carrierCosts": "Agent expenses",
@@ -504,7 +514,7 @@
     "topRoutes": "Top routes",
     "topClients": "Top clients",
     "clearances": "Clearances",
-    "inOperations": "In operations"
+    "pickupPlanned": "Pickup planned"
   },
   "requestKpi": {
     "title": "Commercial pipeline",
@@ -664,7 +674,13 @@
     "search": "Search",
     "filter": "Filter",
     "noAuditEntries": "No audit entries",
-    "roleSupervisor": "Supervisor"
+    "roleSupervisor": "Supervisor",
+    "cargoTypesTitle": "Cargo types",
+    "cargoTypesHint": "Cargo description dictionary — the options offered by the cargo field",
+    "newCargoType": "New cargo type",
+    "cargoTypeExists": "This cargo type already exists",
+    "archiveCargoType": "Archive",
+    "restoreCargoType": "Restore"
   },
   "transportTypes": {
     "truck": "Truck",
@@ -720,17 +736,19 @@
     "delivery": "Delivery"
   },
   "financeCategory": {
-    "customs": "Customs",
+    "customs": "Customs clearance",
     "broker": "Broker",
     "terminal": "Terminal",
     "warehouse": "Warehouse",
-    "loading": "Loading",
+    "loading": "Loading/Unloading",
     "transport": "Transport",
     "insurance": "Insurance",
     "certification": "Certification",
-    "demurrage": "Demurrage",
+    "demurrage": "Demurrage/Detention",
     "bank_fee": "Bank fee",
-    "other": "Other"
+    "other": "Other",
+    "ex1": "EX1",
+    "customs_duties": "Customs duties"
   },
   "auditAction": {
     "created": "created the order",
@@ -795,6 +813,15 @@
     "quotation": "Quotation",
     "booking": "Booking",
     "follow_up": "Follow-up",
+    "other": "Other"
+  },
+  "packagingType": {
+    "pallet": "Pallet",
+    "box": "Box",
+    "crate": "Crate",
+    "bag": "Bag",
+    "drum": "Drum",
+    "roll": "Roll",
     "other": "Other"
   }
 }

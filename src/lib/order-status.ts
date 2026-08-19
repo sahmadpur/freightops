@@ -5,9 +5,9 @@
  * import it without pulling drizzle into the browser bundle. Labels live in the
  * `status` i18n namespace.
  *
- * "Operations" is deliberate — Appendix D forbids "Execution" as the name of
- * this phase. `booked` is optional in practice: a desk that does not track
- * carrier confirmation separately simply never selects it.
+ * `en_route` is domestic / first-mile movement («В пути»); `in_transit` is the
+ * international main carriage («В транзите») — the client's corrections doc
+ * lists both as distinct stages.
  *
  * Distinct from REQUEST_STATUSES, which answer "what is happening with the
  * enquiry?" rather than "where is the cargo?". The two value sets are disjoint,
@@ -15,9 +15,11 @@
  */
 export const ORDER_STATUSES = [
   "created",
-  "operations",
-  "booked",
+  "waiting_pickup",
+  "en_route",
   "in_transit",
+  "ferry_wait",
+  "at_customs",
   "delivered",
   "closed",
 ] as const;
@@ -36,18 +38,19 @@ export function leastAdvancedStatus(statuses: OrderStatus[]): OrderStatus | null
 }
 
 /**
- * Statuses retired when the lifecycle was reduced to the six above. They no
- * longer appear on any order, but the audit log still holds them as old values,
- * so the history tab must be able to name them — hence they keep their
- * `status.*` message keys and their `--status-*` hues.
+ * Statuses retired across lifecycle revisions. They no longer appear on any
+ * order, but the audit log still holds them as old values, so the history tab
+ * must be able to name them — hence they keep their `status.*` message keys and
+ * their `--status-*` hues. (`waiting_pickup`/`at_customs` were un-retired by
+ * the corrections round; `operations`/`booked` replaced them here.)
  */
 export const RETIRED_ORDER_STATUSES = [
-  "waiting_pickup",
+  "operations",
+  "booked",
   "received",
   "internal_transit",
   "loaded",
   "transit",
   "at_border",
-  "at_customs",
   "arrived",
 ] as const;

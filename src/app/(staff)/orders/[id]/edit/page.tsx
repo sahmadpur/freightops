@@ -6,6 +6,7 @@ import { OrderForm } from "@/modules/orders/order-form";
 import { blankOrderInitial } from "@/modules/orders/order-form-initial";
 import { legacyLegDraft } from "@/modules/orders/shipment-columns";
 import { getOrder, orderFormData } from "@/modules/orders/queries";
+import { contactOptions } from "@/modules/requests/queries";
 import { readCargo, readLegs } from "@/modules/requests/shipment";
 import { cargoDraft, familyOf, legDrafts } from "@/modules/requests/shipment-drafts";
 
@@ -13,7 +14,7 @@ export default async function EditOrderPage({ params }: { params: Promise<{ id: 
   const { id } = await params;
   const t = await getTranslations("orders");
   const tn = await getTranslations("nav");
-  const [data, { accountOpts, carrierOpts }, legRows, cargoRow] = await Promise.all([
+  const [data, { accountOpts, carrierOpts, staffOpts, cargoTypeOpts }, legRows, cargoRow] = await Promise.all([
     getOrder(id),
     orderFormData(),
     readLegs(db, "order", id),
@@ -21,6 +22,11 @@ export default async function EditOrderPage({ params }: { params: Promise<{ id: 
   ]);
   if (!data) notFound();
   const o = data.order;
+  const contactOpts = o.accountId ? await contactOptions(o.accountId) : [];
+  // Keep the saved client visible even if its "client" role was later removed.
+  if (o.accountId && !accountOpts.some((a) => a.id === o.accountId)) {
+    accountOpts.push({ id: o.accountId, title: data.accountTitle ?? o.accountId });
+  }
 
   // An order converted from a request already has its legs. One typed in before
   // transport was structured has only the flat columns — seed a leg from them so
@@ -42,10 +48,13 @@ export default async function EditOrderPage({ params }: { params: Promise<{ id: 
   const initial = {
     ...blankOrderInitial(),
     id: o.id,
+    number: o.number,
     accountId: o.accountId,
+    contactId: o.contactId ?? "",
+    responsibleUserId: o.responsibleUserId ?? "",
     carrierId: o.carrierId ?? "",
     title: o.title,
-    rollbackNumber: o.rollbackNumber ?? "",
+    ex1Required: o.ex1Required,
     transportFamily: seeded ? seeded.transportType : familyOf(legRows),
     legs,
     cargo,
@@ -57,7 +66,14 @@ export default async function EditOrderPage({ params }: { params: Promise<{ id: 
   return (
     <div className="mx-auto max-w-[1400px]">
       <PageHeader eyebrow={tn("orders")} title={t("editOrder")} />
-      <OrderForm initial={initial} accountOpts={accountOpts} carrierOpts={carrierOpts} />
+      <OrderForm
+        initial={initial}
+        accountOpts={accountOpts}
+        carrierOpts={carrierOpts}
+        staffOpts={staffOpts}
+        contactOpts={contactOpts}
+        cargoTypeOpts={cargoTypeOpts}
+      />
     </div>
   );
 }

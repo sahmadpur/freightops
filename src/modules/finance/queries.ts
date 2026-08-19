@@ -259,10 +259,10 @@ export async function dashboardData(month?: string) {
     year,
     operational: {
       activeShipments: active,
-      cargoInTransit: count("in_transit"),
-      bookedWithCarrier: count("booked"),
+      cargoInTransit:
+        count("en_route") + count("in_transit") + count("ferry_wait") + count("at_customs"),
+      pickupPlanned: count("waiting_pickup"),
       unfinishedOrders: count("delivered"),
-      inOperations: count("operations"),
     },
     statusCounts: orderStatusList().map((s) => ({ status: s, count: count(s) })),
     financial: totals,

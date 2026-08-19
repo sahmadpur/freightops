@@ -4,7 +4,9 @@
  * Labels live in the `financeCategory` i18n namespace.
  */
 export const FINANCE_CATEGORIES = [
+  "ex1",
   "customs",
+  "customs_duties",
   "broker",
   "terminal",
   "warehouse",

@@ -74,7 +74,7 @@ export default async function OrderDetailPage({
       listTasks("order", id),
       taskAssigneeOptions(),
     ]);
-  const { order, accountTitle, carrierTitle, history, sourceRequestId, sourceRequestNumber, sourceQuotationVersion } = data;
+  const { order, accountTitle, carrierTitle, contactName, responsibleName, history, sourceRequestId, sourceRequestNumber, sourceQuotationVersion } = data;
   const route = routeLabel(order.fromCountry, order.toCountry, locale);
   // Delivery is the trigger to bill the client (requirement #13).
   const invoiceDue =
@@ -89,7 +89,8 @@ export default async function OrderDetailPage({
         <SectionRule>{t("orders.sectionConsignment")}</SectionRule>
         <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
           <DefRow label={t("fields.client")} value={accountTitle} />
-          <DefRow label={t("fields.rollbackNumber")} value={order.rollbackNumber} />
+          <DefRow label={t("fields.contactPerson")} value={contactName} />
+          <DefRow label={t("fields.responsibleManager")} value={responsibleName} />
           <DefRow label={t("fields.carrier")} value={carrierTitle} />
           {legs.length === 0 && (
             <>
@@ -101,6 +102,10 @@ export default async function OrderDetailPage({
             </>
           )}
           <DefRow label={t("fields.incoterms")} value={order.incoterms} />
+          <DefRow
+            label={t("fields.ex1Required")}
+            value={order.ex1Required ? t("common.yes") : t("common.no")}
+          />
         </dl>
       </section>
       {legs.length > 0 ? (
